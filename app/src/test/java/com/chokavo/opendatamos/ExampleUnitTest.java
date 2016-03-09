@@ -1,4 +1,4 @@
-package com.chokavo.opendatamos;
+package com.chokavo.chosportsman;
 
 import org.junit.Test;
 

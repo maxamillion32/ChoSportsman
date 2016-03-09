@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "com.chokavo.opendatamos"
+        applicationId "com.chokavo.chosportsman"
         minSdkVersion 14
         targetSdkVersion 23
         versionCode 1
@@ -29,4 +29,7 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta4'
     compile 'com.squareup.okhttp3:okhttp:3.1.2'
     compile 'org.jetbrains:annotations:13.0'
+    compile 'com.vk:androidsdk:+'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'de.hdodenhof:circleimageview:2.0.0'
 }

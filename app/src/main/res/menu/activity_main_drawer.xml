@@ -3,33 +3,33 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_tariffs"
+            android:id="@+id/nav_open_data"
             android:icon="@drawable/ic_attach_money_24dp"
-            android:title="Тарифы"/>
+            android:title="Открытые данные"/>
         <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery"/>
-        <item
+            android:id="@+id/nav_cloakroom"
+            android:icon="@drawable/ic_account_box_24dp"
+            android:title="Моя раздевалка"/>
+       <!-- <item
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic_menu_slideshow"
             android:title="Slideshow"/>
         <item
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Tools"/>
+            android:title="Tools"/>-->
     </group>
 
     <item android:title="Communicate">
         <menu>
             <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share"/>
+                android:id="@+id/nav_news"
+                android:icon="@drawable/ic_question_answer_24dp"
+                android:title="Новости"/>
             <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send"/>
+                android:id="@+id/nav_calendar"
+                android:icon="@drawable/ic_today_24dp"
+                android:title="Календарь"/>
         </menu>
     </item>
 
