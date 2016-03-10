@@ -37,6 +37,10 @@
             android:name=".ui.activities.OpenDataActivity"
             android:label="Спортивные сооружения">
         </activity>
+        <activity
+            android:name=".ui.activities.calendar.CalendarActivity"
+            android:label="Календарь">
+        </activity>
     </application>
 
 </manifest>

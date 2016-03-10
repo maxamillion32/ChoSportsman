@@ -11,7 +11,7 @@ import com.chokavo.chosportsman.Constants;
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.network.RestInterface;
-import com.chokavo.chosportsman.network.datarows.SportObjectsDataRow;
+import com.chokavo.chosportsman.network.datarows.SportObjectDataRow;
 import com.chokavo.chosportsman.ui.adapters.SportObjectAdapter;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 
@@ -71,16 +71,16 @@ public class OpenDataActivity extends NavigationDrawerActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         RestInterface restInterface = retrofit.create(RestInterface.class);
-        Call<List<SportObjectsDataRow>> call = restInterface.getDataSet(
+        Call<List<SportObjectDataRow>> call = restInterface.getDataSet(
                 Constants.SPORT_OBJECTS_DATASET_ID,
                 5,
                 (int) (Math.random()*10),
                 null,
                 "Number"
         );
-        call.enqueue(new Callback<List<SportObjectsDataRow>>() {
+        call.enqueue(new Callback<List<SportObjectDataRow>>() {
             @Override
-            public void onResponse(Call<List<SportObjectsDataRow>> call, Response<List<SportObjectsDataRow>> response) {
+            public void onResponse(Call<List<SportObjectDataRow>> call, Response<List<SportObjectDataRow>> response) {
                 Log.e("RETRO", "onResponse: " + response.toString());
                 DataManager.getInstance().sportObjects = response.body();
                 SportObjectAdapter adapter = new SportObjectAdapter(DataManager.getInstance().sportObjects);
@@ -90,7 +90,7 @@ public class OpenDataActivity extends NavigationDrawerActivity {
             }
 
             @Override
-            public void onFailure(Call<List<SportObjectsDataRow>> call, Throwable t) {
+            public void onFailure(Call<List<SportObjectDataRow>> call, Throwable t) {
                 Log.e("RETRO", "onFailure: "+t.toString());
                 mSwipeRefresh.setRefreshing(false);
                 ImageSnackbar.make(mSwipeRefresh, ImageSnackbar.TYPE_ERROR, String.format("Возникла ошибка при загрузке данных"), Snackbar.LENGTH_SHORT).show();

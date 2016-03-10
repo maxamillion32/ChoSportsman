@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Created by repitch on 09.03.16.
  */
-public class SportObjectsMoscowCells extends BaseCells {
+public class SportObjectCells extends BaseCells {
 
     @SerializedName("CommonName")
     @Expose

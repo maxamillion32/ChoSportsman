@@ -1,7 +1,5 @@
 package com.chokavo.chosportsman.ui.adapters;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,11 +8,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.chokavo.chosportsman.App;
 import com.chokavo.chosportsman.AppUtils;
 import com.chokavo.chosportsman.R;
-import com.chokavo.chosportsman.network.cells.SportObjectsMoscowCells;
-import com.chokavo.chosportsman.network.datarows.SportObjectsDataRow;
+import com.chokavo.chosportsman.network.cells.SportObjectCells;
+import com.chokavo.chosportsman.network.datarows.SportObjectDataRow;
 
 import java.util.List;
 
@@ -23,9 +20,9 @@ import java.util.List;
  */
 public class SportObjectAdapter extends RecyclerView.Adapter<SportObjectAdapter.ViewHolder> {
 
-    List<SportObjectsDataRow> mDataRows;
+    List<SportObjectDataRow> mDataRows;
 
-    public SportObjectAdapter(List<SportObjectsDataRow> dataRows) {
+    public SportObjectAdapter(List<SportObjectDataRow> dataRows) {
         mDataRows = dataRows;
     }
 
@@ -55,8 +52,8 @@ public class SportObjectAdapter extends RecyclerView.Adapter<SportObjectAdapter.
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final SportObjectsDataRow dataRow = mDataRows.get(position);
-        final SportObjectsMoscowCells cell = dataRow.getCells();
+        final SportObjectDataRow dataRow = mDataRows.get(position);
+        final SportObjectCells cell = dataRow.getCells();
         holder.mTxtTitle.setText(cell.getCommonName());
         holder.mTxtAddress.setText(cell.getFullAddress());
         holder.mTxtWorkingHours.setText(cell.getWorkingHours());

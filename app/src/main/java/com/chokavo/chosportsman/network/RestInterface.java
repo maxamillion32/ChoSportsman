@@ -1,7 +1,6 @@
 package com.chokavo.chosportsman.network;
 
-import com.chokavo.chosportsman.network.datarows.BaseDataRow;
-import com.chokavo.chosportsman.network.datarows.SportObjectsDataRow;
+import com.chokavo.chosportsman.network.datarows.SportObjectDataRow;
 
 import java.util.List;
 
@@ -16,7 +15,7 @@ import retrofit2.http.Query;
 public interface RestInterface {
 
     @GET("datasets/{id}/rows")
-    Call<List<SportObjectsDataRow>> getDataSet(
+    Call<List<SportObjectDataRow>> getDataSet(
             @Path("id") Integer dataSetId,
             @Query("$top") Integer top,
             @Query("$skip") Integer skip,

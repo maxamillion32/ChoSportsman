@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.models.DataManager;
+import com.chokavo.chosportsman.ui.activities.calendar.CalendarActivity;
 import com.squareup.picasso.Picasso;
 import com.vk.sdk.VKSdk;
 import com.vk.sdk.api.model.VKApiUserFull;
@@ -83,7 +84,9 @@ public abstract class NavigationDrawerActivity extends BaseActivity implements N
         } else if (id == R.id.nav_news) {
             Toast.makeText(this, "Пока не доступно", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_calendar) {
-            Toast.makeText(this, "Пока не доступно", Toast.LENGTH_SHORT).show();
+            if (!(this instanceof CalendarActivity)) {
+                startActivity(new Intent(this, CalendarActivity.class));
+            }
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

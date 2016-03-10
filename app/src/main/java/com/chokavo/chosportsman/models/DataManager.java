@@ -1,6 +1,6 @@
 package com.chokavo.chosportsman.models;
 
-import com.chokavo.chosportsman.network.datarows.SportObjectsDataRow;
+import com.chokavo.chosportsman.network.datarows.SportObjectDataRow;
 import com.vk.sdk.api.model.VKApiUserFull;
 
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class DataManager {
 
-    public List<SportObjectsDataRow> sportObjects;
+    public List<SportObjectDataRow> sportObjects;
     public VKApiUserFull vkUser;
 
     private static DataManager ourInstance = new DataManager();

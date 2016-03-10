@@ -32,4 +32,5 @@ dependencies {
     compile 'com.vk:androidsdk:+'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'de.hdodenhof:circleimageview:2.0.0'
+    compile 'com.p_v:flexiblecalendar:1.1.4'
 }

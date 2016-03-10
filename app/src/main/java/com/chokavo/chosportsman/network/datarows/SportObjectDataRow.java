@@ -1,21 +1,22 @@
 
 package com.chokavo.chosportsman.network.datarows;
 
+import com.chokavo.chosportsman.network.cells.SportObjectCells;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class SportObjectsDataRow extends BaseDataRow{
+public class SportObjectDataRow extends BaseDataRow{
 
     @SerializedName("Cells")
     @Expose
-    private com.chokavo.chosportsman.network.cells.SportObjectsMoscowCells Cells;
+    private SportObjectCells Cells;
 
     /**
      * 
      * @return
      *     The Cells
      */
-    public com.chokavo.chosportsman.network.cells.SportObjectsMoscowCells getCells() {
+    public SportObjectCells getCells() {
         return Cells;
     }
 
@@ -24,7 +25,7 @@ public class SportObjectsDataRow extends BaseDataRow{
      * @param Cells
      *     The Cells
      */
-    public void setCells(com.chokavo.chosportsman.network.cells.SportObjectsMoscowCells Cells) {
+    public void setCells(SportObjectCells Cells) {
         this.Cells = Cells;
     }
 
