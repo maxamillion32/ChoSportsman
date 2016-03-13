@@ -20,7 +20,7 @@
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_gravity="center_horizontal"
-            android:src="@drawable/ic_launcher_2"/>
+            android:src="@drawable/ic_social_vk"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -50,7 +50,8 @@
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:text="@string/sign_with_vk"
-            android:textColor="@color/vk_white"/>
+            android:textColor="@color/vk_white"
+            android:id="@+id/sign_vk_btn"/>
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton

@@ -1,5 +1,6 @@
 package com.chokavo.chosportsman.ui.activities;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,7 +23,8 @@ public class ChooseSportsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_choose_sports);
         Toolbar mActionBarToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mActionBarToolbar);
-        mActionBarToolbar.setTitle(R.string.choose_sport_please);
+        if (getSupportActionBar()!=null)
+            getSupportActionBar().setTitle(R.string.choose_sport_please);
 
         loadSports();
         RecyclerView recyclerView = (RecyclerView)findViewById(R.id.choose_sports_recview);
@@ -49,7 +51,8 @@ public class ChooseSportsActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_continue) {
-
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
             return true;
         }
 
@@ -66,5 +69,11 @@ public class ChooseSportsActivity extends AppCompatActivity {
         mSportKindFactory.addSportKind(voleyball);
         mSportKindFactory.addSportKind(hockey);
         mSportKindFactory.addSportKind(basketball);
+    }
+
+    @Override
+    protected void onDestroy() {
+        mSportKindFactory.clear();
+        super.onDestroy();
     }
 }

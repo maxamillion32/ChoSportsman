@@ -35,4 +35,8 @@ public class SportKindFactory {
     public void addSportKind(SportKind sport) {
         mSportKinds.add(sport);
     }
+
+    public void clear(){
+        mSportKinds.clear();
+    }
 }
