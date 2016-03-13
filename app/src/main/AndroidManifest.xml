@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.chokavo.chosportsman"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.chokavo.chosportsman" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher_2"
         android:label="@string/app_name"
-        android:name=".App"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.NoActionBar">
+        android:theme="@style/AppTheme.NoActionBar" >
         <activity
-            android:name="com.chokavo.chosportsman.ui.activities.MainActivity"
-            android:label="@string/app_name">
+            android:name=".ui.activities.MainActivity"
+            android:label="@string/app_name" >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
@@ -26,20 +26,28 @@
             android:label="ServiceActivity"
             android:theme="@style/VK.Transparent" />
         <activity
-            android:name="com.chokavo.chosportsman.ui.activities.CloakRoomActivity"
-            android:label="Моя раздевалка">
+            android:name=".ui.activities.CloakRoomActivity"
+            android:label="Моя раздевалка" >
         </activity>
         <activity
-            android:name="com.chokavo.chosportsman.ui.activities.VKAuthActivity"
-            android:label="Войти ВК">
+            android:name=".ui.activities.VKAuthActivity"
+            android:label="Войти ВК" >
         </activity>
         <activity
             android:name=".ui.activities.OpenDataActivity"
-            android:label="Спортивные сооружения">
+            android:label="Спортивные сооружения" >
         </activity>
         <activity
             android:name=".ui.activities.calendar.CalendarActivity"
-            android:label="Календарь">
+            android:label="Календарь" >
+        </activity>
+        <activity
+            android:name=".ui.activities.HelloScreenActivity"
+            android:label="@string/title_activity_hello_screen" >
+        </activity>
+        <activity
+            android:name=".ui.activities.ChooseSportsActivity"
+            android:label="@string/title_activity_choose_sports" >
         </activity>
     </application>
 

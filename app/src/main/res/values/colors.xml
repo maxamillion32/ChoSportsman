@@ -15,4 +15,6 @@
     <color name="black_20">#33000000</color>
     <color name="black_10">#1a000000</color>
     <color name="black_00">#00000000</color>
+
+    <color name="vk_color_darker">#4c6193</color>
 </resources>

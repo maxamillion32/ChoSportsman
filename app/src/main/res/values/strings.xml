@@ -9,4 +9,10 @@
     <string name="to_hide">спрятать</string>
 
     <integer name="com_vk_sdk_AppId">5336623</integer>
+    <string name="title_activity_hello_screen">HelloScreenActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="sign_with_vk">Войти через Вконтакте</string>
+    <string name="title_activity_choose_sports">ChooseSportsActivity</string>
+    <string name="choose_sport_please">Выберите виды спорта, которые вам по душе</string>
 </resources>
