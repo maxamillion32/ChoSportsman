@@ -17,6 +17,10 @@ import com.chokavo.chosportsman.R;
  * Created by ilyapyavkin on 02.03.16.
  */
 public abstract class BaseActivity extends AppCompatActivity {
+
+    public static final int MY_PERMISSIONS_REQUEST_READ_CALENDAR = 1;
+    public static final int MY_PERMISSIONS_REQUEST_ACCOUNTS = 2;
+
     public void launchActivityWithSharedElement(Class activity, View sharedElement, Bundle args) {
         Intent intent = new Intent(this, activity);
         // Pass data object in the bundle and populate details activity.
@@ -64,5 +68,10 @@ public abstract class BaseActivity extends AppCompatActivity {
         Log.e("STATES", "onCreate by " + this.getClass());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

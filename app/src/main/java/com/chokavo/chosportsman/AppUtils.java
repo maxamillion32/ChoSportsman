@@ -1,22 +1,10 @@
 package com.chokavo.chosportsman;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
-import android.support.design.widget.Snackbar;
-
-import com.chokavo.chosportsman.models.DataManager;
-import com.chokavo.chosportsman.ui.views.ImageSnackbar;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.RequestCreator;
-import com.vk.sdk.api.VKApi;
-import com.vk.sdk.api.VKApiConst;
-import com.vk.sdk.api.VKParameters;
-import com.vk.sdk.api.VKRequest;
-import com.vk.sdk.api.VKResponse;
-import com.vk.sdk.api.model.VKApiUserFull;
-import com.vk.sdk.api.model.VKList;
-
-import java.util.Locale;
 
 /**
  * Created by repitch on 06.03.16.
@@ -43,4 +31,16 @@ public class AppUtils {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         App.getInstance().startActivity(intent);
     }
+
+    /**
+     * Checks whether the device currently has a network connection.
+     * @return true if the device has a network connection, false otherwise.
+     */
+    public static boolean isDeviceOnline() {
+        ConnectivityManager connMgr =
+                (ConnectivityManager) App.getInstance().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        return (networkInfo != null && networkInfo.isConnected());
+    }
+
 }

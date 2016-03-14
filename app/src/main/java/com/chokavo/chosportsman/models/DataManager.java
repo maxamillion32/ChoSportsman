@@ -12,6 +12,7 @@ public class DataManager {
 
     public List<SportObjectDataRow> sportObjects;
     public VKApiUserFull vkUser;
+    public String googleAccount;
 
     private static DataManager ourInstance = new DataManager();
 

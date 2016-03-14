@@ -1,10 +1,9 @@
 package com.chokavo.chosportsman;
 
 import android.app.Application;
-import android.util.Log;
 
+import com.chokavo.chosportsman.models.SharedPrefsManager;
 import com.vk.sdk.VKSdk;
-import com.vk.sdk.util.VKUtil;
 
 
 public class App extends Application {
@@ -16,6 +15,7 @@ public class App extends Application {
         super.onCreate();
 
         application = this;
+        SharedPrefsManager.restoreGoogleAccount();
 
         // Инициализация VK
         VKSdk.initialize(this);

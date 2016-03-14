@@ -28,7 +28,7 @@ public abstract class NavigationDrawerActivity extends BaseActivity implements N
 
     protected NavigationView mNavigationView;
     protected ImageView mImgNavAvatar;
-    protected TextView mTxtNavName;
+    protected TextView mTxtNavName, mTxtNavEmail;
 
     protected void onCreate(int resId, int checkedMenuItem) {
         setContentView(resId);
@@ -53,6 +53,7 @@ public abstract class NavigationDrawerActivity extends BaseActivity implements N
         View header = mNavigationView.getHeaderView(0);
         mImgNavAvatar = (ImageView) header.findViewById(R.id.img_nav_avatar);
         mTxtNavName = (TextView) header.findViewById(R.id.txt_nav_name);
+        mTxtNavEmail = (TextView) header.findViewById(R.id.txt_nav_email);
         mNavigationView.setNavigationItemSelectedListener(this);
 
         if (VKSdk.isLoggedIn()) {
@@ -64,6 +65,10 @@ public abstract class NavigationDrawerActivity extends BaseActivity implements N
             Picasso.with(this)
                     .load(vkUser.photo_200)
                     .into(mImgNavAvatar);
+        }
+
+        if (DataManager.getInstance().googleAccount != null) {
+            mTxtNavEmail.setText(DataManager.getInstance().googleAccount);
         }
     }
 
