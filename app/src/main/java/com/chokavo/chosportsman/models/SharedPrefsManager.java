@@ -15,8 +15,6 @@ public final class SharedPrefsManager {
     @NonNls
     private final String PREFS = "PREFS";
 
-    @NonNls
-    private static final String GOOGLE_ACCOUNT = "GOOGLE_ACCOUNT";
 
     private static SharedPrefsManager manager;
     private SharedPreferences preferences;
@@ -34,6 +32,15 @@ public final class SharedPrefsManager {
     /**
      * GOOGLE_ACCOUNT
      */
+    @NonNls
+    private static final String GOOGLE_ACCOUNT = "GOOGLE_ACCOUNT";
+
+    public static void removeGoogleAccount() {
+        getInstance().preferences
+                .edit()
+                .putString(GOOGLE_ACCOUNT, null)
+                .commit();
+    }
 
     public static void saveGoogleAccount() {
         getInstance().preferences

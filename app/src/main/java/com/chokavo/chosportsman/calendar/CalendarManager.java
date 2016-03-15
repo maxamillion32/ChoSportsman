@@ -61,7 +61,7 @@ public class CalendarManager {
         Intent intent = new Intent(Intent.ACTION_INSERT)
                 .setData(Events.CONTENT_URI);
         intent.putExtra(Events.EVENT_COLOR, Color.RED);
-        activity.startActivityForResult(intent, CalendarActivity.ADD_EVENT);
+        activity.startActivity(intent);
     }
 
     static Uri asSyncAdapter(Uri uri, String account, String accountType) {
@@ -87,10 +87,6 @@ public class CalendarManager {
 //        Uri uri = CalendarContract.Calendars.CONTENT_URI;
         Uri uri = asSyncAdapter(CalendarContract.Calendars.CONTENT_URI, DataManager.getInstance().googleAccount, ACCOUNT_TYPE_GOOGLE);
         String selection = "((" + CalendarContract.Calendars.ACCOUNT_TYPE + " = ?) AND (" + CalendarContract.Calendars.ACCOUNT_NAME + " = ?))";
-       /* String[] selectionArgs = new String[]{"ilyapya@gmail.com", "com.google",
-                "ilyapya@gmail.com"};*/
-        /*String[] selectionArgs = new String[]{null, "com.google",
-                null};*/
         String[] selectionArgs = {ACCOUNT_TYPE_GOOGLE, DataManager.getInstance().googleAccount};
 // Submit the query and get a Cursor object back.
 

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/vk_white"
+              android:orientation="vertical">
+
+    <com.chokavo.chosportsman.ui.widgets.NewEventRowView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:desc="Вид спорта"
+        app:type_icon="@drawable/ic_account_box_24dp"
+        app:value="Баскетбол"
+        />
+
+    <com.chokavo.chosportsman.ui.widgets.NewEventRowView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:desc="Дата"
+        app:type_icon="@drawable/ic_add_black_24dp"
+        app:value="29.03.16"
+        />
+
+    <com.chokavo.chosportsman.ui.widgets.NewEventRowView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:desc="Время начала"
+        app:type_icon="@drawable/ic_account_box_24dp"
+        app:value="18:00"
+        />
+
+    <com.chokavo.chosportsman.ui.widgets.NewEventRowView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:desc="Время окончания"
+        app:type_icon="@drawable/ic_add_black_24dp"
+        app:value="19:30"
+        />
+</LinearLayout>

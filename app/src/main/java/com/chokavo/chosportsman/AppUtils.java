@@ -43,4 +43,10 @@ public class AppUtils {
         return (networkInfo != null && networkInfo.isConnected());
     }
 
+    public static String getApplicationName() {
+        Context context = App.getInstance();
+        int stringId = context.getApplicationInfo().labelRes;
+        return context.getString(stringId);
+    }
+
 }

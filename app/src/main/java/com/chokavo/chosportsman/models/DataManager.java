@@ -13,6 +13,7 @@ public class DataManager {
     public List<SportObjectDataRow> sportObjects;
     public VKApiUserFull vkUser;
     public String googleAccount;
+    public String calendarId; // id for a google calendar
 
     private static DataManager ourInstance = new DataManager();
 

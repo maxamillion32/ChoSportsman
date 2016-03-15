@@ -23,6 +23,7 @@ import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.models.SharedPrefsManager;
 import com.chokavo.chosportsman.ui.activities.BaseActivity;
 import com.chokavo.chosportsman.ui.activities.NavigationDrawerActivity;
+import com.chokavo.chosportsman.ui.fragments.NewEventFragment;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.util.ExponentialBackOff;
@@ -121,7 +122,7 @@ public class CalendarActivity extends NavigationDrawerActivity {
         mFabAddEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CalendarManager.getInstance(CalendarActivity.this).addEvent(CalendarActivity.this);
+                launchFragment(new NewEventFragment(), NewEventFragment.class.getName());
             }
         });
 
@@ -158,6 +159,7 @@ public class CalendarActivity extends NavigationDrawerActivity {
         } else {
             if (AppUtils.isDeviceOnline()) {
 //                new MakeRequestTask(mCredential).execute();
+                CalendarManager.getInstance(this).testCalendar();
                 Log.e("A", "execute async");
             } else {
                 ImageSnackbar.make(mCalendarView, ImageSnackbar.TYPE_ERROR, "Нет интернет-соединения", Snackbar.LENGTH_SHORT).show();
