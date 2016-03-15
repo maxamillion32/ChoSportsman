@@ -1,6 +1,7 @@
 package com.chokavo.chosportsman.ui.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -14,6 +15,9 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.chokavo.chosportsman.R;
+import com.vk.sdk.VKSdk;
+
+import java.util.Set;
 
 public class MainActivity extends NavigationDrawerActivity {
 
@@ -21,6 +25,20 @@ public class MainActivity extends NavigationDrawerActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         super.onCreate(R.layout.activity_main, NAV_NO_CHOSEN);
+        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        int userId = preferences.getInt(getString(R.string.vk_user_id), -1);
+        if (!VKSdk.isLoggedIn() || (userId == -1)) {
+            Intent intent = new Intent(getApplicationContext(), HelloScreenActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        }
+
+        Set<String> sportKinds = preferences.getStringSet(getString(R.string.sport_kinds), null);
+        if (sportKinds == null) {
+            Intent intent = new Intent(getApplicationContext(), ChooseSportsActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

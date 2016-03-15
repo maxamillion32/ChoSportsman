@@ -1,8 +1,10 @@
 package com.chokavo.chosportsman.ui.activities;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -13,10 +15,16 @@ import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.models.SportKind;
 import com.chokavo.chosportsman.models.SportKindFactory;
 import com.chokavo.chosportsman.ui.adapters.ChooseSportsAdapter;
+import com.chokavo.chosportsman.ui.adapters.SportObjectAdapter;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class ChooseSportsActivity extends AppCompatActivity {
     SportKindFactory mSportKindFactory;
-
+    RecyclerView recyclerView;
+    ChooseSportsAdapter adapter;
+    LinearLayoutManager layoutManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,9 +35,9 @@ public class ChooseSportsActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(R.string.choose_sport_please);
 
         loadSports();
-        RecyclerView recyclerView = (RecyclerView)findViewById(R.id.choose_sports_recview);
-        ChooseSportsAdapter adapter = new ChooseSportsAdapter(mSportKindFactory.getSportKinds());
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView = (RecyclerView)findViewById(R.id.choose_sports_recview);
+        adapter = new ChooseSportsAdapter(mSportKindFactory.getSportKinds());
+        layoutManager = new LinearLayoutManager(this);
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(layoutManager);
@@ -51,6 +59,21 @@ public class ChooseSportsActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_continue) {
+            Set<String> mCheckedSports = new HashSet<>();
+            boolean isEmpty = true;
+            for (int i = 0; i < mSportKindFactory.getSportKinds().size(); i++) {
+                if (mSportKindFactory.getSportKinds().get(i).isChecked()) {
+                    mCheckedSports.add(mSportKindFactory.getSportKinds().get(i).getName());
+                    if (isEmpty)
+                        isEmpty = false;
+                }
+            }
+            if (isEmpty) {
+                Snackbar.make(recyclerView, "Выберите хотя бы один вид спорта", Snackbar.LENGTH_LONG).show();
+                return false;
+            }
+            SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+            preferences.edit().putStringSet("Checked sportkinds",mCheckedSports);
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);
             return true;

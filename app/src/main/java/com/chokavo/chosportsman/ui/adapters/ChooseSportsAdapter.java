@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.chokavo.chosportsman.R;
@@ -31,8 +32,14 @@ public class ChooseSportsAdapter extends RecyclerView.Adapter<ChooseSportsAdapte
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        SportKind sport = sports.get(position);
+        final SportKind sport = sports.get(position);
         holder.sportKindName.setText(sport.getName());
+        holder.isChoosed.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                sport.setChecked(isChecked);
+            }
+        });
     }
 
     @Override
@@ -42,8 +49,8 @@ public class ChooseSportsAdapter extends RecyclerView.Adapter<ChooseSportsAdapte
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView sportKindName;
-        private CheckBox isChoosed;
+        public TextView sportKindName;
+        public CheckBox isChoosed;
 
         public ViewHolder(View itemView) {
             super(itemView);

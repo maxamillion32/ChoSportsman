@@ -5,13 +5,23 @@ package com.chokavo.chosportsman.models;
  */
 public class SportKind {
 
-    private String name;
+    private String mName;
 
     public SportKind(String name) {
-        this.name = name;
+        mName = name;
     }
 
     public String getName() {
-        return name;
+        return mName;
+    }
+
+    private boolean mChecked;
+
+    public boolean isChecked() {
+        return mChecked;
+    }
+
+    public void setChecked(boolean checked) {
+        mChecked = checked;
     }
 }

@@ -1,5 +1,8 @@
 package com.chokavo.chosportsman.models;
 
+import android.content.SharedPreferences;
+
+import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.network.datarows.SportObjectDataRow;
 import com.vk.sdk.api.model.VKApiUserFull;
 
@@ -10,8 +13,10 @@ import java.util.List;
  */
 public class DataManager {
 
-    public List<SportObjectDataRow> sportObjects;
-    public VKApiUserFull vkUser;
+    private List<SportObjectDataRow> sportObjects;
+    private VKApiUserFull vkUser;
+    private List<SportKind> mSportKinds;
+    private List<SportKind> mUserSports;
 
     private static DataManager ourInstance = new DataManager();
 
@@ -20,5 +25,10 @@ public class DataManager {
     }
 
     private DataManager() {
+
+    }
+
+    public void setVkUser(VKApiUserFull vkUser) {
+        this.vkUser = vkUser;
     }
 }

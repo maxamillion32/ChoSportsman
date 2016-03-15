@@ -15,4 +15,6 @@
     <string name="sign_with_vk">Войти через Вконтакте</string>
     <string name="title_activity_choose_sports">ChooseSportsActivity</string>
     <string name="choose_sport_please">Выберите виды спорта, которые вам по душе</string>
+    <string name="vk_user_id">VkUserId</string>
+    <string name="sport_kinds">SportKinds</string>
 </resources>
