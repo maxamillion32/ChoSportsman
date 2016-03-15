@@ -75,8 +75,8 @@ public class HelloScreenActivity extends AppCompatActivity {
 // Пользователь успешно авторизовался
                 Log.e(HelloScreenActivity.class.getSimpleName(), "VKSdk onResult");
                 saveUser();
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                Intent intent = new Intent(getApplicationContext(), ChooseSportsActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }
 
@@ -98,11 +98,7 @@ public class HelloScreenActivity extends AppCompatActivity {
             public void onComplete(VKResponse response) {
                 VKList<VKApiUserFull> vkUsers = ((VKList) response.parsedModel);
                 VKApiUserFull vkUser = vkUsers.get(0);
-                DataManager.getInstance().setVkUser(vkUser);
-                SharedPreferences preferences = getPreferences(MODE_PRIVATE);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putInt(getString(R.string.vk_user_id), vkUser.getId());
-                editor.apply();
+                DataManager.getInstance().setVkUser(vkUser, getString(R.string.vk_user_id));
                 super.onComplete(response);
             }
         });

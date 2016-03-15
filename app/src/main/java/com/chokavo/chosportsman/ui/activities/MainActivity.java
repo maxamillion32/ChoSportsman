@@ -3,6 +3,7 @@ package com.chokavo.chosportsman.ui.activities;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -10,13 +11,17 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.chokavo.chosportsman.App;
 import com.chokavo.chosportsman.R;
+import com.chokavo.chosportsman.models.DataManager;
 import com.vk.sdk.VKSdk;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class MainActivity extends NavigationDrawerActivity {
@@ -25,18 +30,20 @@ public class MainActivity extends NavigationDrawerActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         super.onCreate(R.layout.activity_main, NAV_NO_CHOSEN);
-        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        SharedPreferences preferences = DataManager.getInstance().mPreferences;
         int userId = preferences.getInt(getString(R.string.vk_user_id), -1);
+        Log.d(App.TAG, Boolean.toString(VKSdk.isLoggedIn()));
+        boolean isHelloStarted = false;
         if (!VKSdk.isLoggedIn() || (userId == -1)) {
             Intent intent = new Intent(getApplicationContext(), HelloScreenActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
+            isHelloStarted = true;
         }
-
         Set<String> sportKinds = preferences.getStringSet(getString(R.string.sport_kinds), null);
-        if (sportKinds == null) {
+        if (sportKinds == null && !isHelloStarted) {
             Intent intent = new Intent(getApplicationContext(), ChooseSportsActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         }
 

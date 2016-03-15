@@ -93,7 +93,7 @@ public class CloakRoomActivity extends NavigationDrawerActivity {
             public void onComplete(VKResponse response) {
                 VKList<VKApiUserFull> vkUsers = ((VKList) response.parsedModel);
                 VKApiUserFull vkUser = vkUsers.get(0);
-                DataManager.getInstance().vkUser = vkUser;
+                DataManager.getInstance().setVkUser(vkUser,getString(R.string.vk_user_id));
                 String fullName = String.format("%s %s", vkUser.first_name, vkUser.last_name);
                 mTextName.setText(fullName);
                 mTxtNavName.setText(fullName);

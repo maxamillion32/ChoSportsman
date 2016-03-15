@@ -8,6 +8,7 @@ import com.vk.sdk.util.VKUtil;
 
 
 public class App extends Application {
+    public static final String TAG = "Chokavo logs";
 
     private static App application;
 

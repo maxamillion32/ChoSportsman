@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.chokavo.chosportsman.R;
+import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.models.SportKind;
 import com.chokavo.chosportsman.models.SportKindFactory;
 import com.chokavo.chosportsman.ui.adapters.ChooseSportsAdapter;
@@ -33,6 +34,14 @@ public class ChooseSportsActivity extends AppCompatActivity {
         setSupportActionBar(mActionBarToolbar);
         if (getSupportActionBar()!=null)
             getSupportActionBar().setTitle(R.string.choose_sport_please);
+
+        SharedPreferences preferences = DataManager.getInstance().mPreferences;
+        Set<String> sportKinds = preferences.getStringSet(getString(R.string.sport_kinds),null);
+        if (sportKinds != null) {
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }
 
         loadSports();
         recyclerView = (RecyclerView)findViewById(R.id.choose_sports_recview);
@@ -59,11 +68,12 @@ public class ChooseSportsActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_continue) {
-            Set<String> mCheckedSports = new HashSet<>();
+            Set<SportKind> mCheckedSports = new HashSet<>();
             boolean isEmpty = true;
             for (int i = 0; i < mSportKindFactory.getSportKinds().size(); i++) {
-                if (mSportKindFactory.getSportKinds().get(i).isChecked()) {
-                    mCheckedSports.add(mSportKindFactory.getSportKinds().get(i).getName());
+                SportKind sport = mSportKindFactory.getSportKinds().get(i);
+                if (sport.isChecked()) {
+                    mCheckedSports.add(sport);
                     if (isEmpty)
                         isEmpty = false;
                 }
@@ -72,8 +82,7 @@ public class ChooseSportsActivity extends AppCompatActivity {
                 Snackbar.make(recyclerView, "Выберите хотя бы один вид спорта", Snackbar.LENGTH_LONG).show();
                 return false;
             }
-            SharedPreferences preferences = getPreferences(MODE_PRIVATE);
-            preferences.edit().putStringSet("Checked sportkinds",mCheckedSports);
+            DataManager.getInstance().setUserSports(mCheckedSports, getString(R.string.sport_kinds));
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);
             return true;
