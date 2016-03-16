@@ -159,7 +159,7 @@ public class CalendarActivity extends NavigationDrawerActivity {
         } else {
             if (AppUtils.isDeviceOnline()) {
 //                new MakeRequestTask(mCredential).execute();
-                CalendarManager.getInstance(this).testCalendar();
+                CalendarManager.getInstance(this).getSportCalendar();
                 Log.e("A", "execute async");
             } else {
                 ImageSnackbar.make(mCalendarView, ImageSnackbar.TYPE_ERROR, "Нет интернет-соединения", Snackbar.LENGTH_SHORT).show();
@@ -201,7 +201,7 @@ public class CalendarActivity extends NavigationDrawerActivity {
         if (requestCode == MY_PERMISSIONS_REQUEST_READ_CALENDAR) {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                CalendarManager.getInstance(CalendarActivity.this).testCalendar(this);
+//                CalendarManager.getInstance(CalendarActivity.this).getSportCalendar();
             } else {
                 ImageSnackbar.make(mCalendarView, ImageSnackbar.TYPE_ERROR, "К сожалению, вы запретили доступ к календарю", Snackbar.LENGTH_LONG).show();
             }

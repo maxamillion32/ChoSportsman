@@ -1,53 +1,42 @@
 package com.chokavo.chosportsman.calendar;
 
-import com.chokavo.chosportsman.AppUtils;
-import com.chokavo.chosportsman.models.DataManager;
-import com.chokavo.chosportsman.models.SharedPrefsManager;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
-import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
-
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.ExponentialBackOff;
-
-import com.google.api.services.calendar.CalendarScopes;
-import com.google.api.client.util.DateTime;
-
-import com.google.api.services.calendar.model.*;
-
+import android.Manifest;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import com.chokavo.chosportsman.AppUtils;
+import com.chokavo.chosportsman.models.DataManager;
+import com.chokavo.chosportsman.models.SharedPrefsManager;
+import com.chokavo.chosportsman.ui.activities.BaseActivity;
+import com.chokavo.chosportsman.ui.views.ImageSnackbar;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.google.api.services.calendar.model.CalendarList;
+
+import me.everything.providers.android.calendar.Calendar;
+import rx.Subscriber;
 
 public class CalendarActivity2 extends Activity {
-    GoogleAccountCredential mCredential;
     private TextView mOutputText;
     ProgressDialog mProgress;
 
     static final int REQUEST_ACCOUNT_PICKER = 1000;
     static final int REQUEST_AUTHORIZATION = 1001;
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
-    private static final String[] SCOPES = { CalendarScopes.CALENDAR_READONLY };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,11 +66,9 @@ public class CalendarActivity2 extends Activity {
         setContentView(activityLayout);
 
         // Initialize credentials and service object.
+        SharedPrefsManager.removeGoogleAccount();
         SharedPrefsManager.restoreGoogleAccount();
-        mCredential = GoogleAccountCredential.usingOAuth2(
-                getApplicationContext(), Arrays.asList(SCOPES))
-                .setBackOff(new ExponentialBackOff())
-                .setSelectedAccountName(DataManager.getInstance().googleAccount);
+
     }
 
 
@@ -104,17 +91,18 @@ public class CalendarActivity2 extends Activity {
      * Called when an activity launched here (specifically, AccountPicker
      * and authorization) exits, giving you the requestCode you started it with,
      * the resultCode it returned, and any additional data from it.
+     *
      * @param requestCode code indicating which activity result is incoming.
-     * @param resultCode code indicating the result of the incoming
-     *     activity result.
-     * @param data Intent (containing result data) returned by incoming
-     *     activity result.
+     * @param resultCode  code indicating the result of the incoming
+     *                    activity result.
+     * @param data        Intent (containing result data) returned by incoming
+     *                    activity result.
      */
     @Override
     protected void onActivityResult(
             int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch(requestCode) {
+        switch (requestCode) {
             case REQUEST_GOOGLE_PLAY_SERVICES:
                 if (resultCode != RESULT_OK) {
                     isGooglePlayServicesAvailable();
@@ -126,7 +114,7 @@ public class CalendarActivity2 extends Activity {
                     String accountName =
                             data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
                     if (accountName != null) {
-                        mCredential.setSelectedAccountName(accountName);
+                        DataManager.getInstance().googleCredential.setSelectedAccountName(accountName);
                         DataManager.getInstance().googleAccount = accountName;
                         SharedPrefsManager.saveGoogleAccount();
                     }
@@ -150,15 +138,60 @@ public class CalendarActivity2 extends Activity {
      * user can pick an account.
      */
     private void refreshResults() {
-        if (mCredential.getSelectedAccountName() == null) {
+        GoogleAccountCredential googleAccountCredential = DataManager.getInstance().googleCredential;
+        if (googleAccountCredential == null || googleAccountCredential.getSelectedAccountName() == null) {
             chooseAccount();
         } else {
-            if (AppUtils.isDeviceOnline()) {
-                new MakeRequestTask(mCredential).execute();
-//                GoogleCalendarAPI.createCalendar(mCredential);
+            if (DataManager.getInstance().sportCalendarServerId != null) {
+                // если календарь уже создан - отлично, нам даже не нужен доступ в интернет
+                workWithSportCalendar();
+            } else if (AppUtils.isDeviceOnline()) {
+//                new MakeRequestTask(googleAccountCredential).execute();
+
+                Subscriber<CalendarList> subscriber = new Subscriber<CalendarList>() {
+                    @Override
+                    public void onCompleted() {
+                        System.out.println("onCompleted: ");
+                        // мы сохранили CalendarId в DataManager
+                        workWithSportCalendar();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        if (e instanceof UserRecoverableAuthIOException) {
+                            startActivityForResult(
+                                    ((UserRecoverableAuthIOException) e).getIntent(),
+                                    CalendarActivity2.REQUEST_AUTHORIZATION);
+                        } else {
+                            Log.e(CalendarActivity2.class.getName(), "error: " + e.toString());
+                            ImageSnackbar.make(mOutputText, "Ошибка! " + e.getMessage(), Snackbar.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onNext(CalendarList calendarList) {
+                        System.out.println("onNext: " + calendarList.size());
+                    }
+                };
+                GoogleCalendarAPI.getCalendarList(subscriber);
+
+//                GoogleCalendarAPI.createCalendar(googleAccountCredential);
             } else {
                 mOutputText.setText("No network connection available.");
             }
+        }
+    }
+
+    private Calendar mCalendar;
+
+    private void workWithSportCalendar() {
+        mCalendar = CalendarManager.getInstance(CalendarActivity2.this)
+                .getSportCalendar();
+        if (mCalendar == null) {
+            mOutputText.setText("calendar is null");
+        } else {
+            mOutputText.setText(String.format("%s\n%s\n", mCalendar.accountName, mCalendar.displayName));
+
         }
     }
 
@@ -167,16 +200,25 @@ public class CalendarActivity2 extends Activity {
      * account.
      */
     private void chooseAccount() {
+
+        if (ActivityCompat.checkSelfPermission(CalendarActivity2.this, Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions((CalendarActivity2.this),
+                    new String[]{Manifest.permission.GET_ACCOUNTS},
+                    BaseActivity.MY_PERMISSIONS_REQUEST_ACCOUNTS);
+            return;
+        }
         startActivityForResult(
-                mCredential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
+                DataManager.getInstance().googleCredential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
+
     }
 
     /**
      * Check that Google Play services APK is installed and up to date. Will
      * launch an error dialog for the user to update Google Play Services if
      * possible.
+     *
      * @return true if Google Play Services is available and up to
-     *     date on this device; false otherwise.
+     * date on this device; false otherwise.
      */
     private boolean isGooglePlayServicesAvailable() {
         final int connectionStatusCode =
@@ -184,17 +226,32 @@ public class CalendarActivity2 extends Activity {
         if (GooglePlayServicesUtil.isUserRecoverableError(connectionStatusCode)) {
             showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode);
             return false;
-        } else if (connectionStatusCode != ConnectionResult.SUCCESS ) {
+        } else if (connectionStatusCode != ConnectionResult.SUCCESS) {
             return false;
         }
         return true;
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case BaseActivity.MY_PERMISSIONS_REQUEST_ACCOUNTS:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    chooseAccount();
+                } else {
+                    ImageSnackbar.make(mOutputText, ImageSnackbar.TYPE_ERROR, "К сожалению, вы запретили доступ к аккаунтам", Snackbar.LENGTH_LONG).show();
+                }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
     /**
      * Display an error dialog showing that Google Play Services is missing
      * or out of date.
+     *
      * @param connectionStatusCode code describing the presence (or lack of)
-     *     Google Play Services on this device.
+     *                             Google Play Services on this device.
      */
     void showGooglePlayServicesAvailabilityErrorDialog(
             final int connectionStatusCode) {
@@ -203,107 +260,5 @@ public class CalendarActivity2 extends Activity {
                 CalendarActivity2.this,
                 REQUEST_GOOGLE_PLAY_SERVICES);
         dialog.show();
-    }
-
-    /**
-     * An asynchronous task that handles the Google Calendar API call.
-     * Placing the API calls in their own task ensures the UI stays responsive.
-     */
-    private class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
-        private com.google.api.services.calendar.Calendar mService = null;
-        private Exception mLastError = null;
-
-        public MakeRequestTask(GoogleAccountCredential credential) {
-            HttpTransport transport = AndroidHttp.newCompatibleTransport();
-            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-            mService = new com.google.api.services.calendar.Calendar.Builder(
-                    transport, jsonFactory, credential)
-                    .setApplicationName("Чо, спортсмен?")
-                    .build();
-        }
-
-        /**
-         * Background task to call Google Calendar API.
-         * @param params no parameters needed for this task.
-         */
-        @Override
-        protected List<String> doInBackground(Void... params) {
-            try {
-                return getDataFromApi();
-            } catch (Exception e) {
-                mLastError = e;
-                cancel(true);
-                return null;
-            }
-        }
-
-        /**
-         * Fetch a list of the next 10 events from the primary calendar.
-         * @return List of Strings describing returned events.
-         * @throws IOException
-         */
-        private List<String> getDataFromApi() throws IOException {
-            // List the next 10 events from the primary calendar.
-            DateTime now = new DateTime(System.currentTimeMillis());
-            List<String> eventStrings = new ArrayList<String>();
-            Events events = mService.events().list("primary")
-                    .setMaxResults(10)
-                    .setTimeMin(now)
-                    .setOrderBy("startTime")
-                    .setSingleEvents(true)
-                    .execute();
-            List<Event> items = events.getItems();
-
-            for (Event event : items) {
-                DateTime start = event.getStart().getDateTime();
-                if (start == null) {
-                    // All-day events don't have start times, so just use
-                    // the start date.
-                    start = event.getStart().getDate();
-                }
-                eventStrings.add(
-                        String.format("%s (%s)", event.getSummary(), start));
-            }
-            return eventStrings;
-        }
-
-
-        @Override
-        protected void onPreExecute() {
-            mOutputText.setText("");
-            mProgress.show();
-        }
-
-        @Override
-        protected void onPostExecute(List<String> output) {
-            mProgress.hide();
-            if (output == null || output.size() == 0) {
-                mOutputText.setText("No results returned.");
-            } else {
-                output.add(0, "Data retrieved using the Google Calendar API:");
-                mOutputText.setText(TextUtils.join("\n", output));
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mProgress.hide();
-            if (mLastError != null) {
-                if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
-                    showGooglePlayServicesAvailabilityErrorDialog(
-                            ((GooglePlayServicesAvailabilityIOException) mLastError)
-                                    .getConnectionStatusCode());
-                } else if (mLastError instanceof UserRecoverableAuthIOException) {
-                    startActivityForResult(
-                            ((UserRecoverableAuthIOException) mLastError).getIntent(),
-                            CalendarActivity2.REQUEST_AUTHORIZATION);
-                } else {
-                    mOutputText.setText("The following error occurred:\n"
-                            + mLastError.getMessage());
-                }
-            } else {
-                mOutputText.setText("Request cancelled.");
-            }
-        }
     }
 }

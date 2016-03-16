@@ -15,8 +15,14 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import com.chokavo.chosportsman.models.DataManager;
+import com.chokavo.chosportsman.models.SharedPrefsManager;
 import com.chokavo.chosportsman.ui.activities.BaseActivity;
-import com.chokavo.chosportsman.ui.activities.calendar.CalendarActivity;
+
+import java.util.List;
+
+import me.everything.providers.android.calendar.Calendar;
+import me.everything.providers.android.calendar.CalendarProvider;
+import me.everything.providers.core.Data;
 
 
 /**
@@ -46,6 +52,7 @@ public class CalendarManager {
             CalendarContract.Calendars.CALENDAR_COLOR,                           // 4
             CalendarContract.Calendars.NAME,                           // 5
             CalendarContract.Calendars.VISIBLE,                           // 6
+            CalendarContract.Calendars._SYNC_ID,                           // 7
     };
 
     // The indices for the projection array above.
@@ -56,6 +63,7 @@ public class CalendarManager {
     private static final int PROJECTION_CALENDAR_COLOR_INDEX = 4;
     private static final int PROJECTION_NAME_INDEX = 5;
     private static final int PROJECTION_VISIBLE_INDEX = 6;
+    private static final int PROJECTION_VISIBLE_SYNC_ID_INDEX = 7;
 
     public void addEvent(Activity activity) {
         Intent intent = new Intent(Intent.ACTION_INSERT)
@@ -71,29 +79,73 @@ public class CalendarManager {
                 .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, accountType).build();
     }
 
-    public void testCalendar() {
+    public Calendar getSportCalendar() {
         if (DataManager.getInstance().googleAccount == null) {
             Log.e(CalendarManager.class.getName(), "googleAccount is null!");
+            return null;
         }
-        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(((Activity) mContext),
-                    new String[]{Manifest.permission.READ_CALENDAR},
-                    BaseActivity.MY_PERMISSIONS_REQUEST_READ_CALENDAR);
-            return;
+        if (DataManager.getInstance().sportCalendarServerId == null) {
+            Log.e(CalendarManager.class.getName(), "sportCalendarServerId is null!");
+            return null;
         }
+        if (DataManager.getInstance().sportCalendar != null) {
+            return DataManager.getInstance().sportCalendar;
+        }
+        // календаря нет, нужно вытаскивать по id
+        SharedPrefsManager.removeSportCalendarContentProviderId();
+        CalendarProvider calendarProvider = new CalendarProvider(mContext);
+        if (DataManager.getInstance().sportCalendarContentProviderId == -1) {
+            // у нас есть id календаря на сервере, но нет id в content provider
+            if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(((Activity) mContext),
+                        new String[]{Manifest.permission.READ_CALENDAR},
+                        BaseActivity.MY_PERMISSIONS_REQUEST_READ_CALENDAR);
+                return null;
+            }
+            Data<Calendar> calendarsData = calendarProvider.getCalendars();
+            List<Calendar> calendars = calendarsData.getList();
+            String sportCalendarServerId = DataManager.getInstance().sportCalendarServerId;
+            for (Calendar calendar: calendars) {
+                Log.e("","");
+                if (calendar.ownerAccount != null && calendar.ownerAccount.equals(DataManager.getInstance().sportCalendarServerId)) {
+                    // запоминаем местный id
+                    DataManager.getInstance().sportCalendarContentProviderId = calendar.id;
+                    SharedPrefsManager.saveSportCalendarContentProviderId();
+                    DataManager.getInstance().sportCalendar = calendar;
+                    break;
+                }
+            }
+            if (DataManager.getInstance().sportCalendarContentProviderId == -1) {
+                // данный календарь не найден в ContentProvider
+                Log.e(CalendarManager.class.getName(), "Sport calendar id is not found in ContentProvider");
+                return null;
+            }
+        } else {
+            DataManager.getInstance().sportCalendar = calendarProvider.getCalendar(DataManager.getInstance().sportCalendarContentProviderId);
+        }
+        return DataManager.getInstance().sportCalendar;
+    }
+
+
+    private long getCalendarContentProviderId(String googleAccount, String sportCalendarServerId) {
         // Run query
         Cursor cur = null;
         ContentResolver cr = mContext.getContentResolver();
-//        Uri uri = CalendarContract.Calendars.CONTENT_URI;
-        Uri uri = asSyncAdapter(CalendarContract.Calendars.CONTENT_URI, DataManager.getInstance().googleAccount, ACCOUNT_TYPE_GOOGLE);
-        String selection = "((" + CalendarContract.Calendars.ACCOUNT_TYPE + " = ?) AND (" + CalendarContract.Calendars.ACCOUNT_NAME + " = ?))";
-        String[] selectionArgs = {ACCOUNT_TYPE_GOOGLE, DataManager.getInstance().googleAccount};
+        Uri  uri = CalendarContract.Calendars.CONTENT_URI;
+
+//        Uri uri = asSyncAdapter(CalendarContract.Calendars.CONTENT_URI, DataManager.getInstance().googleAccount, ACCOUNT_TYPE_GOOGLE);
+        String selection = "((" + CalendarContract.Calendars.ACCOUNT_TYPE + " = ?) AND ("
+                + CalendarContract.Calendars.OWNER_ACCOUNT + " = ?) AND ("
+                + CalendarContract.Calendars.ACCOUNT_NAME + " = ?))";
+        String[] selectionArgs = {ACCOUNT_TYPE_GOOGLE, sportCalendarServerId, googleAccount};
 // Submit the query and get a Cursor object back.
 
         cur = cr.query(uri, EVENT_PROJECTION, selection, selectionArgs, null);
 
+        long sportCalendarContentProviderId = -1;
         while (cur.moveToNext()) {
             long calID = 0;
+            String calSyncId = null;
             String displayName = null;
             String accountName = null;
             String ownerName = null;
@@ -108,9 +160,15 @@ public class CalendarManager {
             color = cur.getInt(PROJECTION_CALENDAR_COLOR_INDEX);
             name = cur.getString(PROJECTION_NAME_INDEX);
             visible = cur.getShort(PROJECTION_VISIBLE_INDEX);
+            calSyncId = cur.getString(PROJECTION_VISIBLE_SYNC_ID_INDEX);
             Log.e("", "");
-            // Do something with the values...
 
+            if (ownerName.equals(sportCalendarServerId)){
+                // это наш календарь
+                sportCalendarContentProviderId = calID;
+                break;
+            }
         }
+        return sportCalendarContentProviderId;
     }
 }
