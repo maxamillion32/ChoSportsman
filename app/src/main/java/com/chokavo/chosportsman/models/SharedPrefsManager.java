@@ -41,27 +41,23 @@ public final class SharedPrefsManager {
     private static final String GOOGLE_ACCOUNT = "GOOGLE_ACCOUNT";
 
     public static void removeGoogleAccount() {
-        DataManager.getInstance().googleAccount = null;
+        DataManager.getInstance().setGoogleAccount(null);
         DataManager.getInstance().googleCredential = null;
-        getInstance().preferences
-                .edit()
-                .putString(GOOGLE_ACCOUNT, null)
-                .commit();
     }
 
     public static void saveGoogleAccount() {
         getInstance().preferences
                 .edit()
-                .putString(GOOGLE_ACCOUNT, DataManager.getInstance().googleAccount)
+                .putString(GOOGLE_ACCOUNT, DataManager.getInstance().getGoogleAccount())
                 .commit();
     }
 
     public static void restoreGoogleAccount() {
-        DataManager.getInstance().googleAccount = getInstance().preferences.getString(GOOGLE_ACCOUNT, null);
+        DataManager.getInstance().setGoogleAccount(getInstance().preferences.getString(GOOGLE_ACCOUNT, null));
         GoogleAccountCredential googleCredential = GoogleAccountCredential.usingOAuth2(
                 App.getInstance(), Arrays.asList(GoogleCalendarAPI.SCOPES))
                 .setBackOff(new ExponentialBackOff())
-                .setSelectedAccountName(DataManager.getInstance().googleAccount);
+                .setSelectedAccountName(DataManager.getInstance().getGoogleAccount());
         DataManager.getInstance().googleCredential = googleCredential;
     }
 
@@ -74,17 +70,17 @@ public final class SharedPrefsManager {
     public static void saveSportCalendarServerId() {
         getInstance().preferences
                 .edit()
-                .putString(SPORT_CALENDAR_SERVER_ID, DataManager.getInstance().sportCalendarServerId)
+                .putString(SPORT_CALENDAR_SERVER_ID, DataManager.getInstance().sportCalendarGAPIId)
                 .commit();
     }
 
     public static void restoreSportCalendarServerId() {
         String str = getInstance().preferences.getString(SPORT_CALENDAR_SERVER_ID, null);
-        DataManager.getInstance().sportCalendarServerId = str;
+        DataManager.getInstance().sportCalendarGAPIId = str;
     }
 
     public static void removeSportCalendarServerId() {
-        DataManager.getInstance().sportCalendarServerId = null;
+        DataManager.getInstance().sportCalendarGAPIId = null;
         getInstance().preferences
                 .edit()
                 .putString(SPORT_CALENDAR_SERVER_ID, null)

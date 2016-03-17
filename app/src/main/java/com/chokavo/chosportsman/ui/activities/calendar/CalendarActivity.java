@@ -65,8 +65,6 @@ public class CalendarActivity extends NavigationDrawerActivity {
         super.onCreate(savedInstanceState);
         super.onCreate(R.layout.activity_calendar, R.id.nav_calendar);
 
-        DataManager.getInstance().googleAccount = null;
-
         mCalendarView = (FlexibleCalendarView) findViewById(R.id.month_view);
         mFabAddEvent = (FloatingActionButton) findViewById(R.id.fab_add_event);
         mCalendarView.setOnMonthChangeListener(new FlexibleCalendarView.OnMonthChangeListener() {
@@ -136,7 +134,7 @@ public class CalendarActivity extends NavigationDrawerActivity {
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff())
-                .setSelectedAccountName(DataManager.getInstance().googleAccount);
+                .setSelectedAccountName(DataManager.getInstance().getGoogleAccount());
         Log.e("","");
     }
 
@@ -185,8 +183,7 @@ public class CalendarActivity extends NavigationDrawerActivity {
                             data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
                     if (accountName != null) {
                         mCredential.setSelectedAccountName(accountName);
-                        DataManager.getInstance().googleAccount = accountName;
-                        SharedPrefsManager.saveGoogleAccount();
+                        DataManager.getInstance().setGoogleAccount(accountName);
                     }
                 } else if (resultCode == RESULT_CANCELED) {
                     ImageSnackbar.make(mCalendarView, ImageSnackbar.TYPE_ERROR, "К сожалению, вы не выбрали аккаунт", Snackbar.LENGTH_LONG).show();
@@ -212,7 +209,7 @@ public class CalendarActivity extends NavigationDrawerActivity {
                 mCredential = GoogleAccountCredential.usingOAuth2(
                         getApplicationContext(), Arrays.asList(SCOPES))
                         .setBackOff(new ExponentialBackOff())
-                        .setSelectedAccountName(DataManager.getInstance().googleAccount);
+                        .setSelectedAccountName(DataManager.getInstance().getGoogleAccount());
                 Log.e("","");
             } else {
                 ImageSnackbar.make(mCalendarView, ImageSnackbar.TYPE_ERROR, "К сожалению, вы запретили доступ к аккаунтам", Snackbar.LENGTH_LONG).show();

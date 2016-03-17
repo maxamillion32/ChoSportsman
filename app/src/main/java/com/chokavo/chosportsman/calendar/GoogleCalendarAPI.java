@@ -1,5 +1,7 @@
 package com.chokavo.chosportsman.calendar;
 
+import android.util.Log;
+
 import com.chokavo.chosportsman.AppUtils;
 import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.models.SharedPrefsManager;
@@ -53,16 +55,28 @@ public class GoogleCalendarAPI {
                     CalendarList calendarList = mService.calendarList().list().execute();
                     System.out.println("calendarList size: " + calendarList.size());
                     // получили список календарей, теперь нужно сделать проверку на наличие нашего календаря с определенным Summary
-                    String sportCalendarId = getSportCalendarId(calendarList);
-                    if (sportCalendarId == null) {
-                        // создадим календарь
-                        sportCalendarId = createSportCalendar(mService);
-                    }
-                    // здесь мы уже имеем календарь c id=sportCalendarServerId
-                    // попробуем залезть в contentProvider и выудить оттуда новый календарь
-                    DataManager.getInstance().sportCalendarServerId = sportCalendarId;
-                    SharedPrefsManager.saveSportCalendarServerId();
 
+                    CalendarListEntry sportCalendarListEntry = getSportCalendar(calendarList);
+                    String calendarGAPIid;
+                    Calendar calendarGAPI;
+                    if (sportCalendarListEntry == null) {
+                        // создадим календарь
+                        calendarGAPI = createSportCalendar(mService);
+                        calendarGAPIid = calendarGAPI.getId();
+                    } else {
+                        calendarGAPIid = sportCalendarListEntry.getId();
+                        calendarGAPI = getCalendarById(calendarGAPIid);
+                    }
+                    // здесь мы уже имеем календарь c id=sportCalendarGAPIId
+                    DataManager.getInstance().sportCalendarGAPIId = calendarGAPIid;
+                    SharedPrefsManager.saveSportCalendarServerId();
+                    if (calendarGAPIid == null) {
+                        sub.onNext(null);
+                        Log.e(GoogleCalendarAPI.class.getName(), "no sportCalendarGAPIId");
+                        sub.onCompleted();
+                        return;
+                    }
+                    // имеем id и сам календарь, можно спокойно выходить
                     sub.onNext(calendarList);
                     sub.onCompleted();
                 } catch (Exception e) {
@@ -76,7 +90,22 @@ public class GoogleCalendarAPI {
         myObservable.subscribe(subscriber);
     }
 
-    private static String createSportCalendar(com.google.api.services.calendar.Calendar service) throws IOException {
+    private static Calendar getCalendarById (final String calID) throws IOException {
+        com.google.api.services.calendar.Calendar mService = new com.google.api.services.calendar.Calendar.Builder(
+                sHttpTransport, sJsonFactory, DataManager.getInstance().googleCredential)
+                .setApplicationName(AppUtils.getApplicationName())
+                .build();
+        Calendar calendar = mService.calendars().get(calID).execute();
+        if (calendar == null) {
+            System.out.println("calendar null!");
+        } else {
+            System.out.println("calendar desc: " + calendar.getDescription());
+        }
+        DataManager.getInstance().sportCalendarGAPI = calendar;
+        return calendar;
+    }
+
+    private static Calendar createSportCalendar(com.google.api.services.calendar.Calendar service) throws IOException {
         // Create a new calendar
         Calendar calendar = new Calendar()
                 .setSummary(SPORT_CALENDAR_SUMMARY)
@@ -87,14 +116,15 @@ public class GoogleCalendarAPI {
         Calendar createdCalendar = service.calendars().insert(calendar).execute();
 
         System.out.println(createdCalendar.getId());
-        return createdCalendar.getId();
+        return createdCalendar;
     }
 
-    private static String getSportCalendarId(CalendarList calendarList) {
+
+    private static CalendarListEntry getSportCalendar(CalendarList calendarList) {
         for (CalendarListEntry calendar: calendarList.getItems()) {
             String summary = calendar.getSummary();
             if (summary.equals(SPORT_CALENDAR_SUMMARY)){
-                return calendar.getId();
+                return calendar;
             }
         }
         return null;

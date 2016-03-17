@@ -6,7 +6,7 @@ import com.vk.sdk.api.model.VKApiUserFull;
 
 import java.util.List;
 
-import me.everything.providers.android.calendar.Calendar;
+import com.google.api.services.calendar.model.Calendar;
 
 /**
  * Created by ilyapyavkin on 02.03.16.
@@ -15,11 +15,14 @@ public class DataManager {
 
     public List<SportObjectDataRow> sportObjects;
     public VKApiUserFull vkUser;
-    public String googleAccount;
+
+    private String mGoogleAccount;
     public GoogleAccountCredential googleCredential;
-    public String sportCalendarServerId; // id for a google calendar на сервере гугл
+    public String sportCalendarGAPIId; // id for a google calendar на сервере гугл
     public long sportCalendarContentProviderId; // id for a google calendar в Content provider
-    public Calendar sportCalendar; // sport calendar
+
+    public me.everything.providers.android.calendar.Calendar sportCalendar; // календарь, получаем из ContentProvider с помощью me.every
+    public Calendar sportCalendarGAPI; // календарь, который получаем из Google API
 
     private static DataManager ourInstance = new DataManager();
 
@@ -29,4 +32,18 @@ public class DataManager {
 
     private DataManager() {
     }
+
+    public String getGoogleAccount() {
+        if (mGoogleAccount == null) {
+            SharedPrefsManager.restoreGoogleAccount();
+        }
+        return mGoogleAccount;
+    }
+
+    public void setGoogleAccount(String googleAccount) {
+        mGoogleAccount = googleAccount;
+        SharedPrefsManager.saveGoogleAccount();
+    }
+
+
 }

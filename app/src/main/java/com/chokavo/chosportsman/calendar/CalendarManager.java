@@ -3,6 +3,8 @@ package com.chokavo.chosportsman.calendar;
 import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -74,18 +76,18 @@ public class CalendarManager {
 
     static Uri asSyncAdapter(Uri uri, String account, String accountType) {
         return uri.buildUpon()
-                .appendQueryParameter(android.provider.CalendarContract.CALLER_IS_SYNCADAPTER,"true")
+                .appendQueryParameter(android.provider.CalendarContract.CALLER_IS_SYNCADAPTER, "true")
                 .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_NAME, account)
                 .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, accountType).build();
     }
 
     public Calendar getSportCalendar() {
-        if (DataManager.getInstance().googleAccount == null) {
+        if (DataManager.getInstance().getGoogleAccount() == null) {
             Log.e(CalendarManager.class.getName(), "googleAccount is null!");
             return null;
         }
-        if (DataManager.getInstance().sportCalendarServerId == null) {
-            Log.e(CalendarManager.class.getName(), "sportCalendarServerId is null!");
+        if (DataManager.getInstance().sportCalendarGAPIId == null) {
+            Log.e(CalendarManager.class.getName(), "sportCalendarGAPIId is null!");
             return null;
         }
         if (DataManager.getInstance().sportCalendar != null) {
@@ -104,10 +106,12 @@ public class CalendarManager {
             }
             Data<Calendar> calendarsData = calendarProvider.getCalendars();
             List<Calendar> calendars = calendarsData.getList();
-            String sportCalendarServerId = DataManager.getInstance().sportCalendarServerId;
-            for (Calendar calendar: calendars) {
-                Log.e("","");
-                if (calendar.ownerAccount != null && calendar.ownerAccount.equals(DataManager.getInstance().sportCalendarServerId)) {
+            String sportCalendarServerId = DataManager.getInstance().sportCalendarGAPIId;
+            for (Calendar calendar : calendars) {
+                Log.e("", "");
+                String ownerAccount = calendar.ownerAccount;
+                String accountName = calendar.accountName;
+                if (calendar.ownerAccount != null && calendar.ownerAccount.equals(DataManager.getInstance().sportCalendarGAPIId)) {
                     // запоминаем местный id
                     DataManager.getInstance().sportCalendarContentProviderId = calendar.id;
                     SharedPrefsManager.saveSportCalendarContentProviderId();
@@ -118,6 +122,8 @@ public class CalendarManager {
             if (DataManager.getInstance().sportCalendarContentProviderId == -1) {
                 // данный календарь не найден в ContentProvider
                 Log.e(CalendarManager.class.getName(), "Sport calendar id is not found in ContentProvider");
+                // поэтому получим его через Google API
+                // TODO getCalendarGAPI()
                 return null;
             }
         } else {
@@ -126,18 +132,43 @@ public class CalendarManager {
         return DataManager.getInstance().sportCalendar;
     }
 
+    /**
+     * Totally removes secondary calendar
+     * @param calendar
+     */
+    private int deleteCalendarEntry(Calendar calendar) {
+        long calID = calendar.id;
+        Uri baseUri = asSyncAdapter(CalendarContract.Calendars.CONTENT_URI, "ilyapya@gmail.com", ACCOUNT_TYPE_GOOGLE);
+        int iNumRowsDeleted = 0;
+        Uri calendarUri = ContentUris.withAppendedId(baseUri, calID);
 
-    private long getCalendarContentProviderId(String googleAccount, String sportCalendarServerId) {
+        if (calendar.accountName == null || calendar.accountType == null) {
+            ContentValues values = new ContentValues();
+            // The new display name for the calendar
+            values.put(CalendarContract.Calendars.ACCOUNT_NAME, "ilyapya@gmail.com");
+            values.put(CalendarContract.Calendars.ACCOUNT_TYPE, ACCOUNT_TYPE_GOOGLE);
+            int rows = mContext.getContentResolver().update(calendarUri, values, null, null);
+            Log.i("HELLO", "Rows updated: " + rows);
+        }
+        // теперь удаляем календарь
+        iNumRowsDeleted = mContext.getContentResolver().delete(calendarUri, null, null);
+
+        Log.i(CalendarManager.class.getName(), "Deleted " + iNumRowsDeleted + " calendar entry.");
+
+        return iNumRowsDeleted;
+    }
+
+    public long getCalendarContentProviderId(String googleAccount, String sportCalendarServerId) {
         // Run query
         Cursor cur = null;
         ContentResolver cr = mContext.getContentResolver();
-        Uri  uri = CalendarContract.Calendars.CONTENT_URI;
+        Uri uri = CalendarContract.Calendars.CONTENT_URI;
 
 //        Uri uri = asSyncAdapter(CalendarContract.Calendars.CONTENT_URI, DataManager.getInstance().googleAccount, ACCOUNT_TYPE_GOOGLE);
         String selection = "((" + CalendarContract.Calendars.ACCOUNT_TYPE + " = ?) AND ("
-                + CalendarContract.Calendars.OWNER_ACCOUNT + " = ?) AND ("
+//                + CalendarContract.Calendars.OWNER_ACCOUNT + " = ?) AND ("
                 + CalendarContract.Calendars.ACCOUNT_NAME + " = ?))";
-        String[] selectionArgs = {ACCOUNT_TYPE_GOOGLE, sportCalendarServerId, googleAccount};
+        String[] selectionArgs = {ACCOUNT_TYPE_GOOGLE,/* sportCalendarGAPIId,*/ googleAccount};
 // Submit the query and get a Cursor object back.
 
         cur = cr.query(uri, EVENT_PROJECTION, selection, selectionArgs, null);

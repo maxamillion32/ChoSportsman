@@ -13,9 +13,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chokavo.chosportsman.R;
-import com.chokavo.chosportsman.calendar.CalendarActivity2;
+import com.chokavo.chosportsman.ui.activities.calendar.CalendarActivity2;
 import com.chokavo.chosportsman.models.DataManager;
-import com.chokavo.chosportsman.ui.activities.calendar.CalendarActivity;
 import com.squareup.picasso.Picasso;
 import com.vk.sdk.VKSdk;
 import com.vk.sdk.api.model.VKApiUserFull;
@@ -68,8 +67,8 @@ public abstract class NavigationDrawerActivity extends BaseActivity implements N
                     .into(mImgNavAvatar);
         }
 
-        if (DataManager.getInstance().googleAccount != null) {
-            mTxtNavEmail.setText(DataManager.getInstance().googleAccount);
+        if (DataManager.getInstance().getGoogleAccount() != null) {
+            mTxtNavEmail.setText(DataManager.getInstance().getGoogleAccount());
         }
     }
 

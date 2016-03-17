@@ -48,7 +48,7 @@
             android:label="Календарь" >
         </activity>
         <activity
-            android:name=".calendar.CalendarActivity2"
+            android:name=".ui.activities.calendar.CalendarActivity2"
             android:label="Календарь" >
         </activity>
         <activity

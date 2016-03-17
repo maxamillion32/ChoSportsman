@@ -1,4 +1,4 @@
-package com.chokavo.chosportsman.calendar;
+package com.chokavo.chosportsman.ui.activities.calendar;
 
 import android.Manifest;
 import android.accounts.AccountManager;
@@ -10,15 +10,14 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.chokavo.chosportsman.AppUtils;
+import com.chokavo.chosportsman.R;
+import com.chokavo.chosportsman.calendar.CalendarManager;
+import com.chokavo.chosportsman.calendar.GoogleCalendarAPI;
 import com.chokavo.chosportsman.models.DataManager;
-import com.chokavo.chosportsman.models.SharedPrefsManager;
 import com.chokavo.chosportsman.ui.activities.BaseActivity;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 import com.google.android.gms.common.ConnectionResult;
@@ -31,7 +30,7 @@ import me.everything.providers.android.calendar.Calendar;
 import rx.Subscriber;
 
 public class CalendarActivity2 extends Activity {
-    private TextView mOutputText;
+    private TextView mOutputText, mTxtGoogleAccount;
     ProgressDialog mProgress;
 
     static final int REQUEST_ACCOUNT_PICKER = 1000;
@@ -41,33 +40,16 @@ public class CalendarActivity2 extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LinearLayout activityLayout = new LinearLayout(this);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        activityLayout.setLayoutParams(lp);
-        activityLayout.setOrientation(LinearLayout.VERTICAL);
-        activityLayout.setPadding(16, 16, 16, 16);
+        setContentView(R.layout.activity_calendar2);
 
-        ViewGroup.LayoutParams tlp = new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-
-        mOutputText = new TextView(this);
-        mOutputText.setLayoutParams(tlp);
-        mOutputText.setPadding(16, 16, 16, 16);
-        mOutputText.setVerticalScrollBarEnabled(true);
-        mOutputText.setMovementMethod(new ScrollingMovementMethod());
-        activityLayout.addView(mOutputText);
+        mOutputText = (TextView) findViewById(R.id.txt_output);
+        mTxtGoogleAccount = (TextView) findViewById(R.id.txt_google_account);
 
         mProgress = new ProgressDialog(this);
         mProgress.setMessage("Calling Google Calendar API ...");
 
-        setContentView(activityLayout);
-
         // Initialize credentials and service object.
-        SharedPrefsManager.removeGoogleAccount();
-        SharedPrefsManager.restoreGoogleAccount();
+        mTxtGoogleAccount.setText(DataManager.getInstance().getGoogleAccount());
 
     }
 
@@ -115,8 +97,7 @@ public class CalendarActivity2 extends Activity {
                             data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
                     if (accountName != null) {
                         DataManager.getInstance().googleCredential.setSelectedAccountName(accountName);
-                        DataManager.getInstance().googleAccount = accountName;
-                        SharedPrefsManager.saveGoogleAccount();
+                        DataManager.getInstance().setGoogleAccount(accountName);
                     }
                 } else if (resultCode == RESULT_CANCELED) {
                     mOutputText.setText("Account unspecified.");
@@ -132,6 +113,42 @@ public class CalendarActivity2 extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    Subscriber<CalendarList> mSubscriberGetCalList = new Subscriber<CalendarList>() {
+        @Override
+        public void onCompleted() {
+            System.out.println("onCompleted: ");
+            // здесь мы уже получили calendarGAPI с сервера, отобразим данные в UI
+            showCalendarInfo();
+            // мы сохранили CalendarId в DataManager
+//            workWithSportCalendar();
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            if (e instanceof UserRecoverableAuthIOException) {
+                startActivityForResult(
+                        ((UserRecoverableAuthIOException) e).getIntent(),
+                        CalendarActivity2.REQUEST_AUTHORIZATION);
+            } else {
+                Log.e(CalendarActivity2.class.getName(), "error: " + e.toString());
+                ImageSnackbar.make(mOutputText, "Ошибка! " + e.getMessage(), Snackbar.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        public void onNext(CalendarList calendarList) {
+            System.out.println("onNext: " + calendarList.size());
+        }
+    };
+
+    private void showCalendarInfo() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("summary: %s\n", DataManager.getInstance().sportCalendarGAPI.getSummary()));
+        sb.append(String.format("desc: %s\n", DataManager.getInstance().sportCalendarGAPI.getDescription()));
+        sb.append(String.format("timezone: %s\n", DataManager.getInstance().sportCalendarGAPI.getTimeZone()));
+        mOutputText.setText(sb.toString());
+    }
+
     /**
      * Attempt to get a set of data from the Google Calendar API to display. If the
      * email address isn't known yet, then call chooseAccount() method so the
@@ -142,40 +159,13 @@ public class CalendarActivity2 extends Activity {
         if (googleAccountCredential == null || googleAccountCredential.getSelectedAccountName() == null) {
             chooseAccount();
         } else {
-            if (DataManager.getInstance().sportCalendarServerId != null) {
+            if (DataManager.getInstance().sportCalendarGAPIId != null) {
                 // если календарь уже создан - отлично, нам даже не нужен доступ в интернет
                 workWithSportCalendar();
             } else if (AppUtils.isDeviceOnline()) {
 //                new MakeRequestTask(googleAccountCredential).execute();
 
-                Subscriber<CalendarList> subscriber = new Subscriber<CalendarList>() {
-                    @Override
-                    public void onCompleted() {
-                        System.out.println("onCompleted: ");
-                        // мы сохранили CalendarId в DataManager
-                        workWithSportCalendar();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        if (e instanceof UserRecoverableAuthIOException) {
-                            startActivityForResult(
-                                    ((UserRecoverableAuthIOException) e).getIntent(),
-                                    CalendarActivity2.REQUEST_AUTHORIZATION);
-                        } else {
-                            Log.e(CalendarActivity2.class.getName(), "error: " + e.toString());
-                            ImageSnackbar.make(mOutputText, "Ошибка! " + e.getMessage(), Snackbar.LENGTH_SHORT).show();
-                        }
-                    }
-
-                    @Override
-                    public void onNext(CalendarList calendarList) {
-                        System.out.println("onNext: " + calendarList.size());
-                    }
-                };
-                GoogleCalendarAPI.getCalendarList(subscriber);
-
-//                GoogleCalendarAPI.createCalendar(googleAccountCredential);
+                GoogleCalendarAPI.getCalendarList(mSubscriberGetCalList);
             } else {
                 mOutputText.setText("No network connection available.");
             }
