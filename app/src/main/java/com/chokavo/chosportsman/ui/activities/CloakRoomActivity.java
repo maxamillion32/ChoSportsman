@@ -2,13 +2,18 @@ package com.chokavo.chosportsman.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.models.DataManager;
+import com.chokavo.chosportsman.ui.adapters.ChooseSportsAdapter;
+import com.chokavo.chosportsman.ui.adapters.UserSportsAdapter;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
@@ -29,6 +34,10 @@ public class CloakRoomActivity extends NavigationDrawerActivity {
     TextView mTextName;
     ImageView mImgAvatar;
     SwipeRefreshLayout mSwipeRefresh;
+
+    private RecyclerView mRecyclerSports;
+    private UserSportsAdapter adapter;
+    private LinearLayoutManager layoutManager;
 
     @Override
     protected void onStart() {
@@ -52,6 +61,18 @@ public class CloakRoomActivity extends NavigationDrawerActivity {
             return;
         }
         loadVKProfile();
+
+        CollapsingToolbarLayout collapsingToolbar =
+                (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar);
+        collapsingToolbar.setTitle("My Toolbar Tittle");
+
+
+        mRecyclerSports = (RecyclerView)findViewById(R.id.recview_sports_ilove);
+        adapter = new UserSportsAdapter(DataManager.getInstance().loadUserSports(getString(R.string.sport_kinds)));
+        layoutManager = new LinearLayoutManager(this);
+
+        mRecyclerSports.setAdapter(adapter);
+        mRecyclerSports.setLayoutManager(layoutManager);
     }
 
     @Override
@@ -87,7 +108,7 @@ public class CloakRoomActivity extends NavigationDrawerActivity {
                 mSwipeRefresh.setRefreshing(true);
             }
         });
-        VKRequest vkRequest = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "photo_200,sex,bdate,city"));
+        VKRequest vkRequest = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "photo_200,photo_400_orig,sex,bdate,city"));
         vkRequest.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {
@@ -97,11 +118,15 @@ public class CloakRoomActivity extends NavigationDrawerActivity {
                 String fullName = String.format("%s %s", vkUser.first_name, vkUser.last_name);
                 mTextName.setText(fullName);
                 mTxtNavName.setText(fullName);
+                String photo400_orig = vkUser.photo_400_orig;
                 String photo200 = vkUser.photo_200;
                 RequestCreator picasoRequest = Picasso.with(CloakRoomActivity.this)
                         .load(photo200)
                         .placeholder(R.drawable.ic_account_box_24dp);
-                picasoRequest.into(mImgAvatar);
+                RequestCreator picasoRequest1 = Picasso.with(CloakRoomActivity.this)
+                        .load(photo400_orig)
+                        .placeholder(R.drawable.ic_account_box_24dp);
+                picasoRequest1.into(mImgAvatar);
                 picasoRequest.into(mImgNavAvatar);
                 mSwipeRefresh.setRefreshing(false);
                 ImageSnackbar.make(mTextName, ImageSnackbar.TYPE_SUCCESS, String.format("Привет, %s", fullName), Snackbar.LENGTH_SHORT).show();

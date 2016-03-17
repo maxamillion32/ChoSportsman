@@ -19,10 +19,10 @@ import com.chokavo.chosportsman.ui.adapters.ChooseSportsAdapter;
 import com.chokavo.chosportsman.ui.adapters.SportObjectAdapter;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 public class ChooseSportsActivity extends AppCompatActivity {
-    SportKindFactory mSportKindFactory;
     RecyclerView recyclerView;
     ChooseSportsAdapter adapter;
     LinearLayoutManager layoutManager;
@@ -43,9 +43,9 @@ public class ChooseSportsActivity extends AppCompatActivity {
             startActivity(intent);
         }
 
-        loadSports();
+
         recyclerView = (RecyclerView)findViewById(R.id.choose_sports_recview);
-        adapter = new ChooseSportsAdapter(mSportKindFactory.getSportKinds());
+        adapter = new ChooseSportsAdapter(DataManager.getInstance().getSportKinds());
         layoutManager = new LinearLayoutManager(this);
 
         recyclerView.setAdapter(adapter);
@@ -69,9 +69,10 @@ public class ChooseSportsActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_continue) {
             Set<SportKind> mCheckedSports = new HashSet<>();
+            Iterator<SportKind> iterator = DataManager.getInstance().getSportKinds().iterator();
             boolean isEmpty = true;
-            for (int i = 0; i < mSportKindFactory.getSportKinds().size(); i++) {
-                SportKind sport = mSportKindFactory.getSportKinds().get(i);
+            while( iterator.hasNext()) {
+                SportKind sport = iterator.next();
                 if (sport.isChecked()) {
                     mCheckedSports.add(sport);
                     if (isEmpty)
@@ -91,21 +92,9 @@ public class ChooseSportsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void loadSports(){
-        mSportKindFactory = SportKindFactory.get(getApplicationContext());
-        SportKind football = new SportKind("Футбол");
-        SportKind voleyball = new SportKind("Волейбол");
-        SportKind hockey = new SportKind("Хокей");
-        SportKind basketball = new SportKind("Баскетбол");
-        mSportKindFactory.addSportKind(football);
-        mSportKindFactory.addSportKind(voleyball);
-        mSportKindFactory.addSportKind(hockey);
-        mSportKindFactory.addSportKind(basketball);
-    }
 
     @Override
     protected void onDestroy() {
-        mSportKindFactory.clear();
         super.onDestroy();
     }
 }

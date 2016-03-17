@@ -3,6 +3,7 @@ package com.chokavo.chosportsman;
 import android.app.Application;
 import android.util.Log;
 
+import com.chokavo.chosportsman.models.DataManager;
 import com.vk.sdk.VKSdk;
 import com.vk.sdk.util.VKUtil;
 

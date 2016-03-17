@@ -40,6 +40,8 @@ public class MainActivity extends NavigationDrawerActivity {
             startActivity(intent);
             isHelloStarted = true;
         }
+
+        DataManager.getInstance().loadSports();
         Set<String> sportKinds = preferences.getStringSet(getString(R.string.sport_kinds), null);
         if (sportKinds == null && !isHelloStarted) {
             Intent intent = new Intent(getApplicationContext(), ChooseSportsActivity.class);
