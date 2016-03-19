@@ -3,16 +3,19 @@ package com.chokavo.chosportsman.ui.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.models.DataManager;
-import com.chokavo.chosportsman.ui.adapters.ChooseSportsAdapter;
 import com.chokavo.chosportsman.ui.adapters.UserSportsAdapter;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 import com.squareup.picasso.Picasso;
@@ -73,6 +76,26 @@ public class CloakRoomActivity extends NavigationDrawerActivity {
 
         mRecyclerSports.setAdapter(adapter);
         mRecyclerSports.setLayoutManager(layoutManager);
+
+        final FloatingActionButton fab_ok = (FloatingActionButton) findViewById(R.id.fab_ok);
+        final FloatingActionButton fab_edit = (FloatingActionButton) findViewById(R.id.fab_edit);
+        final LinearLayout linearLayoutAdd = (LinearLayout) findViewById(R.id.linlayout_add);
+        fab_ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fab_ok.setVisibility(View.GONE);
+                fab_edit.setVisibility(View.VISIBLE);
+                linearLayoutAdd.setVisibility(View.GONE);
+            }
+        });
+        fab_edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fab_edit.setVisibility(View.GONE);
+                fab_ok.setVisibility(View.VISIBLE);
+                linearLayoutAdd.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     @Override
