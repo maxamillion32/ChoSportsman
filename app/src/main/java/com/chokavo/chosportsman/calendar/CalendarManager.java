@@ -74,6 +74,17 @@ public class CalendarManager {
         activity.startActivity(intent);
     }
 
+    public boolean haveGoogleCalendar() {
+        if (DataManager.getInstance().googleCredential == null) {
+            return false;
+        }
+        if (DataManager.getInstance().calendarCPid <= 0l &&
+                DataManager.getInstance().calendarGAPIid == null) {
+            return false;
+        }
+        return true;
+    }
+
     static Uri asSyncAdapter(Uri uri, String account, String accountType) {
         return uri.buildUpon()
                 .appendQueryParameter(android.provider.CalendarContract.CALLER_IS_SYNCADAPTER, "true")
@@ -86,17 +97,17 @@ public class CalendarManager {
             Log.e(CalendarManager.class.getName(), "googleAccount is null!");
             return null;
         }
-        if (DataManager.getInstance().sportCalendarGAPIId == null) {
-            Log.e(CalendarManager.class.getName(), "sportCalendarGAPIId is null!");
+        if (DataManager.getInstance().calendarGAPIid == null) {
+            Log.e(CalendarManager.class.getName(), "calendarGAPIid is null!");
             return null;
         }
-        if (DataManager.getInstance().sportCalendar != null) {
-            return DataManager.getInstance().sportCalendar;
+        if (DataManager.getInstance().calendarCP != null) {
+            return DataManager.getInstance().calendarCP;
         }
         // календаря нет, нужно вытаскивать по id
-        SharedPrefsManager.removeSportCalendarContentProviderId();
+        SharedPrefsManager.removeCalendarCPid();
         CalendarProvider calendarProvider = new CalendarProvider(mContext);
-        if (DataManager.getInstance().sportCalendarContentProviderId == -1) {
+        if (DataManager.getInstance().calendarCPid == -1) {
             // у нас есть id календаря на сервере, но нет id в content provider
             if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(((Activity) mContext),
@@ -106,20 +117,20 @@ public class CalendarManager {
             }
             Data<Calendar> calendarsData = calendarProvider.getCalendars();
             List<Calendar> calendars = calendarsData.getList();
-            String sportCalendarServerId = DataManager.getInstance().sportCalendarGAPIId;
+            String sportCalendarServerId = DataManager.getInstance().calendarGAPIid;
             for (Calendar calendar : calendars) {
                 Log.e("", "");
                 String ownerAccount = calendar.ownerAccount;
                 String accountName = calendar.accountName;
-                if (calendar.ownerAccount != null && calendar.ownerAccount.equals(DataManager.getInstance().sportCalendarGAPIId)) {
+                if (calendar.ownerAccount != null && calendar.ownerAccount.equals(DataManager.getInstance().calendarGAPIid)) {
                     // запоминаем местный id
-                    DataManager.getInstance().sportCalendarContentProviderId = calendar.id;
-                    SharedPrefsManager.saveSportCalendarContentProviderId();
-                    DataManager.getInstance().sportCalendar = calendar;
+                    DataManager.getInstance().calendarCPid = calendar.id;
+                    SharedPrefsManager.saveCalendarCPid();
+                    DataManager.getInstance().calendarCP = calendar;
                     break;
                 }
             }
-            if (DataManager.getInstance().sportCalendarContentProviderId == -1) {
+            if (DataManager.getInstance().calendarCPid == -1) {
                 // данный календарь не найден в ContentProvider
                 Log.e(CalendarManager.class.getName(), "Sport calendar id is not found in ContentProvider");
                 // поэтому получим его через Google API
@@ -127,9 +138,9 @@ public class CalendarManager {
                 return null;
             }
         } else {
-            DataManager.getInstance().sportCalendar = calendarProvider.getCalendar(DataManager.getInstance().sportCalendarContentProviderId);
+            DataManager.getInstance().calendarCP = calendarProvider.getCalendar(DataManager.getInstance().calendarCPid);
         }
-        return DataManager.getInstance().sportCalendar;
+        return DataManager.getInstance().calendarCP;
     }
 
     /**
@@ -168,7 +179,7 @@ public class CalendarManager {
         String selection = "((" + CalendarContract.Calendars.ACCOUNT_TYPE + " = ?) AND ("
 //                + CalendarContract.Calendars.OWNER_ACCOUNT + " = ?) AND ("
                 + CalendarContract.Calendars.ACCOUNT_NAME + " = ?))";
-        String[] selectionArgs = {ACCOUNT_TYPE_GOOGLE,/* sportCalendarGAPIId,*/ googleAccount};
+        String[] selectionArgs = {ACCOUNT_TYPE_GOOGLE,/* calendarGAPIid,*/ googleAccount};
 // Submit the query and get a Cursor object back.
 
         cur = cr.query(uri, EVENT_PROJECTION, selection, selectionArgs, null);

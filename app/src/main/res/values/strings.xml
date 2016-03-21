@@ -15,4 +15,5 @@
     <string name="sign_with_vk">Войти через Вконтакте</string>
     <string name="title_activity_choose_sports">ChooseSportsActivity</string>
     <string name="choose_sport_please">Выберите виды спорта, которые вам по душе</string>
+    <string name="no_internet_connection">Интернет соединение отсутствует</string>
 </resources>

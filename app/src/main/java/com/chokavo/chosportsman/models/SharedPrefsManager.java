@@ -41,7 +41,7 @@ public final class SharedPrefsManager {
     private static final String GOOGLE_ACCOUNT = "GOOGLE_ACCOUNT";
 
     public static void removeGoogleAccount() {
-        DataManager.getInstance().setGoogleAccount(null);
+        DataManager.getInstance().setAndSaveGoogleAccount(null);
         DataManager.getInstance().googleCredential = null;
     }
 
@@ -67,20 +67,20 @@ public final class SharedPrefsManager {
     @NonNls
     private static final String SPORT_CALENDAR_SERVER_ID = "SPORT_CALENDAR_SERVER_ID";
 
-    public static void saveSportCalendarServerId() {
+    public static void saveCalendarGAPIid() {
         getInstance().preferences
                 .edit()
-                .putString(SPORT_CALENDAR_SERVER_ID, DataManager.getInstance().sportCalendarGAPIId)
+                .putString(SPORT_CALENDAR_SERVER_ID, DataManager.getInstance().calendarGAPIid)
                 .commit();
     }
 
-    public static void restoreSportCalendarServerId() {
+    public static void restoreCalendarGAPIid() {
         String str = getInstance().preferences.getString(SPORT_CALENDAR_SERVER_ID, null);
-        DataManager.getInstance().sportCalendarGAPIId = str;
+        DataManager.getInstance().calendarGAPIid = str;
     }
 
-    public static void removeSportCalendarServerId() {
-        DataManager.getInstance().sportCalendarGAPIId = null;
+    public static void removeCalendarGAPIid() {
+        DataManager.getInstance().calendarGAPIid = null;
         getInstance().preferences
                 .edit()
                 .putString(SPORT_CALENDAR_SERVER_ID, null)
@@ -90,23 +90,23 @@ public final class SharedPrefsManager {
     @NonNls
     private static final String SPORT_CALENDAR_CONTENT_PROVIDER_ID = "SPORT_CALENDAR_CONTENT_PROVIDER_ID";
 
-    public static void saveSportCalendarContentProviderId() {
+    public static void saveCalendarCPid() {
         getInstance().preferences
                 .edit()
-                .putLong(SPORT_CALENDAR_CONTENT_PROVIDER_ID, DataManager.getInstance().sportCalendarContentProviderId)
+                .putLong(SPORT_CALENDAR_CONTENT_PROVIDER_ID, DataManager.getInstance().calendarCPid)
                 .commit();
     }
 
-    public static void removeSportCalendarContentProviderId() {
-        DataManager.getInstance().sportCalendarContentProviderId = -1;
+    public static void removeCalendarCPid() {
+        DataManager.getInstance().calendarCPid = -1;
         getInstance().preferences
                 .edit()
                 .putLong(SPORT_CALENDAR_CONTENT_PROVIDER_ID, -1)
                 .commit();
     }
 
-    public static void restoreSportCalendarContentProviderId() {
-        DataManager.getInstance().sportCalendarContentProviderId = getInstance().preferences.getLong(SPORT_CALENDAR_CONTENT_PROVIDER_ID, -1);
+    public static void restoreCalendarCPid() {
+        DataManager.getInstance().calendarCPid = getInstance().preferences.getLong(SPORT_CALENDAR_CONTENT_PROVIDER_ID, -1);
     }
 }
 

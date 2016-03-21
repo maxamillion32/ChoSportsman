@@ -20,7 +20,6 @@ import com.chokavo.chosportsman.AppUtils;
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.calendar.CalendarManager;
 import com.chokavo.chosportsman.models.DataManager;
-import com.chokavo.chosportsman.models.SharedPrefsManager;
 import com.chokavo.chosportsman.ui.activities.BaseActivity;
 import com.chokavo.chosportsman.ui.activities.NavigationDrawerActivity;
 import com.chokavo.chosportsman.ui.fragments.NewEventFragment;
@@ -183,7 +182,7 @@ public class CalendarActivity extends NavigationDrawerActivity {
                             data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
                     if (accountName != null) {
                         mCredential.setSelectedAccountName(accountName);
-                        DataManager.getInstance().setGoogleAccount(accountName);
+                        DataManager.getInstance().setAndSaveGoogleAccount(accountName);
                     }
                 } else if (resultCode == RESULT_CANCELED) {
                     ImageSnackbar.make(mCalendarView, ImageSnackbar.TYPE_ERROR, "К сожалению, вы не выбрали аккаунт", Snackbar.LENGTH_LONG).show();

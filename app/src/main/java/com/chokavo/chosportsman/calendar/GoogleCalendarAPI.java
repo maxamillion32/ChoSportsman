@@ -41,7 +41,18 @@ public class GoogleCalendarAPI {
      */
     private static HttpTransport sHttpTransport = AndroidHttp.newCompatibleTransport();
 
-    public static void getCalendarList(Subscriber<CalendarList> subscriber) {
+
+    /**
+     * async - выполняется в дополнительном потоке
+     * 1) заходим на GAPI
+     * 2) извлекаем все CalendarList нашего юзера
+     * 3) если нет ListEntry, то создаем календарь и запонимаем его GAPIid
+     * 4) иначе берем календарь по найденному id
+     * 5) сохраняем GAPIid в ShPr
+     * 6) посылаем сигнал подписчику, что календарь у нас
+     * @param subscriber
+     */
+    public static void getCalendarGAPI(Subscriber<CalendarList> subscriber) {
 
         Observable<CalendarList> myObservable = Observable.create(new Observable.OnSubscribe<CalendarList>() {
             @Override
@@ -56,7 +67,7 @@ public class GoogleCalendarAPI {
                     System.out.println("calendarList size: " + calendarList.size());
                     // получили список календарей, теперь нужно сделать проверку на наличие нашего календаря с определенным Summary
 
-                    CalendarListEntry sportCalendarListEntry = getSportCalendar(calendarList);
+                    CalendarListEntry sportCalendarListEntry = getSportCalendarListEntry(calendarList);
                     String calendarGAPIid;
                     Calendar calendarGAPI;
                     if (sportCalendarListEntry == null) {
@@ -67,12 +78,12 @@ public class GoogleCalendarAPI {
                         calendarGAPIid = sportCalendarListEntry.getId();
                         calendarGAPI = getCalendarById(calendarGAPIid);
                     }
-                    // здесь мы уже имеем календарь c id=sportCalendarGAPIId
-                    DataManager.getInstance().sportCalendarGAPIId = calendarGAPIid;
-                    SharedPrefsManager.saveSportCalendarServerId();
+                    // здесь мы уже имеем календарь c id=calendarGAPIid
+                    DataManager.getInstance().calendarGAPIid = calendarGAPIid;
+                    SharedPrefsManager.saveCalendarGAPIid();
                     if (calendarGAPIid == null) {
                         sub.onNext(null);
-                        Log.e(GoogleCalendarAPI.class.getName(), "no sportCalendarGAPIId");
+                        Log.e(GoogleCalendarAPI.class.getName(), "no calendarGAPIid");
                         sub.onCompleted();
                         return;
                     }
@@ -101,7 +112,7 @@ public class GoogleCalendarAPI {
         } else {
             System.out.println("calendar desc: " + calendar.getDescription());
         }
-        DataManager.getInstance().sportCalendarGAPI = calendar;
+        DataManager.getInstance().calendarGAPI = calendar;
         return calendar;
     }
 
@@ -120,7 +131,12 @@ public class GoogleCalendarAPI {
     }
 
 
-    private static CalendarListEntry getSportCalendar(CalendarList calendarList) {
+    /**
+     * Ищет среди CalendarList календарь с названием SPORT_CALENDAR_SUMMARY ("Чо, спортсмен?")
+     * @param calendarList лист календарей юзера
+     * @return спортивный календарь, если он есть, иначе null
+     */
+    private static CalendarListEntry getSportCalendarListEntry(CalendarList calendarList) {
         for (CalendarListEntry calendar: calendarList.getItems()) {
             String summary = calendar.getSummary();
             if (summary.equals(SPORT_CALENDAR_SUMMARY)){
@@ -128,6 +144,41 @@ public class GoogleCalendarAPI {
             }
         }
         return null;
+    }
+
+    public static void getCalendarGAPIbyId(Subscriber<CalendarList> subscriber, final String calendarGAPIid) {
+        Observable<CalendarList> myObservable = Observable.create(new Observable.OnSubscribe<CalendarList>() {
+            @Override
+            public void call(Subscriber<? super CalendarList> sub) {
+                try {
+//                        new MakeRequestTask(DataManager.getInstance().googleCredential, sub).execute();
+                    com.google.api.services.calendar.Calendar mService = new com.google.api.services.calendar.Calendar.Builder(
+                            sHttpTransport, sJsonFactory, DataManager.getInstance().googleCredential)
+                            .setApplicationName(AppUtils.getApplicationName())
+                            .build();
+
+                    Calendar calendarGAPI = getCalendarById(calendarGAPIid);
+                    // здесь мы уже имеем календарь c id=calendarGAPIid
+                    if (calendarGAPI == null) {
+                        DataManager.getInstance().calendarGAPIid = null;
+                        SharedPrefsManager.saveCalendarGAPIid();
+                        sub.onNext(null);
+                        Log.e(GoogleCalendarAPI.class.getName(), "no calendarGAPIid");
+                        sub.onCompleted();
+                        return;
+                    }
+                    // имеем id и сам календарь, можно спокойно выходить
+                    sub.onNext(null);
+                    sub.onCompleted();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    sub.onError(e);
+                }
+            }
+        })
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread());
+        myObservable.subscribe(subscriber);
     }
 }
 
