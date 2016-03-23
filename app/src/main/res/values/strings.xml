@@ -16,4 +16,7 @@
     <string name="title_activity_choose_sports">ChooseSportsActivity</string>
     <string name="choose_sport_please">Выберите виды спорта, которые вам по душе</string>
     <string name="no_internet_connection">Интернет соединение отсутствует</string>
+    <string name="calendar_type_cp">Content provider</string>
+    <string name="calendar_type_gapi">Google API</string>
+    <string name="progress_gapi">Подождите... Работа с календарем через Google Calendar API</string>
 </resources>
