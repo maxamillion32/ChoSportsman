@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:layout_height="60dp">
+    <ImageView
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_gravity="center"
+        android:shadowColor="@color/black_100"
+        android:id="@+id/image_sport"
+        android:src="@drawable/ic_today_24dp"/>
+    <TextView
+        android:layout_width="247dp"
+        android:layout_height="match_parent"
+        android:text="Футбол"
+        android:gravity="center_vertical"
+        android:textSize="20dp"
+        android:textColor="@color/black_100"
+        android:paddingLeft="30dp"
+        android:id="@+id/sportkind_tv"/>
+
+    <CheckBox
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="right"
+        android:shadowColor="@color/black_100"
+        android:id="@+id/checkbox_delete_sport"
+        android:visibility="gone"
+        android:layout_weight="1"/>
+</LinearLayout>
