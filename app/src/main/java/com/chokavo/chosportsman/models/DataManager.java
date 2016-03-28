@@ -2,16 +2,15 @@ package com.chokavo.chosportsman.models;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 
 import com.chokavo.chosportsman.App;
-import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.network.datarows.SportObjectDataRow;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.services.calendar.model.Calendar;
 import com.vk.sdk.api.model.VKApiUserFull;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -61,6 +60,25 @@ public class DataManager {
 
     public Set<SportKind> getSportKinds() {
         return mSportKinds;
+    }
+
+    public SportKind getSportKindByName(@NonNull CharSequence sportTypeChar) {
+        if (sportTypeChar == null) return null;
+        for (SportKind curSportKind: mSportKinds) {
+            if (curSportKind.getName().equals(sportTypeChar.toString())) {
+                return curSportKind;
+            }
+        }
+        return null;
+    }
+
+    public CharSequence[] getSportKindsAsChars() {
+        CharSequence[] chars = new CharSequence[mSportKinds.size()];
+        int i = 0;
+        for (SportKind sportKind: mSportKinds) {
+            chars[i++] = sportKind.getName();
+        }
+        return chars;
     }
 
     public Set<SportKind> getUserSports() {

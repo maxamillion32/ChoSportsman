@@ -5,6 +5,8 @@
     <color name="colorPrimaryTransparent70">#b33f51b5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="colorDivider">#4d000000</color>
+    <color name="error">#ff0000</color>
 
     <color name="black_100">#000000</color>
     <color name="black_90">#e6000000</color>

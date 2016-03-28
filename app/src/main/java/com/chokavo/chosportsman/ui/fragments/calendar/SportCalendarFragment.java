@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +21,7 @@ import com.chokavo.chosportsman.calendar.CalendarManager;
 import com.chokavo.chosportsman.calendar.GoogleCalendarAPI;
 import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.ui.activities.calendar.CalendarActivity;
+import com.chokavo.chosportsman.ui.activities.calendar.CreateEventActivity;
 import com.chokavo.chosportsman.ui.fragments.BaseFragment;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
@@ -45,6 +47,7 @@ public class SportCalendarFragment extends BaseFragment {
     private Calendar mCalendar;
     private CircleImageView mBtnHideCalendar;
     private FlexibleCalendarView mCalendarView;
+    private FloatingActionButton mFabAddEvent;
 
     @Override
     public String getFragmentTitle() {
@@ -81,6 +84,7 @@ public class SportCalendarFragment extends BaseFragment {
         mTxtGoogleAccount = (TextView) rootView.findViewById(R.id.txt_google_account);
         mTxtCalendarType = (TextView) rootView.findViewById(R.id.txt_calendar_type);
         mTxtMonth = (TextView) rootView.findViewById(R.id.txt_month);
+        mFabAddEvent = (FloatingActionButton) rootView.findViewById(R.id.fab_add_event);
 
         mCalendarView.collapse();
         mBtnHideCalendar.setOnClickListener(new View.OnClickListener() {
@@ -101,6 +105,12 @@ public class SportCalendarFragment extends BaseFragment {
 
         // Initialize credentials and service object.
         mTxtGoogleAccount.setText(DataManager.getInstance().getGoogleAccount());
+        mFabAddEvent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), CreateEventActivity.class));
+            }
+        });
 
     }
 

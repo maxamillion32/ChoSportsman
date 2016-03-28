@@ -22,7 +22,7 @@ import com.chokavo.chosportsman.calendar.CalendarManager;
 import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.ui.activities.BaseActivity;
 import com.chokavo.chosportsman.ui.activities.NavigationDrawerActivity;
-import com.chokavo.chosportsman.ui.fragments.NewEventFragment;
+import com.chokavo.chosportsman.ui.fragments.calendar.CreateEventFragment;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.util.ExponentialBackOff;
@@ -119,7 +119,7 @@ public class CalendarActivityOld extends NavigationDrawerActivity {
         mFabAddEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                launchFragment(new NewEventFragment(), NewEventFragment.class.getName());
+                launchFragment(new CreateEventFragment(), CreateEventFragment.class.getName());
             }
         });
 

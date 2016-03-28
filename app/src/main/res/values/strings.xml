@@ -21,4 +21,10 @@
     <string name="progress_gapi">Подождите... Работа с календарем через Google Calendar API</string>
     <string name="vk_user_id">VkUserId</string>
     <string name="sport_kinds">SportKinds</string>
+
+    <string name="date_format_1">E, d MMM yyyy г.</string>
+    <string name="time_format_1">HH:mm</string>
+    <string name="type_training">Тренировка</string>
+    <string name="type_competition">Соревнование</string>
+    <string name="ok">OK</string>
 </resources>

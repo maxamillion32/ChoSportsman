@@ -47,4 +47,8 @@ dependencies {
     compile 'io.reactivex:rxjava:1.1.0'
 
     compile 'me.everything:providers-android:1.0.1'
+    compile 'com.wdullaer:materialdatetimepicker:2.2.0'
+    compile('com.github.afollestad.material-dialogs:core:0.8.5.7@aar') {
+        transitive = true
+    }
 }
