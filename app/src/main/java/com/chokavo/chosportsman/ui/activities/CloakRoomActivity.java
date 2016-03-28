@@ -7,6 +7,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -76,6 +77,7 @@ public class CloakRoomActivity extends NavigationDrawerActivity {
 
         mRecyclerSports.setAdapter(adapter);
         mRecyclerSports.setLayoutManager(layoutManager);
+        mRecyclerSports.setItemAnimator(new DefaultItemAnimator());
 
         final FloatingActionButton fab_ok = (FloatingActionButton) findViewById(R.id.fab_ok);
         final FloatingActionButton fab_edit = (FloatingActionButton) findViewById(R.id.fab_edit);
@@ -86,6 +88,8 @@ public class CloakRoomActivity extends NavigationDrawerActivity {
                 fab_ok.setVisibility(View.GONE);
                 fab_edit.setVisibility(View.VISIBLE);
                 linearLayoutAdd.setVisibility(View.GONE);
+                DataManager.getInstance().setDeleteUserSports(false);
+                adapter.notifyDataSetChanged();
             }
         });
         fab_edit.setOnClickListener(new View.OnClickListener() {
@@ -94,6 +98,8 @@ public class CloakRoomActivity extends NavigationDrawerActivity {
                 fab_edit.setVisibility(View.GONE);
                 fab_ok.setVisibility(View.VISIBLE);
                 linearLayoutAdd.setVisibility(View.VISIBLE);
+                DataManager.getInstance().setDeleteUserSports(true);
+                adapter.notifyDataSetChanged();
             }
         });
     }

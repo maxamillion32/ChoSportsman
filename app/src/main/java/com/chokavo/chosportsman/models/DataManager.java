@@ -10,6 +10,7 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.google.api.services.calendar.model.Calendar;
 import com.vk.sdk.api.model.VKApiUserFull;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -22,8 +23,8 @@ public class DataManager {
 
     public List<SportObjectDataRow> sportObjects;
     public VKApiUserFull vkUser;
-    private Set<SportKind> mSportKinds = new HashSet<>();
-    private Set<SportKind> mUserSports = new HashSet<>();
+    private List<SportKind> mSportKinds = new ArrayList<>();
+    private List<SportKind> mUserSports = new ArrayList<>();
     public SharedPreferences mPreferences;
 
     private String mGoogleAccount;
@@ -49,7 +50,7 @@ public class DataManager {
         mPreferences.edit().putInt(key, vkUser.getId()).apply();
     }
 
-    public void setUserSports(Set<SportKind> sports, String key) {
+    public void setUserSports(List<SportKind> sports, String key) {
         mUserSports = sports;
         Set<String> sportNames = new HashSet<>();
         for (SportKind sport :
@@ -59,20 +60,20 @@ public class DataManager {
         mPreferences.edit().putStringSet(key, sportNames).apply();
     }
 
-    public Set<SportKind> getSportKinds() {
+    public List<SportKind> getSportKinds() {
         return mSportKinds;
     }
 
-    public Set<SportKind> getUserSports() {
+    public List<SportKind> getUserSports() {
         return mUserSports;
     }
 
-    public Set<SportKind> loadUserSports(String key) {
+    public List<SportKind> loadUserSports(String key) {
         if (getUserSports().size() != 0)
             return getUserSports();
         Set<String> sportNames = mPreferences.getStringSet(key, null);
         if (sportNames == null)
-            return new HashSet<>();
+            return new ArrayList<>();
         mUserSports.clear();
         for (SportKind sport :
                 mSportKinds) {
@@ -83,7 +84,7 @@ public class DataManager {
     }
 
     public void loadSports() {
-        mSportKinds = new HashSet<>();
+        mSportKinds = new ArrayList<>();
         SportKind football = new SportKind("Футбол");
         SportKind voleyball = new SportKind("Волейбол");
         SportKind hockey = new SportKind("Хокей");
@@ -92,6 +93,13 @@ public class DataManager {
         mSportKinds.add(voleyball);
         mSportKinds.add(hockey);
         mSportKinds.add(basketball);
+    }
+
+    public void setDeleteUserSports(boolean isDeleteAvailable){
+        for (SportKind sport :
+                mUserSports) {
+            sport.setChecked(isDeleteAvailable);
+        }
     }
 
     public String getGoogleAccount() {

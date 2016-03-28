@@ -18,8 +18,10 @@ import com.chokavo.chosportsman.models.SportKindFactory;
 import com.chokavo.chosportsman.ui.adapters.ChooseSportsAdapter;
 import com.chokavo.chosportsman.ui.adapters.SportObjectAdapter;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 public class ChooseSportsActivity extends AppCompatActivity {
@@ -68,7 +70,7 @@ public class ChooseSportsActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_continue) {
-            Set<SportKind> mCheckedSports = new HashSet<>();
+            List<SportKind> mCheckedSports = new ArrayList<>();
             Iterator<SportKind> iterator = DataManager.getInstance().getSportKinds().iterator();
             boolean isEmpty = true;
             while( iterator.hasNext()) {

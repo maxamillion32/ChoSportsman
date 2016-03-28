@@ -22,8 +22,8 @@ public class ChooseSportsAdapter extends RecyclerView.Adapter<ChooseSportsAdapte
 
     private List<SportKind> sports = new ArrayList<>();
 
-    public ChooseSportsAdapter(Set<SportKind> sportKinds) {
-        sports.addAll(sportKinds);
+    public ChooseSportsAdapter(List<SportKind> sportKinds) {
+        sports = sportKinds;
     }
 
     @Override
