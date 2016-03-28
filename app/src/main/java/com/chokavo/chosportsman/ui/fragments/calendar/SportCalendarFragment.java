@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import com.chokavo.chosportsman.Constants;
@@ -30,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import me.everything.providers.android.calendar.Calendar;
 import rx.Subscriber;
 
@@ -40,6 +43,7 @@ public class SportCalendarFragment extends BaseFragment {
     private TextView mOutputText, mTxtGoogleAccount, mTxtCalendarType, mTxtMonth;
     ProgressDialog mProgress;
     private Calendar mCalendar;
+    private CircleImageView mBtnHideCalendar;
     private FlexibleCalendarView mCalendarView;
 
     @Override
@@ -65,19 +69,38 @@ public class SportCalendarFragment extends BaseFragment {
         return rootView;
     }
 
+    private void rotateArrowButton(boolean back) {
+        Animation rotateAnim = AnimationUtils.loadAnimation(getActivity(), back ? R.anim.rotate_180_back : R.anim.rotate_180);
+        mBtnHideCalendar.setAnimation(rotateAnim);
+    }
+
     private void initViews(View rootView) {
+        mCalendarView = (FlexibleCalendarView) rootView.findViewById(R.id.month_view);
+        mBtnHideCalendar = (CircleImageView) rootView.findViewById(R.id.btn_hide_calendar);
         mOutputText = (TextView) rootView.findViewById(R.id.txt_output);
         mTxtGoogleAccount = (TextView) rootView.findViewById(R.id.txt_google_account);
         mTxtCalendarType = (TextView) rootView.findViewById(R.id.txt_calendar_type);
         mTxtMonth = (TextView) rootView.findViewById(R.id.txt_month);
+
+        mCalendarView.collapse();
+        mBtnHideCalendar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mCalendarView.isShown()){
+                    rotateArrowButton(true);
+                    mCalendarView.collapse();
+                }else{
+                    rotateArrowButton(false);
+                    mCalendarView.expand();
+                }
+            }
+        });
 
         mProgress = new ProgressDialog(getActivity());
         mProgress.setMessage(getString(R.string.progress_gapi));
 
         // Initialize credentials and service object.
         mTxtGoogleAccount.setText(DataManager.getInstance().getGoogleAccount());
-
-        mCalendarView = (FlexibleCalendarView) rootView.findViewById(R.id.month_view);
 
     }
 
