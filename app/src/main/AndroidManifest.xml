@@ -32,7 +32,7 @@
             android:label="ServiceActivity"
             android:theme="@style/VK.Transparent" />
         <activity
-            android:name=".ui.activities.CloakRoomActivity"
+            android:name=".ui.activities.LockerRoomActivity"
             android:label="Моя раздевалка" >
         </activity>
         <activity
