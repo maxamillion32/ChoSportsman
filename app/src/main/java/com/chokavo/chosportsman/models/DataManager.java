@@ -23,9 +23,9 @@ public class DataManager {
 
     public List<SportObjectDataRow> sportObjects;
     public VKApiUserFull vkUser;
-    private List<SportKind> mSportKinds = new ArrayList<>();
     public boolean userSportsChosen;
-    private Set<SportKind> mUserSports = new HashSet<>();
+    private List<SportKind> mSportKinds = new ArrayList<>();
+    private List<SportKind> mUserSports = new ArrayList<>();
     public SharedPreferences mPreferences;
 
     private String mGoogleAccount;
@@ -52,7 +52,7 @@ public class DataManager {
         mPreferences.edit().putInt(key, vkUser.getId()).apply();
     }
 
-    public void setUserSports(Set<SportKind> sports, String key) {
+    public void setUserSports(List<SportKind> sports, String key) {
         mUserSports = sports;
         Set<String> sportNames = new HashSet<>();
         for (SportKind sport :
@@ -85,16 +85,16 @@ public class DataManager {
         return chars;
     }
 
-    public Set<SportKind> getUserSports() {
+    public List<SportKind> getUserSports() {
         return mUserSports;
     }
 
-    public Set<SportKind> loadUserSports(String key) {
+    public List<SportKind> loadUserSports(String key) {
         if (getUserSports().size() != 0)
             return getUserSports();
         Set<String> sportNames = mPreferences.getStringSet(key, null);
         if (sportNames == null)
-            return new HashSet<>();
+            return new ArrayList<>();
         mUserSports.clear();
         for (SportKind sport :
                 mSportKinds) {

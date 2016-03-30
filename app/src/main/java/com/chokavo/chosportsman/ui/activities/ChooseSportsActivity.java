@@ -22,7 +22,7 @@ import com.chokavo.chosportsman.network.SportsmanRestInterface;
 import com.chokavo.chosportsman.ui.adapters.ChooseSportsAdapter;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -48,13 +48,12 @@ public class ChooseSportsActivity extends AppCompatActivity {
         if (getSupportActionBar()!=null)
             getSupportActionBar().setTitle(R.string.choose_sport_please);
 
-        /*SharedPreferences preferences = DataManager.getInstance().mPreferences;
+        SharedPreferences preferences = DataManager.getInstance().mPreferences;
         Set<String> sportKinds = preferences.getStringSet(getString(R.string.sport_kinds),null);
         if (sportKinds != null) {
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-        }*/
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+        }
 
         mSwipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         mSwipeRefresh.setColorSchemeResources(R.color.colorPrimary);
@@ -124,7 +123,7 @@ public class ChooseSportsActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_continue) {
-            Set<SportKind> mCheckedSports = new HashSet<>();
+            List<SportKind> mCheckedSports = new ArrayList<>();
             Iterator<SportKind> iterator = DataManager.getInstance().getSportKinds().iterator();
             boolean isEmpty = true;
             while( iterator.hasNext()) {

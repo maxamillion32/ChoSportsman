@@ -24,8 +24,8 @@ public class UserSportsAdapter extends RecyclerView.Adapter<UserSportsAdapter.Vi
 
     private List<SportKind> sports = new ArrayList<>();
 
-    public UserSportsAdapter(Set<SportKind> sportKinds) {
-        sports.addAll(sportKinds);
+    public UserSportsAdapter(List<SportKind> sportKinds) {
+        sports = sportKinds;
     }
 
     @Override
