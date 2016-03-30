@@ -9,12 +9,17 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Calendar;
 import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
+import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventDateTime;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
 import rx.Observable;
@@ -41,6 +46,93 @@ public class GoogleCalendarAPI {
      */
     private static HttpTransport sHttpTransport = AndroidHttp.newCompatibleTransport();
 
+    private static GoogleCalendarAPI sGoogleCalendarAPI;
+
+    public void createEvent(Subscriber<Event> subscriber,
+                            final String summary,
+                            final String location,
+                            final boolean allday,
+                            final java.util.Calendar calendarStart,
+                            final java.util.Calendar calendarEnd
+    ) {
+        Observable<Event> myObservable = Observable.create(new Observable.OnSubscribe<Event>() {
+            @Override
+            public void call(Subscriber<? super Event> sub) {
+                try {
+                    Event event = new Event()
+                            .setSummary(summary)
+                            .setLocation(location);
+
+                    DateTime startDateTime;
+                    EventDateTime start = new EventDateTime();
+                    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    if (allday) {
+                        String strStart = dateFormat.format(calendarStart.getTime());
+                        startDateTime = new DateTime(strStart);
+                        start.setDate(startDateTime);
+                    } else {
+                        startDateTime = new DateTime(calendarStart.getTimeInMillis());
+                        start.setDateTime(startDateTime);
+                    }
+                    event.setStart(start);
+
+                    DateTime endDateTime;
+                    EventDateTime end = new EventDateTime();
+                    if (allday) {
+                        String strEnd = dateFormat.format(calendarEnd.getTime());
+                        endDateTime = new DateTime(strEnd);
+                        end.setDate(endDateTime);
+                    } else {
+                        endDateTime = new DateTime(calendarEnd.getTimeInMillis());
+                        end.setDateTime(endDateTime);
+                    }
+                    event.setEnd(end);
+
+                    // TODO recurrence (повторение)
+//        String[] recurrence = new String[] {"RRULE:FREQ=DAILY;COUNT=2"};
+//        event.setRecurrence(Arrays.asList(recurrence));
+
+                    // TODO Reminders (напоминалки)
+        /*EventReminder[] reminderOverrides = new EventReminder[] {
+                new EventReminder().setMethod("email").setMinutes(24 * 60),
+                new EventReminder().setMethod("popup").setMinutes(10),
+        };
+        Event.Reminders reminders = new Event.Reminders()
+                .setUseDefault(false)
+                .setOverrides(Arrays.asList(reminderOverrides));
+        event.setReminders(reminders);*/
+
+                    String calendarId = DataManager.getInstance().calendarGAPIid;
+                    event = mService.events().insert(calendarId, event).execute();
+                    DataManager.getInstance().lastEvent = event;
+                    sub.onNext(event);
+                    sub.onCompleted();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    sub.onError(e);
+                }
+            }
+        })
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread());
+        myObservable.subscribe(subscriber);
+    }
+
+    private com.google.api.services.calendar.Calendar mService;
+
+    public GoogleCalendarAPI() {
+        mService = new com.google.api.services.calendar.Calendar.Builder(
+                sHttpTransport, sJsonFactory, DataManager.getInstance().googleCredential)
+                .setApplicationName(AppUtils.getApplicationName())
+                .build();
+    }
+
+    public static GoogleCalendarAPI getInstance() {
+        if (sGoogleCalendarAPI == null) {
+            sGoogleCalendarAPI = new GoogleCalendarAPI();
+        }
+        return sGoogleCalendarAPI;
+    }
 
     /**
      * async - выполняется в дополнительном потоке

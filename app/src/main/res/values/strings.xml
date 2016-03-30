@@ -19,6 +19,7 @@
     <string name="calendar_type_cp">Content provider</string>
     <string name="calendar_type_gapi">Google API</string>
     <string name="progress_gapi">Подождите... Работа с календарем через Google Calendar API</string>
+    <string name="progress_create_event">Подождите... Событие создается</string>
     <string name="vk_user_id">VkUserId</string>
     <string name="sport_kinds">SportKinds</string>
     <string name="lorem">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor

@@ -12,6 +12,8 @@ import com.chokavo.chosportsman.ui.fragments.calendar.CreateEventFragment;
  * Created by ilyapyavkin on 28.03.16.
  */
 public class CreateEventActivity extends BaseActivity {
+    public static final int REQUEST_CREATE_EVENT = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

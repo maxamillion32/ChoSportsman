@@ -8,6 +8,7 @@ import com.chokavo.chosportsman.App;
 import com.chokavo.chosportsman.network.datarows.SportObjectDataRow;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.services.calendar.model.Calendar;
+import com.google.api.services.calendar.model.Event;
 import com.vk.sdk.api.model.VKApiUserFull;
 
 import java.util.HashSet;
@@ -32,6 +33,7 @@ public class DataManager {
 
     public me.everything.providers.android.calendar.Calendar calendarCP; // календарь, получаем из ContentProvider с помощью me.every
     public Calendar calendarGAPI; // календарь, который получаем из Google API
+    public Event lastEvent; // последнее созданное событие
 
     private static DataManager ourInstance = new DataManager();
 

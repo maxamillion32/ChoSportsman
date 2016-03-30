@@ -108,7 +108,8 @@ public class SportCalendarFragment extends BaseFragment {
         mFabAddEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getActivity(), CreateEventActivity.class));
+                startActivityForResult(new Intent(getActivity(), CreateEventActivity.class),
+                        CreateEventActivity.REQUEST_CREATE_EVENT);
             }
         });
 
@@ -180,6 +181,13 @@ public class SportCalendarFragment extends BaseFragment {
             case REQUEST_AUTHORIZATION:
                 if (resultCode != Activity.RESULT_OK) {
                     launchFragmentNoBackStack(new NoSportCalendarFragment(), NoSportCalendarFragment.getFragmentTag());
+                }
+                break;
+            case CreateEventActivity.REQUEST_CREATE_EVENT:
+                if (resultCode == Activity.RESULT_OK) {
+                    ImageSnackbar.make(mBtnHideCalendar, ImageSnackbar.TYPE_SUCCESS,
+                            String.format("Событие '%s' успешно создано", DataManager.getInstance().lastEvent.getSummary()),
+                            Snackbar.LENGTH_LONG).show();
                 }
                 break;
         }

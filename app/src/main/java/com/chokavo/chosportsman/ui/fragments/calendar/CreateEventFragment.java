@@ -1,7 +1,11 @@
 package com.chokavo.chosportsman.ui.fragments.calendar;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,18 +20,23 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.chokavo.chosportsman.R;
+import com.chokavo.chosportsman.calendar.GoogleCalendarAPI;
 import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.models.SportEventType;
 import com.chokavo.chosportsman.models.SportKind;
 import com.chokavo.chosportsman.ui.adapters.CheckableItemAdapter;
 import com.chokavo.chosportsman.ui.fragments.BaseFragment;
+import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 import com.chokavo.chosportsman.ui.widgets.NewEventRowView;
+import com.google.api.services.calendar.model.Event;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+
+import rx.Subscriber;
 
 /**
  * Created by repitch on 15.03.16.
@@ -44,7 +53,7 @@ public class CreateEventFragment extends BaseFragment {
     private NewEventRowView mRowSportType, mRowEventType, mRowRepeat;
     private LinearLayout mLlWholeDayWrap, mLlRemindersWrap;
     private TextView mTxtDataStart, mTxtTimeStart, mTxtDataEnd, mTxtTimeEnd, mTxtAddReminder;
-    private EditText mEditLocation;
+    private EditText mEditLocation, mEditSummary;
     private Switch mSwitchWholeDay;
 
     private MaterialDialog mDialogSportType, mDialogSportEventType, mDialogTimeError;
@@ -55,6 +64,8 @@ public class CreateEventFragment extends BaseFragment {
     private Calendar mCalendarStart, mCalendarEnd;
     private Calendar mCalendarStartDate, mCalendarEndDate; // only date, no time
     private boolean timeStartEndError;
+
+    private ProgressDialog mProgress;
 
     private CharSequence mEventTypes[], mSportTypes[];
 
@@ -86,6 +97,7 @@ public class CreateEventFragment extends BaseFragment {
         mTxtTimeEnd = (TextView) rootView.findViewById(R.id.txt_time_end);
         mTxtAddReminder = (TextView) rootView.findViewById(R.id.txt_add_reminder);
         mEditLocation = (EditText) rootView.findViewById(R.id.edit_location);
+        mEditSummary = (EditText) rootView.findViewById(R.id.edit_summary);
         mSwitchWholeDay = (Switch) rootView.findViewById(R.id.switch_whole_day);
 
         //dialogs
@@ -132,6 +144,10 @@ public class CreateEventFragment extends BaseFragment {
         mEventTypes = SportEventType.getEventTypesAsChars(getActivity());
         mChosenSportEventType = 0;
         mRowEventType.setValue(mEventTypes[mChosenSportEventType].toString());
+
+        // progress dialog
+        mProgress = new ProgressDialog(getActivity());
+        mProgress.setMessage(getString(R.string.progress_create_event));
     }
 
     private void initActions() {
@@ -301,7 +317,39 @@ public class CreateEventFragment extends BaseFragment {
             showDialogTimeError();
             return;
         }
-        // TODO create new event on server
+
+        boolean allday = mSwitchWholeDay.isChecked();
+        mProgress.show();
+        GoogleCalendarAPI.getInstance().createEvent(
+                new Subscriber<Event>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.e("createEvent", "onCompleted");
+                        mProgress.hide();
+                        getActivity().setResult(Activity.RESULT_OK);
+                        getActivity().finish();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("createEvent", String.format("onError: %s", e));
+                        mProgress.hide();
+                        ImageSnackbar.make(mEditLocation, ImageSnackbar.TYPE_ERROR,
+                                "При создании события произошла ошибка", Snackbar.LENGTH_LONG)
+                                .show();
+                    }
+
+                    @Override
+                    public void onNext(Event event) {
+                        Log.e("createEvent", String.format("Event created: %s\n", event.getHtmlLink()));
+                    }
+                },
+                mEditSummary.getText().toString(),
+                mEditLocation.getText().toString(),
+                allday,
+                allday ? mCalendarStartDate : mCalendarStart,
+                allday ? mCalendarEndDate : mCalendarEnd
+        );
     }
 
     private void showDialogTimeError() {
