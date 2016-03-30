@@ -19,6 +19,7 @@ public class App extends Application {
         SharedPrefsManager.restoreGoogleAccount();
         SharedPrefsManager.restoreCalendarGAPIid();
         SharedPrefsManager.restoreCalendarCPid();
+        SharedPrefsManager.restoreUserSportsChosen();
 
         // Инициализация VK
         VKSdk.initialize(this);

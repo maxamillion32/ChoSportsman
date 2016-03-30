@@ -16,10 +16,8 @@ import java.util.Arrays;
  * Created by ilyapyavkin on 14.03.16.
  */
 public final class SharedPrefsManager {
-
     @NonNls
     private final String PREFS = "PREFS";
-
 
     private static SharedPrefsManager manager;
     private SharedPreferences preferences;
@@ -108,5 +106,20 @@ public final class SharedPrefsManager {
     public static void restoreCalendarCPid() {
         DataManager.getInstance().calendarCPid = getInstance().preferences.getLong(SPORT_CALENDAR_CONTENT_PROVIDER_ID, -1);
     }
+
+    // sports
+    private static final String USER_SPORTS_CHOSEN = "USER_SPORTS_CHOSEN";
+
+    public static void restoreUserSportsChosen() {
+        DataManager.getInstance().userSportsChosen = getInstance().preferences.getBoolean(USER_SPORTS_CHOSEN, false);
+    }
+
+    public static void saveUserSportsChosen() {
+        getInstance().preferences
+                .edit()
+                .putBoolean(USER_SPORTS_CHOSEN, DataManager.getInstance().userSportsChosen)
+                .commit();
+    }
+
 }
 

@@ -11,6 +11,7 @@ import com.google.api.services.calendar.model.Calendar;
 import com.google.api.services.calendar.model.Event;
 import com.vk.sdk.api.model.VKApiUserFull;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,7 +23,8 @@ public class DataManager {
 
     public List<SportObjectDataRow> sportObjects;
     public VKApiUserFull vkUser;
-    private Set<SportKind> mSportKinds = new HashSet<>();
+    private List<SportKind> mSportKinds = new ArrayList<>();
+    public boolean userSportsChosen;
     private Set<SportKind> mUserSports = new HashSet<>();
     public SharedPreferences mPreferences;
 
@@ -60,7 +62,7 @@ public class DataManager {
         mPreferences.edit().putStringSet(key, sportNames).apply();
     }
 
-    public Set<SportKind> getSportKinds() {
+    public List<SportKind> getSportKinds() {
         return mSportKinds;
     }
 
@@ -102,8 +104,9 @@ public class DataManager {
         return mUserSports;
     }
 
+    @Deprecated
     public void loadSports() {
-        mSportKinds = new HashSet<>();
+        mSportKinds = new ArrayList<>();
         SportKind football = new SportKind("Футбол");
         SportKind voleyball = new SportKind("Волейбол");
         SportKind hockey = new SportKind("Хокей");
@@ -131,4 +134,7 @@ public class DataManager {
     }
 
 
+    public void setSportKinds(List<SportKind> sportKinds) {
+        mSportKinds = sportKinds;
+    }
 }
