@@ -56,6 +56,25 @@ public abstract class BaseActivity extends AppCompatActivity {
                 .commit();
     }
 
+    public static final int ANIM_LEFT2RIGHT = 1;
+
+    public void launchAnimationFragment(Fragment fragment, String tag, int animType) {
+        clearBackStack();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        // тут буду мутить свои анимашки, пока что тест
+        switch (animType) {
+            case ANIM_LEFT2RIGHT:
+                ft.setCustomAnimations(
+                        R.anim.left_to_right, R.anim.right_to_left);
+                break;
+            default:
+                return;
+        }
+        ft.replace(R.id.content_frame, fragment, tag)
+                .commit();
+
+    }
+
     public void clearBackStack() {
         FragmentManager fm = getSupportFragmentManager();
         for (int i = 0; i < fm.getBackStackEntryCount(); ++i) {

@@ -1,22 +1,19 @@
 package com.chokavo.chosportsman.ui.activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.models.DataManager;
+import com.chokavo.chosportsman.ui.fragments.helloscreen.SplashFragment;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.VKCallback;
-import com.vk.sdk.VKScope;
 import com.vk.sdk.VKSdk;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
@@ -27,22 +24,18 @@ import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiUserFull;
 import com.vk.sdk.api.model.VKList;
 
-public class HelloScreenActivity extends AppCompatActivity {
+public class HelloScreenActivity extends BaseActivity {
 
-    Button mSignVK;
+    private View mContentFrame;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hello_screen);
+        mContentFrame = findViewById(R.id.content_frame);
 
-        mSignVK = (Button) findViewById(R.id.sign_vk_btn);
-        mSignVK.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                VKSdk.login(HelloScreenActivity.this, VKScope.AUDIO, VKScope.FRIENDS);
-            }
-        });
+        launchFragmentNoBackStack(new SplashFragment(),
+                SplashFragment.getFragmentTag());
     }
 
     @Override
@@ -67,31 +60,29 @@ public class HelloScreenActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (!VKSdk.onActivityResult(requestCode, resultCode, data, new VKCallback<VKAccessToken>() {
             @Override
             public void onResult(VKAccessToken res) {
 // Пользователь успешно авторизовался
                 Log.e(HelloScreenActivity.class.getSimpleName(), "VKSdk onResult");
                 saveUser();
-                Intent intent = new Intent(getApplicationContext(), ChooseSportsActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
             }
 
             @Override
             public void onError(VKError error) {
 // Произошла ошибка авторизации (например, пользователь запретил авторизацию)
                 Log.e(HelloScreenActivity.class.getSimpleName(), "VKSdk onError");
-                ImageSnackbar.make(mSignVK, ImageSnackbar.TYPE_ERROR, "Ошибка при авторизации", Snackbar.LENGTH_LONG).show();
+                ImageSnackbar.make(mContentFrame, ImageSnackbar.TYPE_ERROR, "Ошибка при авторизации", Snackbar.LENGTH_LONG).show();
             }
         })) {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
-    public void saveUser(){
+    public void saveUser() {
         VKRequest vkRequest = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "photo_200,sex,bdate,city"));
         vkRequest.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
@@ -99,6 +90,9 @@ public class HelloScreenActivity extends AppCompatActivity {
                 VKList<VKApiUserFull> vkUsers = ((VKList) response.parsedModel);
                 VKApiUserFull vkUser = vkUsers.get(0);
                 DataManager.getInstance().setVkUser(vkUser, getString(R.string.vk_user_id));
+
+                startActivity(new Intent(HelloScreenActivity.this, ChooseSportsActivity.class));
+                finish();
                 super.onComplete(response);
             }
         });
