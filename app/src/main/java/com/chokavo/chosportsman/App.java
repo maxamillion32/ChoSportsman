@@ -5,6 +5,7 @@ import android.app.Application;
 import com.chokavo.chosportsman.models.SharedPrefsManager;
 import com.vk.sdk.VKSdk;
 
+import net.danlew.android.joda.JodaTimeAndroid;
 
 public class App extends Application {
     public static final String TAG = "Chokavo logs";
@@ -23,6 +24,8 @@ public class App extends Application {
 
         // Инициализация VK
         VKSdk.initialize(this);
+        // йода тайм
+        JodaTimeAndroid.init(this);
     }
 
     public static App getInstance() {

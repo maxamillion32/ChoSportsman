@@ -4,16 +4,28 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.chokavo.chosportsman.R;
+import com.chokavo.chosportsman.models.DataManager;
+import com.chokavo.chosportsman.models.SportKind;
+import com.chokavo.chosportsman.network.RFManager;
 import com.chokavo.chosportsman.ui.activities.BaseActivity;
 import com.chokavo.chosportsman.ui.activities.MainActivity;
 import com.chokavo.chosportsman.ui.fragments.BaseFragment;
+import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 import com.vk.sdk.VKSdk;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by ilyapyavkin on 01.04.16.
@@ -36,10 +48,34 @@ public class SplashFragment extends BaseFragment {
         View rootView = inflater.inflate(R.layout.fragment_splash, container, false);
         initViews(rootView);
 
-        asyncDone = true;
+        if (VKSdk.isLoggedIn()) {
+            // залогинены, подгружаем данные с сервера
+            loadSportTypes();
+        } else {
+            // просто ждем
+            asyncDone = true;
+        }
         (new WaitTask()).execute();
 
         return rootView;
+    }
+
+    private void loadSportTypes() {
+        RFManager.getInstance().getSportTypes(new Callback<List<SportKind>>() {
+            @Override
+            public void onResponse(Call<List<SportKind>> call, Response<List<SportKind>> response) {
+                DataManager.getInstance().setSportKinds(response.body());
+                asyncDone = true;
+//                mProgressSplash.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onFailure(Call<List<SportKind>> call, Throwable t) {
+                Log.e("RETRO", "onFailure: "+t.toString());
+                mProgressSplash.setVisibility(View.GONE);
+                ImageSnackbar.make(mProgressSplash, ImageSnackbar.TYPE_ERROR, String.format("Возникла ошибка при загрузке данных"), Snackbar.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void initViews(View rootView) {

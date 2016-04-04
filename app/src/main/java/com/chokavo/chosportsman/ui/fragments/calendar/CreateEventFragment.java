@@ -44,7 +44,6 @@ import rx.Subscriber;
 public class CreateEventFragment extends BaseFragment {
 
     private static final String DATE_PICKER_TAG = "DATE_PICKER_TAG";
-
     @Override
     public String getFragmentTitle() {
         return "Новое событие";
@@ -63,6 +62,7 @@ public class CreateEventFragment extends BaseFragment {
     private int mChosenSportEventType;
     private Calendar mCalendarStart, mCalendarEnd;
     private Calendar mCalendarStartDate, mCalendarEndDate; // only date, no time
+    private long diff, diffDate; // разница между началом и концом
     private boolean timeStartEndError;
 
     private ProgressDialog mProgress;
@@ -193,6 +193,7 @@ public class CreateEventFragment extends BaseFragment {
         mTxtDataStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                countDiff();
                 openDatePicker((TextView) v);
             }
         });
@@ -205,6 +206,7 @@ public class CreateEventFragment extends BaseFragment {
         mTxtTimeStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                countDiff();
                 openTimePicker((TextView) v);
             }
         });
@@ -214,6 +216,13 @@ public class CreateEventFragment extends BaseFragment {
                 openTimePicker((TextView) v);
             }
         });
+    }
+
+    private void countDiff() {
+        if (!timeStartEndError) {
+            diff = mCalendarEnd.getTimeInMillis() - mCalendarStart.getTimeInMillis();
+            diffDate = mCalendarEndDate.getTimeInMillis() - mCalendarStartDate.getTimeInMillis();
+        }
     }
 
     private void fillDataAndTime() {
@@ -264,6 +273,11 @@ public class CreateEventFragment extends BaseFragment {
                 if (textView.equals(mTxtDataStart)) {
                     mCalendarStart = calendar;
                     mCalendarStartDate = calendarDate;
+                    if (!timeStartEndError) {
+                        // плюсуем прошлый timeDif только если без ошибки
+                        mCalendarEnd .setTimeInMillis(mCalendarStart.getTimeInMillis() + diff);
+                        mCalendarEndDate.setTimeInMillis(mCalendarStartDate.getTimeInMillis() + diffDate);
+                    }
                 } else if (textView.equals(mTxtDataEnd)) {
                     mCalendarEnd = calendar;
                     mCalendarEndDate = calendarDate;
@@ -287,6 +301,11 @@ public class CreateEventFragment extends BaseFragment {
 
                 if (textView.equals(mTxtTimeStart)) {
                     mCalendarStart = calendar;
+                    if (!timeStartEndError) {
+                        // плюсуем прошлый timeDif только если без ошибки
+                        mCalendarEnd .setTimeInMillis(mCalendarStart.getTimeInMillis() + diff);
+                        mCalendarEndDate.setTimeInMillis(mCalendarStartDate.getTimeInMillis() + diffDate);
+                    }
                 } else if (textView.equals(mTxtTimeEnd)) {
                     mCalendarEnd = calendar;
                 }
