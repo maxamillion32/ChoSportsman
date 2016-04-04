@@ -16,11 +16,13 @@ import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
+import com.google.api.services.calendar.model.EventReminder;
 
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.List;
 import java.util.TimeZone;
 
 import rx.Observable;
@@ -55,7 +57,8 @@ public class GoogleCalendarAPI {
                             final boolean allday,
                             final java.util.Calendar calendarStart,
                             final java.util.Calendar calendarEnd,
-                            final RecurrenceItem recurrenceItem
+                            final RecurrenceItem recurrenceItem,
+                            final List<EventReminder> eventReminders
     ) {
         Observable<Event> myObservable = Observable.create(new Observable.OnSubscribe<Event>() {
             @Override
@@ -97,15 +100,10 @@ public class GoogleCalendarAPI {
                         event.setRecurrence(Arrays.asList(recurrence));
                     }
 
-                    // TODO Reminders (напоминалки)
-        /*EventReminder[] reminderOverrides = new EventReminder[] {
-                new EventReminder().setMethod("email").setMinutes(24 * 60),
-                new EventReminder().setMethod("popup").setMinutes(10),
-        };
-        Event.Reminders reminders = new Event.Reminders()
-                .setUseDefault(false)
-                .setOverrides(Arrays.asList(reminderOverrides));
-        event.setReminders(reminders);*/
+                    Event.Reminders reminders = new Event.Reminders()
+                            .setUseDefault(false)
+                            .setOverrides(eventReminders);
+                    event.setReminders(reminders);
 
                     String calendarId = DataManager.getInstance().calendarGAPIid;
                     event = mService.events().insert(calendarId, event).execute();

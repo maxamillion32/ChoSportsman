@@ -5,6 +5,8 @@ import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,22 +22,28 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.chokavo.chosportsman.R;
+import com.chokavo.chosportsman.calendar.EventReminderX;
 import com.chokavo.chosportsman.calendar.GoogleCalendarAPI;
 import com.chokavo.chosportsman.calendar.RecurrenceItem;
 import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.models.SportEventType;
 import com.chokavo.chosportsman.models.SportKind;
 import com.chokavo.chosportsman.ui.adapters.CheckableItemAdapter;
+import com.chokavo.chosportsman.ui.adapters.EventReminderAdapter;
 import com.chokavo.chosportsman.ui.fragments.BaseFragment;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 import com.chokavo.chosportsman.ui.widgets.NewEventRowView;
 import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventReminder;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 
 import rx.Subscriber;
 
@@ -43,7 +51,6 @@ import rx.Subscriber;
  * Created by repitch on 15.03.16.
  */
 public class CreateEventFragment extends BaseFragment {
-
     private static final String DATE_PICKER_TAG = "DATE_PICKER_TAG";
     @Override
     public String getFragmentTitle() {
@@ -55,8 +62,10 @@ public class CreateEventFragment extends BaseFragment {
     private TextView mTxtDataStart, mTxtTimeStart, mTxtDataEnd, mTxtTimeEnd, mTxtAddReminder;
     private EditText mEditLocation, mEditSummary;
     private Switch mSwitchWholeDay;
+    private RecyclerView mRvReminders;
 
-    private MaterialDialog mDialogSportType, mDialogSportEventType, mDialogTimeError, mDialogRecurrence;
+    private MaterialDialog mDialogSportType, mDialogSportEventType,
+            mDialogRecurrence, mDialogReminder, mDialogTimeError;
 
     private SportKind mChosenSportKind;
     private Calendar mCalendarStart, mCalendarEnd;
@@ -68,7 +77,8 @@ public class CreateEventFragment extends BaseFragment {
 
     private int mChosenSportKindId;
     private int mChosenSportEventType, mChosenRecurrence;
-    private CharSequence mEventTypes[], mSportTypes[], mRecurrenceTypes[];
+    private CharSequence mEventTypes[], mSportTypes[], mRecurrenceTypes[], mDefaultReminders[];
+    private List<EventReminder> mEventReminders = new ArrayList<>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,7 +89,7 @@ public class CreateEventFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_new_event, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_create_event, container, false);
         initViews(rootView);
         initActions();
         return rootView;
@@ -100,6 +110,7 @@ public class CreateEventFragment extends BaseFragment {
         mEditLocation = (EditText) rootView.findViewById(R.id.edit_location);
         mEditSummary = (EditText) rootView.findViewById(R.id.edit_summary);
         mSwitchWholeDay = (Switch) rootView.findViewById(R.id.switch_whole_day);
+        mRvReminders = (RecyclerView) rootView.findViewById(R.id.rv_reminders);
 
         //dialogs
         createDialogs();
@@ -151,19 +162,65 @@ public class CreateEventFragment extends BaseFragment {
         mDialogRecurrence.show();
     }
 
+    private class ReminderOnItemClick implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            int chosenId = mRvReminders.getChildAdapterPosition(v);
+            showDialogReminder(chosenId);
+        }
+    }
+
+    private void notifyRvRemindersDataChanged() {
+        mRvReminders.swapAdapter(new EventReminderAdapter(getActivity(), mEventReminders, new ReminderOnItemClick()), true);
+    }
+
+    private void showDialogReminder(final int chosenId) {
+        EventReminder reminder = mEventReminders.get(chosenId);
+        mDialogReminder = new MaterialDialog.Builder(getActivity())
+                .adapter(new CheckableItemAdapter(getActivity(), mDefaultReminders, EventReminderX.getDefaultId(reminder)),
+                        new MaterialDialog.ListCallback() {
+                            @Override
+                            public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                                EventReminder chosenReminder = EventReminderX.DEFAULT_REMINDERS_OPTIONS[which];
+                                if (chosenReminder == null) {
+                                    mEventReminders.remove(chosenId);
+                                } else {
+                                    mEventReminders.set(chosenId, chosenReminder);
+                                }
+                                notifyRvRemindersDataChanged();
+                                dialog.cancel();
+                            }
+                        })
+                .build();
+        mDialogReminder.show();
+
+    }
+
     private void createDialogs() {
         mSportTypes = DataManager.getInstance().getSportKindsAsChars();
         // choose sport
         mChosenSportKindId = 0;
         mRowSportType.setValue(mSportTypes[mChosenSportKindId].toString());
-        // choose event types
+
+        /** choose event types **/
         mEventTypes = SportEventType.getEventTypesAsChars(getActivity());
         mChosenSportEventType = 0;
         mRowEventType.setValue(mEventTypes[mChosenSportEventType].toString());
-        // повторение (recurrence)
+
+        /** повторение (recurrence) */
         mRecurrenceTypes = RecurrenceItem.getAsChars(getActivity());
         mChosenRecurrence = 0;
         mRowRepeat.setValue(mRecurrenceTypes[mChosenRecurrence].toString());
+
+        /** напоминалки (reminders) **/
+        // по умолчанию заполним диалог
+        mDefaultReminders = EventReminderX.toCharSequence(EventReminderX.DEFAULT_REMINDERS_OPTIONS);
+        // по умолчанию за 30 минут почта и popup
+        mEventReminders = new ArrayList<>(Arrays.asList(EventReminderX.DEFAULT_REMINDERS));
+        // use a linear layout manager
+        mRvReminders.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRvReminders.setAdapter(new EventReminderAdapter(getActivity(), mEventReminders, new ReminderOnItemClick()));
 
         // progress dialog
         mProgress = new ProgressDialog(getActivity());
@@ -201,6 +258,16 @@ public class CreateEventFragment extends BaseFragment {
                 mTxtTimeStart.setVisibility(isChecked ? View.GONE : View.VISIBLE);
                 mTxtTimeEnd.setVisibility(isChecked ? View.GONE : View.VISIBLE);
                 fillDataAndTime();
+            }
+        });
+        mTxtAddReminder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // добавляем еще одно напоминание
+                EventReminder eventReminder = EventReminderX.DEFAULT_REMINDERS_OPTIONS[1];
+                mEventReminders.add(eventReminder);
+                notifyRvRemindersDataChanged();
+                showDialogReminder(mEventReminders.size()-1);
             }
         });
 
@@ -395,7 +462,8 @@ public class CreateEventFragment extends BaseFragment {
                 allday,
                 allday ? mCalendarStartDate : mCalendarStart,
                 allday ? mCalendarEndDate : mCalendarEnd,
-                recItem
+                recItem,
+                mEventReminders
         );
     }
 
