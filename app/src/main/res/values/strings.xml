@@ -44,4 +44,9 @@
     <string name="type_training">Тренировка</string>
     <string name="type_competition">Соревнование</string>
     <string name="ok">OK</string>
+    <string name="recurrence_type_no">Не повторяется</string>
+    <string name="recurrence_type_every_day">Каждый день</string>
+    <string name="recurrence_type_every_week">Каждую неделю</string>
+    <string name="recurrence_type_every_month">Каждый месяц</string>
+    <string name="recurrence_type_every_year">Каждый год</string>
 </resources>

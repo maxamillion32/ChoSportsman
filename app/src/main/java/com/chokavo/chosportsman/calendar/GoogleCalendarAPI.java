@@ -20,6 +20,7 @@ import com.google.api.services.calendar.model.EventDateTime;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.TimeZone;
 
 import rx.Observable;
@@ -53,7 +54,8 @@ public class GoogleCalendarAPI {
                             final String location,
                             final boolean allday,
                             final java.util.Calendar calendarStart,
-                            final java.util.Calendar calendarEnd
+                            final java.util.Calendar calendarEnd,
+                            final RecurrenceItem recurrenceItem
     ) {
         Observable<Event> myObservable = Observable.create(new Observable.OnSubscribe<Event>() {
             @Override
@@ -74,6 +76,7 @@ public class GoogleCalendarAPI {
                         startDateTime = new DateTime(calendarStart.getTimeInMillis());
                         start.setDateTime(startDateTime);
                     }
+                    start.setTimeZone(TimeZone.getDefault().getID());
                     event.setStart(start);
 
                     DateTime endDateTime;
@@ -86,11 +89,13 @@ public class GoogleCalendarAPI {
                         endDateTime = new DateTime(calendarEnd.getTimeInMillis());
                         end.setDateTime(endDateTime);
                     }
+                    end.setTimeZone(TimeZone.getDefault().getID());
                     event.setEnd(end);
 
-                    // TODO recurrence (повторение)
-//        String[] recurrence = new String[] {"RRULE:FREQ=DAILY;COUNT=2"};
-//        event.setRecurrence(Arrays.asList(recurrence));
+                    if (recurrenceItem.getType() != RecurrenceItem.TYPE_NO) {
+                        String[] recurrence = new String[] {recurrenceItem.getAsRule()};
+                        event.setRecurrence(Arrays.asList(recurrence));
+                    }
 
                     // TODO Reminders (напоминалки)
         /*EventReminder[] reminderOverrides = new EventReminder[] {

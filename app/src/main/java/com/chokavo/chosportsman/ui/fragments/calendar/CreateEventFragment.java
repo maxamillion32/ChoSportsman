@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.calendar.GoogleCalendarAPI;
+import com.chokavo.chosportsman.calendar.RecurrenceItem;
 import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.models.SportEventType;
 import com.chokavo.chosportsman.models.SportKind;
@@ -55,11 +56,9 @@ public class CreateEventFragment extends BaseFragment {
     private EditText mEditLocation, mEditSummary;
     private Switch mSwitchWholeDay;
 
-    private MaterialDialog mDialogSportType, mDialogSportEventType, mDialogTimeError;
+    private MaterialDialog mDialogSportType, mDialogSportEventType, mDialogTimeError, mDialogRecurrence;
 
     private SportKind mChosenSportKind;
-    private int mChosenSportKindId;
-    private int mChosenSportEventType;
     private Calendar mCalendarStart, mCalendarEnd;
     private Calendar mCalendarStartDate, mCalendarEndDate; // only date, no time
     private long diff, diffDate; // разница между началом и концом
@@ -67,7 +66,9 @@ public class CreateEventFragment extends BaseFragment {
 
     private ProgressDialog mProgress;
 
-    private CharSequence mEventTypes[], mSportTypes[];
+    private int mChosenSportKindId;
+    private int mChosenSportEventType, mChosenRecurrence;
+    private CharSequence mEventTypes[], mSportTypes[], mRecurrenceTypes[];
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -135,6 +136,21 @@ public class CreateEventFragment extends BaseFragment {
         mDialogSportEventType.show();
     }
 
+    private void showDialogRecurrence() {
+        mDialogRecurrence = new MaterialDialog.Builder(getActivity())
+                .adapter(new CheckableItemAdapter(getActivity(), mRecurrenceTypes, mChosenRecurrence),
+                        new MaterialDialog.ListCallback() {
+                            @Override
+                            public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                                mChosenRecurrence = which;
+                                mRowRepeat.setValue(mRecurrenceTypes[which].toString());
+                                dialog.cancel();
+                            }
+                        })
+                .build();
+        mDialogRecurrence.show();
+    }
+
     private void createDialogs() {
         mSportTypes = DataManager.getInstance().getSportKindsAsChars();
         // choose sport
@@ -144,6 +160,10 @@ public class CreateEventFragment extends BaseFragment {
         mEventTypes = SportEventType.getEventTypesAsChars(getActivity());
         mChosenSportEventType = 0;
         mRowEventType.setValue(mEventTypes[mChosenSportEventType].toString());
+        // повторение (recurrence)
+        mRecurrenceTypes = RecurrenceItem.getAsChars(getActivity());
+        mChosenRecurrence = 0;
+        mRowRepeat.setValue(mRecurrenceTypes[mChosenRecurrence].toString());
 
         // progress dialog
         mProgress = new ProgressDialog(getActivity());
@@ -161,6 +181,12 @@ public class CreateEventFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 showDialogSportEventType();
+            }
+        });
+        mRowRepeat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialogRecurrence();
             }
         });
         mLlWholeDayWrap.setOnClickListener(new View.OnClickListener() {
@@ -339,6 +365,7 @@ public class CreateEventFragment extends BaseFragment {
 
         boolean allday = mSwitchWholeDay.isChecked();
         mProgress.show();
+        RecurrenceItem recItem = RecurrenceItem.getItemById(mChosenRecurrence);
         GoogleCalendarAPI.getInstance().createEvent(
                 new Subscriber<Event>() {
                     @Override
@@ -367,7 +394,8 @@ public class CreateEventFragment extends BaseFragment {
                 mEditLocation.getText().toString(),
                 allday,
                 allday ? mCalendarStartDate : mCalendarStart,
-                allday ? mCalendarEndDate : mCalendarEnd
+                allday ? mCalendarEndDate : mCalendarEnd,
+                recItem
         );
     }
 
