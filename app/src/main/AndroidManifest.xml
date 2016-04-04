@@ -39,10 +39,6 @@
             android:label="Спортивные сооружения" >
         </activity>
         <activity
-            android:name=".ui.activities.calendar.CalendarActivityOld"
-            android:label="Календарь" >
-        </activity>
-        <activity
             android:name=".ui.activities.calendar.CalendarActivity"
             android:label="Календарь" >
         </activity>

@@ -3,6 +3,7 @@ package com.chokavo.chosportsman.ui.fragments.calendar;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -15,7 +16,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
-import com.chokavo.chosportsman.Constants;
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.calendar.CalendarManager;
 import com.chokavo.chosportsman.calendar.GoogleCalendarAPI;
@@ -26,13 +26,14 @@ import com.chokavo.chosportsman.ui.fragments.BaseFragment;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.services.calendar.model.CalendarList;
-import com.p_v.flexiblecalendar.FlexibleCalendarView;
-import com.p_v.flexiblecalendar.entity.Event;
-import com.p_v.flexiblecalendar.entity.SelectedDateItem;
+import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.DayViewDecorator;
+import com.prolificinteractive.materialcalendarview.DayViewFacade;
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+import com.prolificinteractive.materialcalendarview.spans.DotSpan;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import me.everything.providers.android.calendar.Calendar;
@@ -42,11 +43,11 @@ import rx.Subscriber;
  * Created by ilyapyavkin on 21.03.16.
  */
 public class SportCalendarFragment extends BaseFragment {
-    private TextView mOutputText, mTxtGoogleAccount, mTxtCalendarType, mTxtMonth;
+    private TextView mOutputText, mTxtGoogleAccount, mTxtCalendarType;
     ProgressDialog mProgress;
     private Calendar mCalendar;
     private CircleImageView mBtnHideCalendar;
-    private FlexibleCalendarView mCalendarView;
+    private MaterialCalendarView mCalendarView;
     private FloatingActionButton mFabAddEvent;
 
     @Override
@@ -78,16 +79,14 @@ public class SportCalendarFragment extends BaseFragment {
     }
 
     private void initViews(View rootView) {
-        mCalendarView = (FlexibleCalendarView) rootView.findViewById(R.id.month_view);
+        mCalendarView = (MaterialCalendarView) rootView.findViewById(R.id.calendar_view);
         mBtnHideCalendar = (CircleImageView) rootView.findViewById(R.id.btn_hide_calendar);
         mOutputText = (TextView) rootView.findViewById(R.id.txt_output);
         mTxtGoogleAccount = (TextView) rootView.findViewById(R.id.txt_google_account);
         mTxtCalendarType = (TextView) rootView.findViewById(R.id.txt_calendar_type);
-        mTxtMonth = (TextView) rootView.findViewById(R.id.txt_month);
         mFabAddEvent = (FloatingActionButton) rootView.findViewById(R.id.fab_add_event);
 
-        mCalendarView.collapse();
-        mBtnHideCalendar.setOnClickListener(new View.OnClickListener() {
+        /*mBtnHideCalendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(mCalendarView.isShown()){
@@ -98,7 +97,7 @@ public class SportCalendarFragment extends BaseFragment {
                     mCalendarView.expand();
                 }
             }
-        });
+        });*/
 
         mProgress = new ProgressDialog(getActivity());
         mProgress.setMessage(getString(R.string.progress_gapi));
@@ -114,64 +113,31 @@ public class SportCalendarFragment extends BaseFragment {
         });
 
     }
+    public class EventDecorator implements DayViewDecorator {
 
-    private void initCalendar() {
-        SelectedDateItem dateItem = mCalendarView.getSelectedDateItem();
-        updateMonthUI(dateItem.getYear(), dateItem.getMonth());
+        private final int color;
+        private final HashSet<CalendarDay> dates;
 
-        mCalendarView.setOnMonthChangeListener(new FlexibleCalendarView.OnMonthChangeListener() {
-            @Override
-            public void onMonthChange(int year, int month, int direction) {
-                updateMonthUI(year, month);
-            }
-        });
-
-        mCalendarView.setEventDataProvider(new FlexibleCalendarView.EventDataProvider() {
-            @Override
-            public List<? extends Event> getEventsForTheDay(int year, int month, int day) {
-                if (year == 2016 && month == 2 && day == 25) {
-                    List<CustomEvent> colorLst1 = new ArrayList<>();
-                    colorLst1.add(new CustomEvent(android.R.color.holo_green_dark));
-                    colorLst1.add(new CustomEvent(android.R.color.holo_blue_light));
-                    colorLst1.add(new CustomEvent(android.R.color.holo_purple));
-                    return colorLst1;
-                }
-                if (year == 2016 && month == 2 && day == 8) {
-                    List<CustomEvent> colorLst1 = new ArrayList<>();
-                    colorLst1.add(new CustomEvent(android.R.color.holo_green_dark));
-                    colorLst1.add(new CustomEvent(android.R.color.holo_blue_light));
-                    colorLst1.add(new CustomEvent(android.R.color.holo_purple));
-                    return colorLst1;
-                }
-                if (year == 2016 && month == 2 && day == 5) {
-                    List<CustomEvent> colorLst1 = new ArrayList<>();
-                    colorLst1.add(new CustomEvent(android.R.color.holo_purple));
-                    return colorLst1;
-                }
-                return null;
-            }
-        });
-    }
-
-    private void updateMonthUI(int year, int month) {
-        java.util.Calendar cal = java.util.Calendar.getInstance();
-        cal.set(year, month, 1);
-        SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_MONTH);
-        mTxtMonth.setText(sdf.format(cal.getTime()));
-    }
-
-    public class CustomEvent implements Event {
-
-        private int color;
-
-        public CustomEvent(int color){
+        public EventDecorator(int color, Collection<CalendarDay> dates) {
             this.color = color;
+            this.dates = new HashSet<>(dates);
         }
 
         @Override
-        public int getColor() {
-            return color;
+        public boolean shouldDecorate(CalendarDay day) {
+            return dates.contains(day);
         }
+
+        @Override
+        public void decorate(DayViewFacade view) {
+            view.addSpan(new DotSpan(8, color));
+        }
+    }
+
+    private void initCalendar() {
+        HashSet<CalendarDay> hashSet = new HashSet<>();
+        hashSet.add(new CalendarDay(2016,3,12));
+        mCalendarView.addDecorator(new EventDecorator(Color.RED, hashSet));
     }
 
     @Override

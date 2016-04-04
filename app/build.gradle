@@ -40,7 +40,7 @@ dependencies {
     compile 'com.vk:androidsdk:1.6.6'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'de.hdodenhof:circleimageview:2.0.0'
-    compile 'com.p_v:flexiblecalendar:1.1.4'
+    compile 'com.github.prolificinteractive:material-calendarview:v1.2.0'
     compile 'junit:junit:4.12'
 
     compile 'io.reactivex:rxandroid:1.1.0'
