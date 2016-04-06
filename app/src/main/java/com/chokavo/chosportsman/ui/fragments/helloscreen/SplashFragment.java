@@ -13,14 +13,19 @@ import android.widget.ProgressBar;
 
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.models.DataManager;
-import com.chokavo.chosportsman.models.SportKind;
 import com.chokavo.chosportsman.network.RFManager;
+import com.chokavo.chosportsman.ormlite.DBHelperFactory;
+import com.chokavo.chosportsman.ormlite.dao.SportTypeDao;
+import com.chokavo.chosportsman.ormlite.dao.SportsmanDao;
+import com.chokavo.chosportsman.ormlite.models.SportType;
+import com.chokavo.chosportsman.ormlite.models.Sportsman;
 import com.chokavo.chosportsman.ui.activities.BaseActivity;
 import com.chokavo.chosportsman.ui.activities.MainActivity;
 import com.chokavo.chosportsman.ui.fragments.BaseFragment;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 import com.vk.sdk.VKSdk;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import retrofit2.Call;
@@ -55,27 +60,59 @@ public class SplashFragment extends BaseFragment {
             // просто ждем
             asyncDone = true;
         }
+        // тестируем sqlite
+        try {
+            // TODO убрать или применить
+            SportsmanDao sportsmanDao = DBHelperFactory.getHelper().getSportsmanDao();
+            SportTypeDao sportTypeDao = DBHelperFactory.getHelper().getSportTypeDao();
+            List<Sportsman> sportsmen = DBHelperFactory.getHelper().getSportsmanDao().getAll();
+            List<SportType> sportTypes = sportTypeDao.getAll();
+
+            Log.e("","");
+        } catch (SQLException e) {
+            ImageSnackbar.make(rootView, ImageSnackbar.TYPE_ERROR, "SQLite error: "+e, Snackbar.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
         (new WaitTask()).execute();
 
         return rootView;
     }
 
     private void loadSportTypes() {
-        RFManager.getInstance().getSportTypes(new Callback<List<SportKind>>() {
-            @Override
-            public void onResponse(Call<List<SportKind>> call, Response<List<SportKind>> response) {
-                DataManager.getInstance().setSportKinds(response.body());
-                asyncDone = true;
+        try {
+            final SportTypeDao stDao = DBHelperFactory.getHelper().getSportTypeDao();
+            final List<SportType> sportTypes = stDao.getAll();
+            if (sportTypes == null || sportTypes.size() == 0) {
+                // в базе данных видов спорта нет, добавим их через retrofit
+                RFManager.getInstance().getSportTypes(new Callback<List<SportType>>() {
+                    @Override
+                    public void onResponse(Call<List<SportType>> call, Response<List<SportType>> response) {
+                        DataManager.getInstance().setSportTypes(response.body());
+                        asyncDone = true;
+                        try {
+                            stDao.createList(response.body());
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
 //                mProgressSplash.setVisibility(View.GONE);
-            }
+                    }
 
-            @Override
-            public void onFailure(Call<List<SportKind>> call, Throwable t) {
-                Log.e("RETRO", "onFailure: "+t.toString());
-                mProgressSplash.setVisibility(View.GONE);
-                ImageSnackbar.make(mProgressSplash, ImageSnackbar.TYPE_ERROR, String.format("Возникла ошибка при загрузке данных"), Snackbar.LENGTH_SHORT).show();
+                    @Override
+                    public void onFailure(Call<List<SportType>> call, Throwable t) {
+                        Log.e("RETRO", "onFailure: "+t.toString());
+                        mProgressSplash.setVisibility(View.GONE);
+                        ImageSnackbar.make(mProgressSplash, ImageSnackbar.TYPE_ERROR, String.format("Возникла ошибка при загрузке данных"), Snackbar.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                // в базе данных есть виды спорта. Можно выгрузить в DataManager
+                DataManager.getInstance().setSportTypes(sportTypes);
+                asyncDone = true;
             }
-        });
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void initViews(View rootView) {

@@ -1,8 +1,10 @@
 package com.chokavo.chosportsman.calendar;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.chokavo.chosportsman.AppUtils;
+import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.models.SharedPrefsManager;
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -17,6 +19,7 @@ import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.EventReminder;
+import com.google.api.services.calendar.model.Events;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -48,8 +51,36 @@ public class GoogleCalendarAPI {
      * Global instance of the HTTP transport.
      */
     private static HttpTransport sHttpTransport = AndroidHttp.newCompatibleTransport();
-
     private static GoogleCalendarAPI sGoogleCalendarAPI;
+
+    public static String getReadableCalendarInfo(Context context) {
+        Calendar cal = DataManager.getInstance().calendarGAPI;
+        if (cal == null) {
+            return context.getString(R.string.no_calendar);
+        }
+        return String.format(
+                context.getString(R.string.calendar_info),
+                cal.getSummary(), cal.getDescription(), cal.getTimeZone());
+    }
+
+    public void getEventList(Subscriber<Events> subscriber) {
+        Observable<Events> observable = Observable.create(new Observable.OnSubscribe<Events>() {
+            @Override
+            public void call(Subscriber<? super Events> subscriber) {
+                try {
+                    String calendarId = DataManager.getInstance().calendarGAPIid;
+                    Events events = mService.events().list(calendarId).execute();
+                    // TODO дальше то что делать с этими событиями?
+                    Log.e("","");
+                    subscriber.onCompleted();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread());
+        observable.subscribe(subscriber);
+    }
 
     public void createEvent(Subscriber<Event> subscriber,
                             final String summary,
@@ -96,7 +127,7 @@ public class GoogleCalendarAPI {
                     event.setEnd(end);
 
                     if (recurrenceItem.getType() != RecurrenceItem.TYPE_NO) {
-                        String[] recurrence = new String[] {recurrenceItem.getAsRule()};
+                        String[] recurrence = new String[]{recurrenceItem.getAsRule()};
                         event.setRecurrence(Arrays.asList(recurrence));
                     }
 
@@ -145,6 +176,7 @@ public class GoogleCalendarAPI {
      * 4) иначе берем календарь по найденному id
      * 5) сохраняем GAPIid в ShPr
      * 6) посылаем сигнал подписчику, что календарь у нас
+     *
      * @param subscriber
      */
     public static void getCalendarGAPI(Subscriber<CalendarList> subscriber) {
@@ -196,7 +228,7 @@ public class GoogleCalendarAPI {
         myObservable.subscribe(subscriber);
     }
 
-    private static Calendar getCalendarById (final String calID) throws IOException {
+    private static Calendar getCalendarById(final String calID) throws IOException {
         com.google.api.services.calendar.Calendar mService = new com.google.api.services.calendar.Calendar.Builder(
                 sHttpTransport, sJsonFactory, DataManager.getInstance().googleCredential)
                 .setApplicationName(AppUtils.getApplicationName())
@@ -228,30 +260,25 @@ public class GoogleCalendarAPI {
 
     /**
      * Ищет среди CalendarList календарь с названием SPORT_CALENDAR_SUMMARY ("Чо, спортсмен?")
+     *
      * @param calendarList лист календарей юзера
      * @return спортивный календарь, если он есть, иначе null
      */
     private static CalendarListEntry getSportCalendarListEntry(CalendarList calendarList) {
-        for (CalendarListEntry calendar: calendarList.getItems()) {
+        for (CalendarListEntry calendar : calendarList.getItems()) {
             String summary = calendar.getSummary();
-            if (summary.equals(SPORT_CALENDAR_SUMMARY)){
+            if (summary.equals(SPORT_CALENDAR_SUMMARY)) {
                 return calendar;
             }
         }
         return null;
     }
 
-    public static void getCalendarGAPIbyId(Subscriber<CalendarList> subscriber, final String calendarGAPIid) {
+    public void getCalendarGAPIbyId(Subscriber<CalendarList> subscriber, final String calendarGAPIid) {
         Observable<CalendarList> myObservable = Observable.create(new Observable.OnSubscribe<CalendarList>() {
             @Override
             public void call(Subscriber<? super CalendarList> sub) {
                 try {
-//                        new MakeRequestTask(DataManager.getInstance().googleCredential, sub).execute();
-                    com.google.api.services.calendar.Calendar mService = new com.google.api.services.calendar.Calendar.Builder(
-                            sHttpTransport, sJsonFactory, DataManager.getInstance().googleCredential)
-                            .setApplicationName(AppUtils.getApplicationName())
-                            .build();
-
                     Calendar calendarGAPI = getCalendarById(calendarGAPIid);
                     // здесь мы уже имеем календарь c id=calendarGAPIid
                     if (calendarGAPI == null) {

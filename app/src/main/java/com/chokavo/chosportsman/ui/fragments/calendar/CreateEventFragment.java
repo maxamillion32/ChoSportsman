@@ -27,7 +27,8 @@ import com.chokavo.chosportsman.calendar.GoogleCalendarAPI;
 import com.chokavo.chosportsman.calendar.RecurrenceItem;
 import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.models.SportEventType;
-import com.chokavo.chosportsman.models.SportKind;
+import com.chokavo.chosportsman.ormlite.models.SportType;
+import com.chokavo.chosportsman.ui.activities.calendar.CreateEventActivity;
 import com.chokavo.chosportsman.ui.adapters.CheckableItemAdapter;
 import com.chokavo.chosportsman.ui.adapters.EventReminderAdapter;
 import com.chokavo.chosportsman.ui.fragments.BaseFragment;
@@ -43,6 +44,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import rx.Subscriber;
@@ -67,7 +69,7 @@ public class CreateEventFragment extends BaseFragment {
     private MaterialDialog mDialogSportType, mDialogSportEventType,
             mDialogRecurrence, mDialogReminder, mDialogTimeError;
 
-    private SportKind mChosenSportKind;
+    private Date mDefaultDate;
     private Calendar mCalendarStart, mCalendarEnd;
     private Calendar mCalendarStartDate, mCalendarEndDate; // only date, no time
     private long diff, diffDate; // разница между началом и концом
@@ -75,15 +77,26 @@ public class CreateEventFragment extends BaseFragment {
 
     private ProgressDialog mProgress;
 
+    private SportType mChosenSportType;
     private int mChosenSportKindId;
     private int mChosenSportEventType, mChosenRecurrence;
     private CharSequence mEventTypes[], mSportTypes[], mRecurrenceTypes[], mDefaultReminders[];
     private List<EventReminder> mEventReminders = new ArrayList<>();
 
+    public static CreateEventFragment newInstance(Bundle args) {
+        CreateEventFragment fragment = new CreateEventFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        // args
+        if (getArguments() != null) {
+            mDefaultDate = (Date) getArguments().getSerializable(CreateEventActivity.EXTRA_DATE);
+        }
     }
 
     @Nullable
@@ -123,7 +136,7 @@ public class CreateEventFragment extends BaseFragment {
                             @Override
                             public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
                                 mChosenSportKindId = which;
-                                mChosenSportKind = DataManager.getInstance().getSportKindByName(mSportTypes[which]);
+                                mChosenSportType = DataManager.getInstance().getSportTypeByName(mSportTypes[which]);
                                 mRowSportType.setValue(mSportTypes[which].toString());
                                 dialog.cancel();
                             }
@@ -198,7 +211,7 @@ public class CreateEventFragment extends BaseFragment {
     }
 
     private void createDialogs() {
-        mSportTypes = DataManager.getInstance().getSportKindsAsChars();
+        mSportTypes = DataManager.getInstance().getSportTypesAsChars();
         // choose sport
         mChosenSportKindId = 0;
         mRowSportType.setValue(mSportTypes[mChosenSportKindId].toString());
@@ -276,6 +289,13 @@ public class CreateEventFragment extends BaseFragment {
         mCalendarStartDate = Calendar.getInstance();
         mCalendarEndDate = Calendar.getInstance();
         mCalendarEnd = Calendar.getInstance();
+        // при запуске фрагмента мы могли передать дефолтную дату
+        if (mDefaultDate != null) {
+            mCalendarStart.setTime(mDefaultDate);
+            mCalendarStartDate.setTime(mDefaultDate);
+            mCalendarEndDate.setTime(mDefaultDate);
+            mCalendarEnd.setTime(mDefaultDate);
+        }
         mCalendarEnd.add(Calendar.HOUR_OF_DAY, 1);
         mCalendarStartDate.set(Calendar.HOUR_OF_DAY, 0);
         mCalendarStartDate.set(Calendar.MINUTE, 0);

@@ -150,7 +150,7 @@ public class NoSportCalendarFragment extends BaseFragment {
         }
         // календарь есть на сервере, у нас есть его GAPI, но пока его нет в CoPr
         // поэтому работаем с GAPI
-        GoogleCalendarAPI.getCalendarGAPIbyId(mSubscriberGetCalendarGAPI, DataManager.getInstance().calendarGAPIid);
+        GoogleCalendarAPI.getInstance().getCalendarGAPIbyId(mSubscriberGetCalendarGAPI, DataManager.getInstance().calendarGAPIid);
 
     }
 

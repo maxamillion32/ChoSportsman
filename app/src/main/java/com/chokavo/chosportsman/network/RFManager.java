@@ -1,7 +1,7 @@
 package com.chokavo.chosportsman.network;
 
 import com.chokavo.chosportsman.Constants;
-import com.chokavo.chosportsman.models.SportKind;
+import com.chokavo.chosportsman.ormlite.models.SportType;
 
 import java.util.List;
 
@@ -35,8 +35,8 @@ public class RFManager {
         return sRFManager;
     }
 
-    public void getSportTypes(Callback<List<SportKind>> callback) {
-        Call<List<SportKind>> call = mRestInterface.getSportTypes();
+    public void getSportTypes(Callback<List<SportType>> callback) {
+        Call<List<SportType>> call = mRestInterface.getSportTypes();
         call.enqueue(callback);
     }
 

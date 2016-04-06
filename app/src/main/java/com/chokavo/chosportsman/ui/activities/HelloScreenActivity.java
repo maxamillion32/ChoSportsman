@@ -10,6 +10,8 @@ import android.view.View;
 
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.models.DataManager;
+import com.chokavo.chosportsman.ormlite.DBHelperFactory;
+import com.chokavo.chosportsman.ormlite.models.Sportsman;
 import com.chokavo.chosportsman.ui.fragments.helloscreen.SplashFragment;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 import com.vk.sdk.VKAccessToken;
@@ -23,6 +25,8 @@ import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiUserFull;
 import com.vk.sdk.api.model.VKList;
+
+import java.sql.SQLException;
 
 public class HelloScreenActivity extends BaseActivity {
 
@@ -90,11 +94,30 @@ public class HelloScreenActivity extends BaseActivity {
                 VKList<VKApiUserFull> vkUsers = ((VKList) response.parsedModel);
                 VKApiUserFull vkUser = vkUsers.get(0);
                 DataManager.getInstance().setVkUser(vkUser, getString(R.string.vk_user_id));
+                // TODO регистрация юзера на нашем сайте
+                // есть vkUser - сохраняем в бд и на сервер
+                saveUserSQLite();
 
                 startActivity(new Intent(HelloScreenActivity.this, ChooseSportsActivity.class));
                 finish();
                 super.onComplete(response);
             }
         });
+    }
+
+    /**
+     * Сохранение юзера в базу данных SQLite
+     */
+    private void saveUserSQLite() {
+        try {
+            VKApiUserFull vkUser = DataManager.getInstance().vkUser;
+            Sportsman sportsman = new Sportsman();
+            sportsman.setVkid(vkUser.id);
+//                sportsman.setServerId(serverId);
+            DBHelperFactory.getHelper().getSportsmanDao().createIfNotExists(sportsman);
+            DataManager.getInstance().mSportsman = sportsman;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

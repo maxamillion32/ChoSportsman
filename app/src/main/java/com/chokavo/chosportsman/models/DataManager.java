@@ -6,6 +6,8 @@ import android.support.annotation.NonNull;
 
 import com.chokavo.chosportsman.App;
 import com.chokavo.chosportsman.network.datarows.SportObjectDataRow;
+import com.chokavo.chosportsman.ormlite.models.SportType;
+import com.chokavo.chosportsman.ormlite.models.Sportsman;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.services.calendar.model.Calendar;
 import com.google.api.services.calendar.model.Event;
@@ -23,9 +25,12 @@ public class DataManager {
 
     public List<SportObjectDataRow> sportObjects;
     public VKApiUserFull vkUser;
+    public Sportsman mSportsman;
     public boolean userSportsChosen;
-    private List<SportKind> mSportKinds = new ArrayList<>();
-    private List<SportKind> mUserSports = new ArrayList<>();
+    private List<SportType> mSportTypes = new ArrayList<>();
+    private List<SportType> mUserSports = new ArrayList<>();
+
+//    private List<SportKind> mSportKinds = new ArrayList<>();
     public SharedPreferences mPreferences;
 
     private String mGoogleAccount;
@@ -52,53 +57,49 @@ public class DataManager {
         mPreferences.edit().putInt(key, vkUser.getId()).apply();
     }
 
-    public void setUserSports(List<SportKind> sports, String key) {
+    public void setUserSports(List<SportType> sports, String key) {
         mUserSports = sports;
         Set<String> sportNames = new HashSet<>();
-        for (SportKind sport :
+        for (SportType sport :
                 sports) {
-            sportNames.add(sport.getName());
+            sportNames.add(sport.getTitle());
         }
         mPreferences.edit().putStringSet(key, sportNames).apply();
     }
 
-    public List<SportKind> getSportKinds() {
-        return mSportKinds;
-    }
-
-    public SportKind getSportKindByName(@NonNull CharSequence sportTypeChar) {
+    public SportType getSportTypeByName(@NonNull CharSequence sportTypeChar) {
         if (sportTypeChar == null) return null;
-        for (SportKind curSportKind: mSportKinds) {
-            if (curSportKind.getName().equals(sportTypeChar.toString())) {
-                return curSportKind;
+        for (SportType curSportType: mSportTypes) {
+            if (curSportType.getTitle().equals(sportTypeChar.toString())) {
+                return curSportType;
             }
         }
         return null;
     }
 
-    public CharSequence[] getSportKindsAsChars() {
-        CharSequence[] chars = new CharSequence[mSportKinds.size()];
+    public CharSequence[] getSportTypesAsChars() {
+        CharSequence[] chars = new CharSequence[mSportTypes.size()];
         int i = 0;
-        for (SportKind sportKind: mSportKinds) {
-            chars[i++] = sportKind.getName();
+        for (SportType sportType: mSportTypes) {
+            chars[i++] = sportType.getTitle();
         }
         return chars;
     }
 
-    public List<SportKind> getUserSports() {
+    public List<SportType> getUserSports() {
         return mUserSports;
     }
 
-    public List<SportKind> loadUserSports(String key) {
+    public List<SportType> loadUserSports(String key) {
         if (getUserSports().size() != 0)
             return getUserSports();
         Set<String> sportNames = mPreferences.getStringSet(key, null);
         if (sportNames == null)
             return new ArrayList<>();
         mUserSports.clear();
-        for (SportKind sport :
-                mSportKinds) {
-            if (sportNames.contains(sport.getName()))
+        for (SportType sport :
+                mSportTypes) {
+            if (sportNames.contains(sport.getTitle()))
                 mUserSports.add(sport);
         }
         return mUserSports;
@@ -106,15 +107,15 @@ public class DataManager {
 
     @Deprecated
     public void loadSports() {
-        mSportKinds = new ArrayList<>();
-        SportKind football = new SportKind("Футбол");
-        SportKind voleyball = new SportKind("Волейбол");
-        SportKind hockey = new SportKind("Хокей");
-        SportKind basketball = new SportKind("Баскетбол");
-        mSportKinds.add(football);
-        mSportKinds.add(voleyball);
-        mSportKinds.add(hockey);
-        mSportKinds.add(basketball);
+        mSportTypes = new ArrayList<>();
+        SportType football = new SportType("Футбол");
+        SportType voleyball = new SportType("Волейбол");
+        SportType hockey = new SportType("Хокей");
+        SportType basketball = new SportType("Баскетбол");
+        mSportTypes.add(football);
+        mSportTypes.add(voleyball);
+        mSportTypes.add(hockey);
+        mSportTypes.add(basketball);
     }
 
     public String getGoogleAccount() {
@@ -133,8 +134,11 @@ public class DataManager {
         SharedPrefsManager.saveGoogleAccount();
     }
 
+    public List<SportType> getSportTypes() {
+        return mSportTypes;
+    }
 
-    public void setSportKinds(List<SportKind> sportKinds) {
-        mSportKinds = sportKinds;
+    public void setSportTypes(List<SportType> sportTypes) {
+        mSportTypes = sportTypes;
     }
 }

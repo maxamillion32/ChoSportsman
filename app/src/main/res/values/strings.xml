@@ -41,6 +41,7 @@
 
     <string name="date_format_1">E, d MMM yyyy г.</string>
     <string name="time_format_1">HH:mm</string>
+    <string name="current_day_format">d MMM (E)</string>
     <string name="type_training">Тренировка</string>
     <string name="type_competition">Соревнование</string>
     <string name="ok">OK</string>
@@ -49,4 +50,8 @@
     <string name="recurrence_type_every_week">Каждую неделю</string>
     <string name="recurrence_type_every_month">Каждый месяц</string>
     <string name="recurrence_type_every_year">Каждый год</string>
+    <string name="no_calendar">Календарь Google отсутствует</string>
+    <string name="calendar_info" formatted="false">
+        Название: %s\nОписание: %s\nЧасовой пояс: %s\n
+    </string>
 </resources>

@@ -6,6 +6,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Created by Дашицырен on 13.03.2016.
  */
+@Deprecated
 public class SportKind {
 
     @SerializedName("sport_type_id")

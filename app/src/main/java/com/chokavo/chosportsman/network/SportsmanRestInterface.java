@@ -1,6 +1,6 @@
 package com.chokavo.chosportsman.network;
 
-import com.chokavo.chosportsman.models.SportKind;
+import com.chokavo.chosportsman.ormlite.models.SportType;
 
 import java.util.List;
 
@@ -13,5 +13,5 @@ import retrofit2.http.GET;
 public interface SportsmanRestInterface {
 
     @GET("sporttype/get")
-    Call<List<SportKind>> getSportTypes();
+    Call<List<SportType>> getSportTypes();
 }

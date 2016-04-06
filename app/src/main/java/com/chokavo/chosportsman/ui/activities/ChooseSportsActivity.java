@@ -13,15 +13,17 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.chokavo.chosportsman.Constants;
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.models.SharedPrefsManager;
-import com.chokavo.chosportsman.models.SportKind;
-import com.chokavo.chosportsman.network.SportsmanRestInterface;
+import com.chokavo.chosportsman.network.RFManager;
+import com.chokavo.chosportsman.ormlite.DBHelperFactory;
+import com.chokavo.chosportsman.ormlite.dao.SportTypeDao;
+import com.chokavo.chosportsman.ormlite.models.SportType;
 import com.chokavo.chosportsman.ui.adapters.ChooseSportsAdapter;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -30,8 +32,6 @@ import java.util.Set;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ChooseSportsActivity extends AppCompatActivity {
     RecyclerView recyclerView;
@@ -58,7 +58,8 @@ public class ChooseSportsActivity extends AppCompatActivity {
         mSwipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         mSwipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         recyclerView = (RecyclerView)findViewById(R.id.choose_sports_recview);
-        adapter = new ChooseSportsAdapter(DataManager.getInstance().getSportKinds());
+        List<SportType> sportTypes = DataManager.getInstance().getSportTypes();
+        adapter = new ChooseSportsAdapter(sportTypes);
         layoutManager = new LinearLayoutManager(this);
 
         recyclerView.setAdapter(adapter);
@@ -72,34 +73,39 @@ public class ChooseSportsActivity extends AppCompatActivity {
             }
         });
 
-        mSwipeRefresh.setRefreshing(true);
-        loadSportTypes();
+        if (sportTypes == null || sportTypes.size() == 0) {
+            mSwipeRefresh.setRefreshing(true);
+            loadSportTypes();
+        }
+    }
+
+    private void setSportTypes() {
+        adapter = new ChooseSportsAdapter(DataManager.getInstance().getSportTypes());
+        recyclerView.swapAdapter(adapter, true);
+        mSwipeRefresh.setRefreshing(false);
+        ImageSnackbar.make(mSwipeRefresh, ImageSnackbar.TYPE_SUCCESS, String.format("Данные успешно загружены"), Snackbar.LENGTH_SHORT).show();
+        if (DataManager.getInstance().userSportsChosen) {
+            startActivity(new Intent(ChooseSportsActivity.this, MainActivity.class));
+            finish();
+        }
     }
 
     private void loadSportTypes() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Constants.SPORTSMAN_BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        SportsmanRestInterface restInterface = retrofit.create(SportsmanRestInterface.class);
-        Call<List<SportKind>> call = restInterface.getSportTypes();
-        call.enqueue(new Callback<List<SportKind>>() {
+        RFManager.getInstance().getSportTypes(new Callback<List<SportType>>() {
             @Override
-            public void onResponse(Call<List<SportKind>> call, Response<List<SportKind>> response) {
-                DataManager.getInstance().setSportKinds(response.body());
-
-                adapter = new ChooseSportsAdapter(DataManager.getInstance().getSportKinds());
-                recyclerView.swapAdapter(adapter, true);
-                mSwipeRefresh.setRefreshing(false);
-                ImageSnackbar.make(mSwipeRefresh, ImageSnackbar.TYPE_SUCCESS, String.format("Данные успешно загружены"), Snackbar.LENGTH_SHORT).show();
-                if (DataManager.getInstance().userSportsChosen) {
-                    startActivity(new Intent(ChooseSportsActivity.this, MainActivity.class));
-                    finish();
+            public void onResponse(Call<List<SportType>> call, Response<List<SportType>> response) {
+                DataManager.getInstance().setSportTypes(response.body());
+                try {
+                    SportTypeDao stDao = DBHelperFactory.getHelper().getSportTypeDao();
+                    stDao.createList(response.body());
+                    setSportTypes();
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
             }
 
             @Override
-            public void onFailure(Call<List<SportKind>> call, Throwable t) {
+            public void onFailure(Call<List<SportType>> call, Throwable t) {
                 Log.e("RETRO", "onFailure: "+t.toString());
                 mSwipeRefresh.setRefreshing(false);
                 ImageSnackbar.make(mSwipeRefresh, ImageSnackbar.TYPE_ERROR, String.format("Возникла ошибка при загрузке данных"), Snackbar.LENGTH_SHORT).show();
@@ -123,11 +129,11 @@ public class ChooseSportsActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_continue) {
-            List<SportKind> mCheckedSports = new ArrayList<>();
-            Iterator<SportKind> iterator = DataManager.getInstance().getSportKinds().iterator();
+            List<SportType> mCheckedSports = new ArrayList<>();
+            Iterator<SportType> iterator = DataManager.getInstance().getSportTypes().iterator();
             boolean isEmpty = true;
-            while( iterator.hasNext()) {
-                SportKind sport = iterator.next();
+            while(iterator.hasNext()) {
+                SportType sport = iterator.next();
                 if (sport.isChecked()) {
                     mCheckedSports.add(sport);
                     if (isEmpty)

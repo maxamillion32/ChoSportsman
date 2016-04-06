@@ -5,17 +5,27 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.calendar.CalendarManager;
 import com.chokavo.chosportsman.calendar.GoogleCalendarAPI;
@@ -24,18 +34,22 @@ import com.chokavo.chosportsman.ui.activities.calendar.CalendarActivity;
 import com.chokavo.chosportsman.ui.activities.calendar.CreateEventActivity;
 import com.chokavo.chosportsman.ui.fragments.BaseFragment;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
+import com.github.aakira.expandablelayout.ExpandableRelativeLayout;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.services.calendar.model.CalendarList;
+import com.google.api.services.calendar.model.Events;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.prolificinteractive.materialcalendarview.spans.DotSpan;
 
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 import me.everything.providers.android.calendar.Calendar;
 import rx.Subscriber;
 
@@ -43,16 +57,25 @@ import rx.Subscriber;
  * Created by ilyapyavkin on 21.03.16.
  */
 public class SportCalendarFragment extends BaseFragment {
-    private TextView mOutputText, mTxtGoogleAccount, mTxtCalendarType;
     ProgressDialog mProgress;
     private Calendar mCalendar;
-    private CircleImageView mBtnHideCalendar;
+    private ImageView mBtnHideCalendar;
+    private ExpandableRelativeLayout mExpandCalendarWrap;
     private MaterialCalendarView mCalendarView;
     private FloatingActionButton mFabAddEvent;
+    private TextView mTxtCurrentDay;
+    private LinearLayout mWrapCurrentDay, mWrapNoEvent;
+    private RecyclerView mRvDayEvents;
 
     @Override
     public String getFragmentTitle() {
         return "Календарь";
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -73,37 +96,90 @@ public class SportCalendarFragment extends BaseFragment {
         return rootView;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_sport_calendar, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_info:
+                showCalendarInfo();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void showCalendarInfo() {
+        MaterialDialog dialogInfo = new MaterialDialog.Builder(getActivity())
+                .content(GoogleCalendarAPI.getReadableCalendarInfo(getActivity()))
+                .positiveText(R.string.ok)
+                .show();
+    }
+
     private void rotateArrowButton(boolean back) {
         Animation rotateAnim = AnimationUtils.loadAnimation(getActivity(), back ? R.anim.rotate_180_back : R.anim.rotate_180);
         mBtnHideCalendar.setAnimation(rotateAnim);
     }
 
+    private void collapseCalendar() {
+        rotateArrowButton(true);
+        mExpandCalendarWrap.collapse();
+    }
+
+    private void expandCalendar() {
+        rotateArrowButton(false);
+        mExpandCalendarWrap.expand();
+    }
+
+    private void toggleCalendar() {
+        if (mExpandCalendarWrap.isExpanded()) {
+            collapseCalendar();
+        } else {
+            expandCalendar();
+        }
+    }
+
     private void initViews(View rootView) {
         mCalendarView = (MaterialCalendarView) rootView.findViewById(R.id.calendar_view);
-        mBtnHideCalendar = (CircleImageView) rootView.findViewById(R.id.btn_hide_calendar);
-        mOutputText = (TextView) rootView.findViewById(R.id.txt_output);
-        mTxtGoogleAccount = (TextView) rootView.findViewById(R.id.txt_google_account);
-        mTxtCalendarType = (TextView) rootView.findViewById(R.id.txt_calendar_type);
+        mExpandCalendarWrap = (ExpandableRelativeLayout) rootView.findViewById(R.id.expand_calendar_wrap);
+        mBtnHideCalendar = (ImageView) rootView.findViewById(R.id.btn_hide_calendar);
+        mWrapCurrentDay = (LinearLayout) rootView.findViewById(R.id.wrap_current_day);
+        mWrapNoEvent = (LinearLayout) rootView.findViewById(R.id.wrap_no_event);
         mFabAddEvent = (FloatingActionButton) rootView.findViewById(R.id.fab_add_event);
+        mTxtCurrentDay = (TextView) rootView.findViewById(R.id.txt_current_day);
+        mRvDayEvents = (RecyclerView) rootView.findViewById(R.id.rv_day_events);
 
-        /*mBtnHideCalendar.setOnClickListener(new View.OnClickListener() {
+        mBtnHideCalendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mCalendarView.isShown()){
-                    rotateArrowButton(true);
-                    mCalendarView.collapse();
-                }else{
-                    rotateArrowButton(false);
-                    mCalendarView.expand();
-                }
+                toggleCalendar();
             }
-        });*/
+        });
+
+        mWrapNoEvent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // для текущей даты откроем окно создания события
+                Intent intent = new Intent(getActivity(), CreateEventActivity.class);
+                Date extraDate;
+                if (mCalendarView.getSelectedDate() == null ||
+                        DateUtils.isToday(mCalendarView.getSelectedDate().getDate().getTime())) {
+                    extraDate = java.util.Calendar.getInstance().getTime();
+                } else {
+                    extraDate = mCalendarView.getSelectedDate().getDate();
+                }
+                intent.putExtra(CreateEventActivity.EXTRA_DATE, extraDate);
+                startActivityForResult(intent, CreateEventActivity.REQUEST_CREATE_EVENT);
+            }
+        });
 
         mProgress = new ProgressDialog(getActivity());
         mProgress.setMessage(getString(R.string.progress_gapi));
 
         // Initialize credentials and service object.
-        mTxtGoogleAccount.setText(DataManager.getInstance().getGoogleAccount());
         mFabAddEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,6 +189,7 @@ public class SportCalendarFragment extends BaseFragment {
         });
 
     }
+
     public class EventDecorator implements DayViewDecorator {
 
         private final int color;
@@ -135,9 +212,26 @@ public class SportCalendarFragment extends BaseFragment {
     }
 
     private void initCalendar() {
+        // выбранная дата - сегодня
+        Date today = java.util.Calendar.getInstance().getTime();
+        mCalendarView.setSelectedDate(today);
+        selectDate(today);
         HashSet<CalendarDay> hashSet = new HashSet<>();
         hashSet.add(new CalendarDay(2016,3,12));
         mCalendarView.addDecorator(new EventDecorator(Color.RED, hashSet));
+        mCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
+            @Override
+            public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
+                selectDate(date.getDate());
+                collapseCalendar();
+            }
+        });
+    }
+
+    private void selectDate(Date date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(getString(R.string.current_day_format),
+                getResources().getConfiguration().locale);
+        mTxtCurrentDay.setText(dateFormat.format(date));
     }
 
     @Override
@@ -164,7 +258,7 @@ public class SportCalendarFragment extends BaseFragment {
         if (DataManager.getInstance().calendarGAPI == null) {
             // придется делать асинхронный запрос к серверу google
             mProgress.show();
-            GoogleCalendarAPI.getCalendarGAPIbyId(new Subscriber<CalendarList>() {
+            GoogleCalendarAPI.getInstance().getCalendarGAPIbyId(new Subscriber<CalendarList>() {
                 @Override
                 public void onCompleted() {
                     mProgress.hide();
@@ -190,25 +284,32 @@ public class SportCalendarFragment extends BaseFragment {
             }, DataManager.getInstance().calendarGAPIid);
             return;
         }
-        mTxtCalendarType.setText(R.string.calendar_type_gapi);
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format("summary: %s\n", DataManager.getInstance().calendarGAPI.getSummary()));
-        sb.append(String.format("desc: %s\n", DataManager.getInstance().calendarGAPI.getDescription()));
-        sb.append(String.format("timezone: %s\n", DataManager.getInstance().calendarGAPI.getTimeZone()));
-        mOutputText.setText(sb.toString());
+        // TODO отработать получение списка событий
+        mProgress.show();
+        GoogleCalendarAPI.getInstance().getEventList(new Subscriber<Events>() {
+            @Override
+            public void onCompleted() {
+                mProgress.hide();
+                Log.e("getEventList", "onCompleted");
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.e(SportCalendarFragment.class.getName(), "error: " + e.toString());
+            }
+
+            @Override
+            public void onNext(Events events) {
+                Log.e("getEventList", "onNext");
+            }
+        });
 
     }
 
     private void workWithCalendarCP() {
-        mTxtCalendarType.setText(R.string.calendar_type_cp);
         mCalendar = CalendarManager.getInstance(getActivity())
                 .getSportCalendar();
-        if (mCalendar == null) {
-            mOutputText.setText("calendar is null");
-        } else {
-            mOutputText.setText(String.format("%s\n%s\n", mCalendar.accountName, mCalendar.displayName));
-
-        }
+        Toast.makeText(getActivity(), "ContentProvider", Toast.LENGTH_SHORT).show();
     }
 
 }
