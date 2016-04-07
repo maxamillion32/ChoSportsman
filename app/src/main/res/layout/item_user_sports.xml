@@ -21,6 +21,11 @@
         android:paddingLeft="30dp"
         android:id="@+id/sporttype_tv"/>
 
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/checkbox_delete_sport"/>
+
     <ImageView
         android:layout_width="35dp"
         android:layout_height="35dp"

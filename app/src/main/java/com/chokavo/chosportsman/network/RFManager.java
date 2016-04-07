@@ -2,6 +2,7 @@ package com.chokavo.chosportsman.network;
 
 import com.chokavo.chosportsman.Constants;
 import com.chokavo.chosportsman.ormlite.models.SportType;
+import com.chokavo.chosportsman.ormlite.models.Sportsman;
 
 import java.util.List;
 
@@ -37,6 +38,12 @@ public class RFManager {
 
     public void getSportTypes(Callback<List<SportType>> callback) {
         Call<List<SportType>> call = mRestInterface.getSportTypes();
+        call.enqueue(callback);
+    }
+
+    public void vkAuth(int vkId,
+                       Callback<Sportsman> callback) {
+        Call<Sportsman> call = mRestInterface.vkAuth(vkId);
         call.enqueue(callback);
     }
 

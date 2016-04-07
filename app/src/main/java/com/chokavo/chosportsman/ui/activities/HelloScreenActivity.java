@@ -1,5 +1,6 @@
 package com.chokavo.chosportsman.ui.activities;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -10,6 +11,7 @@ import android.view.View;
 
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.models.DataManager;
+import com.chokavo.chosportsman.network.RFManager;
 import com.chokavo.chosportsman.ormlite.DBHelperFactory;
 import com.chokavo.chosportsman.ormlite.models.Sportsman;
 import com.chokavo.chosportsman.ui.fragments.helloscreen.SplashFragment;
@@ -28,15 +30,22 @@ import com.vk.sdk.api.model.VKList;
 
 import java.sql.SQLException;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class HelloScreenActivity extends BaseActivity {
 
     private View mContentFrame;
+    private ProgressDialog mProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hello_screen);
         mContentFrame = findViewById(R.id.content_frame);
+        mProgress = new ProgressDialog(this);
+        mProgress.setMessage(getString(R.string.wait_second));
 
         launchFragmentNoBackStack(new SplashFragment(),
                 SplashFragment.getFragmentTag());
@@ -87,6 +96,7 @@ public class HelloScreenActivity extends BaseActivity {
     }
 
     public void saveUser() {
+        mProgress.show();
         VKRequest vkRequest = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "photo_200,sex,bdate,city"));
         vkRequest.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
@@ -94,26 +104,43 @@ public class HelloScreenActivity extends BaseActivity {
                 VKList<VKApiUserFull> vkUsers = ((VKList) response.parsedModel);
                 VKApiUserFull vkUser = vkUsers.get(0);
                 DataManager.getInstance().setVkUser(vkUser, getString(R.string.vk_user_id));
-                // TODO регистрация юзера на нашем сайте
-                // есть vkUser - сохраняем в бд и на сервер
-                saveUserSQLite();
 
-                startActivity(new Intent(HelloScreenActivity.this, ChooseSportsActivity.class));
-                finish();
+                vkAuth(vkUser.id);
                 super.onComplete(response);
             }
         });
     }
 
+    private void vkAuth(int id) {
+        RFManager.getInstance().vkAuth(id,
+                new Callback<Sportsman>() {
+                    @Override
+                    public void onResponse(Call<Sportsman> call, Response<Sportsman> response) {
+                        mProgress.hide();
+                        // регистрация на сайте успешна
+                        Sportsman sportsman = response.body();
+                        saveUserSQLite(sportsman);
+
+                        startActivity(new Intent(HelloScreenActivity.this, ChooseSportsActivity.class));
+                        finish();
+                    }
+
+                    @Override
+                    public void onFailure(Call<Sportsman> call, Throwable t) {
+                        mProgress.hide();
+                        Log.e(HelloScreenActivity.class.getSimpleName(),
+                                "Error logging out site: "+t.getLocalizedMessage());
+                        ImageSnackbar.make(mContentFrame, ImageSnackbar.TYPE_ERROR,
+                                "Ошибка при регистрации на сайте", Snackbar.LENGTH_LONG).show();
+                    }
+                });
+    }
+
     /**
      * Сохранение юзера в базу данных SQLite
      */
-    private void saveUserSQLite() {
+    private void saveUserSQLite(Sportsman sportsman) {
         try {
-            VKApiUserFull vkUser = DataManager.getInstance().vkUser;
-            Sportsman sportsman = new Sportsman();
-            sportsman.setVkid(vkUser.id);
-//                sportsman.setServerId(serverId);
             DBHelperFactory.getHelper().getSportsmanDao().createIfNotExists(sportsman);
             DataManager.getInstance().mSportsman = sportsman;
         } catch (SQLException e) {

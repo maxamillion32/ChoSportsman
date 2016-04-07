@@ -45,13 +45,13 @@ public class UserSportsAdapter extends RecyclerView.Adapter<UserSportsAdapter.Vi
                 sport.setChecked(isChecked);
             }
         });
-        holder.deleteImage.setOnClickListener(new View.OnClickListener() {
+        /*holder.deleteImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sports.remove(position);
                 notifyDataSetChanged();
             }
-        });
+        });*/
     }
 
     @Override
@@ -62,7 +62,6 @@ public class UserSportsAdapter extends RecyclerView.Adapter<UserSportsAdapter.Vi
     class ViewHolder extends RecyclerView.ViewHolder {
 
         public TextView sportKindName;
-        public ImageView deleteImage;
         public TextView sportTypeName;
         public CheckBox isChoosed;
         public ImageView sportImage;

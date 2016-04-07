@@ -119,7 +119,7 @@ public class DataManager {
     }
 
     public void setDeleteUserSports(boolean isDeleteAvailable){
-        for (SportKind sport :
+        for (SportType sport :
                 mUserSports) {
             sport.setChecked(isDeleteAvailable);
         }
