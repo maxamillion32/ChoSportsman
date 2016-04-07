@@ -14,25 +14,20 @@
     <application
         android:name=".App"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher_2"
+        android:icon="@mipmap/ic_launcher_3"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar" >
         <activity
             android:name=".ui.activities.MainActivity"
             android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name="com.vk.sdk.VKServiceActivity"
             android:label="ServiceActivity"
             android:theme="@style/VK.Transparent" />
         <activity
-            android:name=".ui.activities.CloakRoomActivity"
+            android:name=".ui.activities.LockerRoomActivity"
             android:label="Моя раздевалка" >
         </activity>
         <activity
@@ -44,15 +39,21 @@
             android:label="Спортивные сооружения" >
         </activity>
         <activity
-            android:name=".ui.activities.calendar.CalendarActivityOld"
-            android:label="Календарь" >
-        </activity>
-        <activity
             android:name=".ui.activities.calendar.CalendarActivity"
             android:label="Календарь" >
         </activity>
         <activity
-            android:name=".ui.activities.HelloScreenActivity">
+            android:name=".ui.activities.calendar.CreateEventActivity"
+            android:label="Новое событие" >
+        </activity>
+        <activity
+            android:name=".ui.activities.HelloScreenActivity"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".ui.activities.ChooseSportsActivity"

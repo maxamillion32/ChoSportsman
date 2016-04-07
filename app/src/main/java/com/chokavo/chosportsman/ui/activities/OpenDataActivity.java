@@ -67,7 +67,7 @@ public class OpenDataActivity extends NavigationDrawerActivity {
 
     private void loadData() {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Constants.BASE_URL)
+                .baseUrl(Constants.OPEN_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         RestInterface restInterface = retrofit.create(RestInterface.class);

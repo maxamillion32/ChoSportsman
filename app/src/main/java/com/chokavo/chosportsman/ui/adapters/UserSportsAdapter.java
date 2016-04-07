@@ -1,5 +1,6 @@
 package com.chokavo.chosportsman.ui.adapters;
 
+import android.media.Image;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,8 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.chokavo.chosportsman.R;
-import com.chokavo.chosportsman.models.DataManager;
-import com.chokavo.chosportsman.models.SportKind;
+import com.chokavo.chosportsman.ormlite.models.SportType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +22,10 @@ import java.util.Set;
  */
 public class UserSportsAdapter extends RecyclerView.Adapter<UserSportsAdapter.ViewHolder> {
 
-    private List<SportKind> sports = new ArrayList<>();
+    private List<SportType> sports = new ArrayList<>();
 
-    public UserSportsAdapter(List<SportKind> sportKinds) {
-        sports = sportKinds;
+    public UserSportsAdapter(List<SportType> sportTypes) {
+        sports = sportTypes;
     }
 
     @Override
@@ -37,11 +37,14 @@ public class UserSportsAdapter extends RecyclerView.Adapter<UserSportsAdapter.Vi
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
 
-        final SportKind sport = sports.get(position);
-        holder.sportKindName.setText(sport.getName());
-        if (sport.isChecked()) {
-            holder.deleteImage.setVisibility(View.VISIBLE);
-        }
+        final SportType sport = sports.get(position);
+        holder.sportTypeName.setText(sport.getTitle());
+        holder.isChoosed.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                sport.setChecked(isChecked);
+            }
+        });
         holder.deleteImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,12 +63,14 @@ public class UserSportsAdapter extends RecyclerView.Adapter<UserSportsAdapter.Vi
 
         public TextView sportKindName;
         public ImageView deleteImage;
+        public TextView sportTypeName;
+        public CheckBox isChoosed;
         public ImageView sportImage;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            sportKindName = (TextView) itemView.findViewById(R.id.sportkind_tv);
-            deleteImage = (ImageView) itemView.findViewById(R.id.delete_sport);
+            sportTypeName = (TextView) itemView.findViewById(R.id.sporttype_tv);
+            isChoosed = (CheckBox) itemView.findViewById(R.id.checkbox_delete_sport);
             sportImage = (ImageView) itemView.findViewById(R.id.image_sport);
         }
     }

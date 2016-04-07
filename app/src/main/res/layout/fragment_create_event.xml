@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/vk_white"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingRight="16dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="top"
+                android:layout_marginBottom="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="32dp"
+                android:layout_marginTop="16dp"
+                android:src="@drawable/ic_description_black_24dp" />
+
+            <EditText
+                android:id="@+id/edit_summary"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Название"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <com.chokavo.chosportsman.ui.widgets.NewEventRowView
+            android:id="@+id/row_sport_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:desc="Вид спорта"
+            app:type_icon="@drawable/ic_running_man"
+            app:value="Баскетбол" />
+
+        <com.chokavo.chosportsman.ui.widgets.NewEventRowView
+            android:id="@+id/row_event_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:desc="Тип события"
+            app:type_icon="@drawable/ic_info_outline_black_24dp"
+            app:value="Тренировка" />
+
+        <include layout="@layout/item_thin_divider" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/img_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="top"
+                android:layout_marginBottom="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="32dp"
+                android:layout_marginTop="16dp"
+                android:src="@drawable/ic_time_black_24dp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingRight="16dp">
+
+                <LinearLayout
+                    android:id="@+id/ll_whole_day_wrap"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingBottom="16dp"
+                    android:paddingTop="16dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Весь день"
+                        android:textColor="@color/black_100"
+                        android:textSize="16sp" />
+
+                    <Switch
+                        android:id="@+id/switch_whole_day"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_date_start_wrap"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/txt_data_start"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:paddingBottom="16dp"
+                        android:paddingTop="16dp"
+                        android:text="пн, 28 марта 2016 г."
+                        android:textColor="@color/black_100"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/txt_time_start"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="16dp"
+                        android:paddingTop="16dp"
+                        android:text="13:30"
+                        android:textSize="16sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_date_end_wrap"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/txt_data_end"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:paddingBottom="16dp"
+                        android:paddingTop="16dp"
+                        android:text="пн, 29 марта 2016 г."
+                        android:textColor="@color/black_100"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/txt_time_end"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="16dp"
+                        android:paddingTop="16dp"
+                        android:text="14:30"
+                        android:textSize="16sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <com.chokavo.chosportsman.ui.widgets.NewEventRowView
+            android:id="@+id/row_repeat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:desc="Повторение"
+            app:type_icon="@drawable/ic_refresh_black_24dp"
+            app:value="Не повторяется" />
+
+        <include layout="@layout/item_thin_divider" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingRight="16dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="top"
+                android:layout_marginBottom="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="32dp"
+                android:layout_marginTop="16dp"
+                android:src="@drawable/ic_place_black_24dp" />
+
+            <EditText
+                android:id="@+id/edit_location"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Укажите место проведения"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingRight="16dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="top"
+                android:layout_marginBottom="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="32dp"
+                android:layout_marginTop="16dp"
+                android:src="@drawable/ic_notifications_black_24dp" />
+
+            <LinearLayout
+                android:id="@+id/ll_reminders_wrap"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rv_reminders"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/txt_add_reminder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="16dp"
+                    android:paddingTop="16dp"
+                    android:text="Добавить оповещение"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+</ScrollView>

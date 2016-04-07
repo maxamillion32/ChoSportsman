@@ -84,10 +84,10 @@ public abstract class NavigationDrawerActivity extends BaseActivity implements N
                 finish();
             }
         } else if (id == R.id.nav_cloakroom) {
-            if (!(this instanceof CloakRoomActivity)) {
-                startActivity(new Intent(this, CloakRoomActivity.class));
+//            if (!(this instanceof LockerRoomActivity)) {
+                startActivity(new Intent(this, LockerRoomActivity.class));
                 finish();
-            }
+//            }
         } else if (id == R.id.nav_news) {
             Toast.makeText(this, "Пока не доступно", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_calendar) {

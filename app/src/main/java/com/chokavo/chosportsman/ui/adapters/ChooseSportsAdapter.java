@@ -9,20 +9,19 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.chokavo.chosportsman.R;
-import com.chokavo.chosportsman.models.SportKind;
+import com.chokavo.chosportsman.ormlite.models.SportType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by Дашицырен on 13.03.2016.
  */
 public class ChooseSportsAdapter extends RecyclerView.Adapter<ChooseSportsAdapter.ViewHolder> {
 
-    private List<SportKind> sports = new ArrayList<>();
+    private List<SportType> sports = new ArrayList<>();
 
-    public ChooseSportsAdapter(List<SportKind> sportKinds) {
+    public ChooseSportsAdapter(List<SportType> sportKinds) {
         sports = sportKinds;
     }
 
@@ -34,8 +33,8 @@ public class ChooseSportsAdapter extends RecyclerView.Adapter<ChooseSportsAdapte
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final SportKind sport = sports.get(position);
-        holder.sportKindName.setText(sport.getName());
+        final SportType sport = sports.get(position);
+        holder.sportKindName.setText(sport.getTitle());
         holder.isChoosed.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -56,7 +55,7 @@ public class ChooseSportsAdapter extends RecyclerView.Adapter<ChooseSportsAdapte
 
         public ViewHolder(View itemView) {
             super(itemView);
-            sportKindName = (TextView) itemView.findViewById(R.id.sportkind_tv);
+            sportKindName = (TextView) itemView.findViewById(R.id.sporttype_tv);
             isChoosed = (CheckBox) itemView.findViewById(R.id.ischoosed_chbox);
         }
     }

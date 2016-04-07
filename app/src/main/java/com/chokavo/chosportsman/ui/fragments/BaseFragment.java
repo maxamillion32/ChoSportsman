@@ -44,6 +44,14 @@ public abstract class BaseFragment extends Fragment {
         }
     }
 
+    public void launchAnimationFragment(Fragment fragment, String tag, int animType) {
+        if (getActivity() instanceof BaseActivity) {
+            ((BaseActivity)getActivity()).launchAnimationFragment(fragment, tag, animType);
+        } else {
+            Log.e(BaseFragment.class.getName(), "launchFragment when activity is not an instance of BaseActivity");
+        }
+    }
+
     /**
      * Check that Google Play services APK is installed and up to date. Will
      * launch an error dialog for the user to update Google Play Services if
