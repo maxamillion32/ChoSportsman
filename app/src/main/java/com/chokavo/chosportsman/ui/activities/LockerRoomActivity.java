@@ -7,6 +7,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -77,6 +78,7 @@ public class LockerRoomActivity extends NavigationDrawerActivity implements AppB
 
         mRecyclerSports.setAdapter(adapter);
         mRecyclerSports.setLayoutManager(layoutManager);
+        mRecyclerSports.setItemAnimator(new DefaultItemAnimator());
 
         mFabEdit = (FloatingActionButton) findViewById(R.id.fab_edit);
         mlinearLayoutAdd = (LinearLayout) findViewById(R.id.linlayout_add);

@@ -21,12 +21,13 @@
         android:paddingLeft="30dp"
         android:id="@+id/sporttype_tv"/>
 
-    <CheckBox
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="right"
-        android:shadowColor="@color/black_100"
-        android:id="@+id/checkbox_delete_sport"
+    <ImageView
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="10dp"
+        android:src="@drawable/ic_clear_24dp"
+        android:id="@+id/delete_sport"
         android:visibility="gone"
         android:layout_weight="1"/>
 </LinearLayout>

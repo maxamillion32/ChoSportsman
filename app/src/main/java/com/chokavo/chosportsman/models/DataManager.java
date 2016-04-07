@@ -118,6 +118,13 @@ public class DataManager {
         mSportTypes.add(basketball);
     }
 
+    public void setDeleteUserSports(boolean isDeleteAvailable){
+        for (SportKind sport :
+                mUserSports) {
+            sport.setChecked(isDeleteAvailable);
+        }
+    }
+
     public String getGoogleAccount() {
        /* if (mGoogleAccount == null) {
             SharedPrefsManager.restoreGoogleAccount();

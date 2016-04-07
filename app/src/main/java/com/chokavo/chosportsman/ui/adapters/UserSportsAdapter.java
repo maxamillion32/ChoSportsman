@@ -1,5 +1,6 @@
 package com.chokavo.chosportsman.ui.adapters;
 
+import android.media.Image;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import com.chokavo.chosportsman.ormlite.models.SportType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Дашицырен on 17.03.2016.
@@ -33,7 +35,7 @@ public class UserSportsAdapter extends RecyclerView.Adapter<UserSportsAdapter.Vi
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
 
         final SportType sport = sports.get(position);
         holder.sportTypeName.setText(sport.getTitle());
@@ -41,6 +43,13 @@ public class UserSportsAdapter extends RecyclerView.Adapter<UserSportsAdapter.Vi
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 sport.setChecked(isChecked);
+            }
+        });
+        holder.deleteImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sports.remove(position);
+                notifyDataSetChanged();
             }
         });
     }
@@ -52,6 +61,8 @@ public class UserSportsAdapter extends RecyclerView.Adapter<UserSportsAdapter.Vi
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
+        public TextView sportKindName;
+        public ImageView deleteImage;
         public TextView sportTypeName;
         public CheckBox isChoosed;
         public ImageView sportImage;
