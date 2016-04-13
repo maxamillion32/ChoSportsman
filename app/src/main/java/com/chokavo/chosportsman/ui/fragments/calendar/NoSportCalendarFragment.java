@@ -20,6 +20,9 @@ import com.chokavo.chosportsman.AppUtils;
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.calendar.GoogleCalendarAPI;
 import com.chokavo.chosportsman.models.DataManager;
+import com.chokavo.chosportsman.network.RFManager;
+import com.chokavo.chosportsman.ormlite.DBHelperFactory;
+import com.chokavo.chosportsman.ormlite.models.Sportsman;
 import com.chokavo.chosportsman.ui.activities.BaseActivity;
 import com.chokavo.chosportsman.ui.activities.calendar.CalendarActivity;
 import com.chokavo.chosportsman.ui.fragments.BaseFragment;
@@ -27,6 +30,11 @@ import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.services.calendar.model.CalendarList;
 
+import java.sql.SQLException;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import rx.Subscriber;
 
 /**
@@ -40,7 +48,7 @@ public class NoSportCalendarFragment extends BaseFragment {
     }
 
     Button mBtnCreateCal;
-    ProgressDialog mProgress;
+    ProgressDialog mProgress, mProgressUpdateAccount;
 
     @Nullable
     @Override
@@ -61,6 +69,8 @@ public class NoSportCalendarFragment extends BaseFragment {
 
         mProgress = new ProgressDialog(getActivity());
         mProgress.setMessage(getString(R.string.progress_gapi));
+        mProgressUpdateAccount = new ProgressDialog(getActivity());
+        mProgressUpdateAccount.setMessage(getString(R.string.progress_update_user));
     }
 
     @Override
@@ -99,9 +109,9 @@ public class NoSportCalendarFragment extends BaseFragment {
                     String accountName =
                             data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
                     if (accountName != null) {
-                        DataManager.getInstance().googleCredential.setSelectedAccountName(accountName);
-                        DataManager.getInstance().setAndSaveGoogleAccount(accountName);
-                        beginCreatingCalendar();
+                        DataManager.getInstance().getGoogleCredential().setSelectedAccountName(accountName);
+                        // аккаунт выбран - сохраним googleAccount на сервер и локально
+                        updateGoogleAccount(accountName);
                     } else {
                         ImageSnackbar.make(getView(), ImageSnackbar.TYPE_ERROR, "Аккаунт == null", Snackbar.LENGTH_LONG).show();
                     }
@@ -117,12 +127,50 @@ public class NoSportCalendarFragment extends BaseFragment {
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
+
+    private void updateGoogleAccount(String accountName) {
+        mProgressUpdateAccount.show();
+        // 0 обновим юзера
+        Sportsman sportsman = DataManager.getInstance().mSportsman;
+        sportsman.setGoogleAccount(accountName);
+        // 1 сохраним аккаунт в sqlite
+        try {
+            DBHelperFactory.getHelper().getSportsmanDao().update(sportsman);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        // 2 сохраним аккаунт на сервере
+        RFManager.getInstance().updateUser(sportsman,
+                new Callback<Sportsman>() {
+                    @Override
+                    public void onResponse(Call<Sportsman> call, Response<Sportsman> response) {
+                        // TODO приходит 500 ошибка, надо исправить
+                        mProgressUpdateAccount.hide();
+                        Sportsman sportsman = response.body();
+                        Log.e(NoSportCalendarFragment.getFragmentTag(), "onResponse when updateUser: ");
+                        beginCreatingCalendar();
+                    }
+
+                    @Override
+                    public void onFailure(Call<Sportsman> call, Throwable t) {
+                        mProgressUpdateAccount.hide();
+                        Log.e(NoSportCalendarFragment.getFragmentTag(), "onFailure when updateUser: "+t);
+                        ImageSnackbar.make(getView(), ImageSnackbar.TYPE_ERROR, "Возникла ошибка при обновлении пользователя", Snackbar.LENGTH_LONG).show();
+                    }
+                });
+    }
+
     /**
      * Данная функция вызывается по нажитю на кнопкуу "новый календарь"
      */
     private void beginCreatingCalendar() {
         // 1 аккаунт google
-        if (DataManager.getInstance().getGoogleAccount() == null) {
+        if (DataManager.getInstance().mSportsman == null) {
+            // no sportsman
+            Log.e(NoSportCalendarFragment.getFragmentTag(), "no sportsman");
+            return;
+        }
+        if (DataManager.getInstance().mSportsman.getGoogleAccount() == null) {
             // позволяем юзеру выбрать аккаунт гугл из списка
             chooseAccount();
             return;
@@ -197,7 +245,7 @@ public class NoSportCalendarFragment extends BaseFragment {
             return;
         }
         startActivityForResult(
-                DataManager.getInstance().googleCredential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
+                DataManager.getInstance().getGoogleCredential().newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
 
     }
 

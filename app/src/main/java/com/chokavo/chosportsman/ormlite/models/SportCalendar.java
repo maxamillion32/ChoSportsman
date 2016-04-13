@@ -9,7 +9,7 @@ import java.util.Date;
 /**
  * Created by ilyapyavkin on 06.04.16.
  */
-@DatabaseTable(tableName = "sportcalendars")
+@DatabaseTable(tableName = "sportcalendar")
 public class SportCalendar {
 
     public static final String SPORTSMAN_ID_FIELD_NAME = "sportsman_id";

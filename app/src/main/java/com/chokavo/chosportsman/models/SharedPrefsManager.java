@@ -4,13 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.chokavo.chosportsman.App;
-import com.chokavo.chosportsman.calendar.GoogleCalendarAPI;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.util.ExponentialBackOff;
 
 import org.jetbrains.annotations.NonNls;
-
-import java.util.Arrays;
 
 /**
  * Created by ilyapyavkin on 14.03.16.
@@ -35,7 +30,7 @@ public final class SharedPrefsManager {
     /**
      * GOOGLE_ACCOUNT
      */
-    @NonNls
+    /*@NonNls
     private static final String GOOGLE_ACCOUNT = "GOOGLE_ACCOUNT";
 
     public static void removeGoogleAccount() {
@@ -48,16 +43,7 @@ public final class SharedPrefsManager {
                 .edit()
                 .putString(GOOGLE_ACCOUNT, DataManager.getInstance().getGoogleAccount())
                 .commit();
-    }
-
-    public static void restoreGoogleAccount() {
-        DataManager.getInstance().setGoogleAccount(getInstance().preferences.getString(GOOGLE_ACCOUNT, null));
-        GoogleAccountCredential googleCredential = GoogleAccountCredential.usingOAuth2(
-                App.getInstance(), Arrays.asList(GoogleCalendarAPI.SCOPES))
-                .setBackOff(new ExponentialBackOff())
-                .setSelectedAccountName(DataManager.getInstance().getGoogleAccount());
-        DataManager.getInstance().googleCredential = googleCredential;
-    }
+    }*/
 
     /**
      * Sport calendar
@@ -121,5 +107,29 @@ public final class SharedPrefsManager {
                 .commit();
     }
 
+
+    private static final String USER_ID_ORMLITE = "USER_ID_ORMLITE";
+
+    /**
+     * Восстанавливает id пользователя в локальной базе данных ORMLite
+     */
+    public static void restoreUserIdORMLite() {
+        DataManager.getInstance().userIdOTMLite = getInstance().preferences.getInt(USER_ID_ORMLITE, -1);
+    }
+
+    public static void saveUserIdORMLite() {
+        getInstance().preferences
+                .edit()
+                .putInt(USER_ID_ORMLITE, DataManager.getInstance().userIdOTMLite)
+                .commit();
+    }
+
+    public static void restoreAllData() {
+        restoreUserIdORMLite();
+//        restoreGoogleAccount();
+        restoreCalendarGAPIid();
+        restoreCalendarCPid();
+        restoreUserSportsChosen();
+    }
 }
 

@@ -5,15 +5,18 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
 import com.chokavo.chosportsman.App;
+import com.chokavo.chosportsman.calendar.GoogleCalendarAPI;
 import com.chokavo.chosportsman.network.datarows.SportObjectDataRow;
 import com.chokavo.chosportsman.ormlite.models.SportType;
 import com.chokavo.chosportsman.ormlite.models.Sportsman;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.calendar.model.Calendar;
 import com.google.api.services.calendar.model.Event;
 import com.vk.sdk.api.model.VKApiUserFull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,8 +36,10 @@ public class DataManager {
 //    private List<SportKind> mSportKinds = new ArrayList<>();
     public SharedPreferences mPreferences;
 
+
+    public int userIdOTMLite; // id текущего юзера в локальной бд
     private String mGoogleAccount;
-    public GoogleAccountCredential googleCredential;
+    private GoogleAccountCredential googleCredential;
     public String calendarGAPIid; // id for a google calendar на сервере гугл
     public long calendarCPid; // id for a google calendar в Content provider
 
@@ -126,9 +131,6 @@ public class DataManager {
     }
 
     public String getGoogleAccount() {
-       /* if (mGoogleAccount == null) {
-            SharedPrefsManager.restoreGoogleAccount();
-        }*/
         return mGoogleAccount;
     }
 
@@ -136,10 +138,10 @@ public class DataManager {
         mGoogleAccount = googleAccount;
     }
 
-    public void setAndSaveGoogleAccount(String googleAccount) {
+    /*public void setAndSaveGoogleAccount(String googleAccount) {
         setGoogleAccount(googleAccount);
         SharedPrefsManager.saveGoogleAccount();
-    }
+    }*/
 
     public List<SportType> getSportTypes() {
         return mSportTypes;
@@ -147,5 +149,15 @@ public class DataManager {
 
     public void setSportTypes(List<SportType> sportTypes) {
         mSportTypes = sportTypes;
+    }
+
+    public GoogleAccountCredential getGoogleCredential() {
+        if (googleCredential == null) {
+            googleCredential = GoogleAccountCredential.usingOAuth2(
+                    App.getInstance(), Arrays.asList(GoogleCalendarAPI.SCOPES))
+                    .setBackOff(new ExponentialBackOff())
+                    .setSelectedAccountName(DataManager.getInstance().mSportsman.getGoogleAccount());
+        }
+        return googleCredential;
     }
 }

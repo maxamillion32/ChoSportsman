@@ -67,8 +67,9 @@ public abstract class NavigationDrawerActivity extends BaseActivity implements N
                     .into(mImgNavAvatar);
         }
 
-        if (DataManager.getInstance().getGoogleAccount() != null) {
-            mTxtNavEmail.setText(DataManager.getInstance().getGoogleAccount());
+//        if (DataManager.getInstance().getGoogleAccount() != null) {
+        if (DataManager.getInstance().mSportsman.getGoogleAccount() != null) {
+            mTxtNavEmail.setText(DataManager.getInstance().mSportsman.getGoogleAccount());
         }
     }
 

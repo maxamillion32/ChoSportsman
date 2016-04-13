@@ -11,8 +11,11 @@ import android.view.View;
 
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.models.DataManager;
+import com.chokavo.chosportsman.models.SharedPrefsManager;
 import com.chokavo.chosportsman.network.RFManager;
 import com.chokavo.chosportsman.ormlite.DBHelperFactory;
+import com.chokavo.chosportsman.ormlite.dao.SportsmanFavSportTypeDao;
+import com.chokavo.chosportsman.ormlite.models.SportType;
 import com.chokavo.chosportsman.ormlite.models.Sportsman;
 import com.chokavo.chosportsman.ui.fragments.helloscreen.SplashFragment;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
@@ -29,6 +32,7 @@ import com.vk.sdk.api.model.VKApiUserFull;
 import com.vk.sdk.api.model.VKList;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -116,18 +120,16 @@ public class HelloScreenActivity extends BaseActivity {
                 new Callback<Sportsman>() {
                     @Override
                     public void onResponse(Call<Sportsman> call, Response<Sportsman> response) {
-                        mProgress.hide();
                         // регистрация на сайте успешна
                         Sportsman sportsman = response.body();
+                        // сохранине в базе данных SQLite
                         saveUserSQLite(sportsman);
-
-                        startActivity(new Intent(HelloScreenActivity.this, ChooseSportsActivity.class));
-                        finish();
+                        // проверим - есть ли у данного юзера на сервере "любимые виды спорта"
+                        checkUserSportTypes(sportsman);
                     }
 
                     @Override
                     public void onFailure(Call<Sportsman> call, Throwable t) {
-                        mProgress.hide();
                         Log.e(HelloScreenActivity.class.getSimpleName(),
                                 "Error logging out site: "+t.getLocalizedMessage());
                         ImageSnackbar.make(mContentFrame, ImageSnackbar.TYPE_ERROR,
@@ -136,12 +138,53 @@ public class HelloScreenActivity extends BaseActivity {
                 });
     }
 
+    private void checkUserSportTypes(final Sportsman sportsman) {
+        RFManager.getInstance().getUserSportTypes(sportsman.getServerId(),
+                new Callback<List<SportType>>() {
+                    @Override
+                    public void onResponse(Call<List<SportType>> call, Response<List<SportType>> response) {
+                        mProgress.hide();
+                        List<SportType> favSportTypes = response.body();
+                        if (favSportTypes.size() == 0) {
+                            // любимых видов спорта нет - открываем соответствующее активити
+                            startActivity(new Intent(HelloScreenActivity.this, ChooseSportsActivity.class));
+                            finish();
+                        } else {
+                            // любимые виды спорта есть - сохраняем их ORMLite и выходим
+                            saveFavSportsSQLite(sportsman, favSportTypes);
+                            startActivity(new Intent(HelloScreenActivity.this, MainActivity.class));
+                            finish();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<SportType>> call, Throwable t) {
+                        mProgress.hide();
+                        Log.e(HelloScreenActivity.class.getSimpleName(), "Ошибка при получении избранных видов спорта: "+t);
+                        ImageSnackbar.make(mContentFrame, ImageSnackbar.TYPE_ERROR,
+                                "Ошибка при получении избранных видов спорта", Snackbar.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    private void saveFavSportsSQLite(Sportsman sportsman, List<SportType> favSportTypes) {
+        try {
+            SportsmanFavSportTypeDao dao = DBHelperFactory.getHelper().getSportsmanFavSportTypeDao();
+            dao.createListIfNotExist(sportsman, favSportTypes);
+            DataManager.getInstance().mSportsman.setFavSportTypes(favSportTypes);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Сохранение юзера в базу данных SQLite
      */
     private void saveUserSQLite(Sportsman sportsman) {
         try {
             DBHelperFactory.getHelper().getSportsmanDao().createIfNotExists(sportsman);
+            DataManager.getInstance().userIdOTMLite = sportsman.getId();
+            SharedPrefsManager.saveUserIdORMLite();
             DataManager.getInstance().mSportsman = sportsman;
         } catch (SQLException e) {
             e.printStackTrace();

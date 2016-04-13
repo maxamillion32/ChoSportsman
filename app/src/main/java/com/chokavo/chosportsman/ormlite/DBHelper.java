@@ -7,9 +7,11 @@ import android.util.Log;
 import com.chokavo.chosportsman.ormlite.dao.SportCalendarDao;
 import com.chokavo.chosportsman.ormlite.dao.SportTypeDao;
 import com.chokavo.chosportsman.ormlite.dao.SportsmanDao;
+import com.chokavo.chosportsman.ormlite.dao.SportsmanFavSportTypeDao;
 import com.chokavo.chosportsman.ormlite.models.SportCalendar;
 import com.chokavo.chosportsman.ormlite.models.SportType;
 import com.chokavo.chosportsman.ormlite.models.Sportsman;
+import com.chokavo.chosportsman.ormlite.models.SportsmanFavSportType;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
@@ -28,6 +30,7 @@ public class DBHelper extends OrmLiteSqliteOpenHelper {
     private SportCalendarDao mSportCalendarDao = null;
     private SportsmanDao mSportsmanDao = null;
     private SportTypeDao mSportTypeDao = null;
+    private SportsmanFavSportTypeDao mSportsmanFavSportTypeDao = null;
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -40,6 +43,7 @@ public class DBHelper extends OrmLiteSqliteOpenHelper {
             TableUtils.createTableIfNotExists(connectionSource, Sportsman.class);
             TableUtils.createTableIfNotExists(connectionSource, SportCalendar.class);
             TableUtils.createTableIfNotExists(connectionSource, SportType.class);
+            TableUtils.createTableIfNotExists(connectionSource, SportsmanFavSportType.class);
         }
         catch (SQLException e){
             Log.e(TAG, "error creating DB " + DATABASE_NAME);
@@ -54,6 +58,7 @@ public class DBHelper extends OrmLiteSqliteOpenHelper {
             TableUtils.dropTable(connectionSource, Sportsman.class, true);
             TableUtils.dropTable(connectionSource, SportCalendar.class, true);
             TableUtils.dropTable(connectionSource, SportType.class, true);
+            TableUtils.dropTable(connectionSource, SportsmanFavSportType.class, true);
             onCreate(database, connectionSource);
         }
         catch (SQLException e){
@@ -83,6 +88,13 @@ public class DBHelper extends OrmLiteSqliteOpenHelper {
         return mSportTypeDao;
     }
 
+    public SportsmanFavSportTypeDao getSportsmanFavSportTypeDao() throws SQLException {
+        if (mSportsmanFavSportTypeDao == null) {
+            mSportsmanFavSportTypeDao = new SportsmanFavSportTypeDao(getConnectionSource());
+        }
+        return mSportsmanFavSportTypeDao;
+    }
+
     //выполняется при закрытии приложения
     @Override
     public void close(){
@@ -90,5 +102,6 @@ public class DBHelper extends OrmLiteSqliteOpenHelper {
         mSportCalendarDao = null;
         mSportsmanDao = null;
         mSportTypeDao = null;
+        mSportsmanFavSportTypeDao = null;
     }
 }

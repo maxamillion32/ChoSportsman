@@ -156,7 +156,7 @@ public class GoogleCalendarAPI {
 
     public GoogleCalendarAPI() {
         mService = new com.google.api.services.calendar.Calendar.Builder(
-                sHttpTransport, sJsonFactory, DataManager.getInstance().googleCredential)
+                sHttpTransport, sJsonFactory, DataManager.getInstance().getGoogleCredential())
                 .setApplicationName(AppUtils.getApplicationName())
                 .build();
     }
@@ -187,7 +187,7 @@ public class GoogleCalendarAPI {
                 try {
 //                        new MakeRequestTask(DataManager.getInstance().googleCredential, sub).execute();
                     com.google.api.services.calendar.Calendar mService = new com.google.api.services.calendar.Calendar.Builder(
-                            sHttpTransport, sJsonFactory, DataManager.getInstance().googleCredential)
+                            sHttpTransport, sJsonFactory, DataManager.getInstance().getGoogleCredential())
                             .setApplicationName(AppUtils.getApplicationName())
                             .build();
                     CalendarList calendarList = mService.calendarList().list().execute();
@@ -230,7 +230,7 @@ public class GoogleCalendarAPI {
 
     private static Calendar getCalendarById(final String calID) throws IOException {
         com.google.api.services.calendar.Calendar mService = new com.google.api.services.calendar.Calendar.Builder(
-                sHttpTransport, sJsonFactory, DataManager.getInstance().googleCredential)
+                sHttpTransport, sJsonFactory, DataManager.getInstance().getGoogleCredential())
                 .setApplicationName(AppUtils.getApplicationName())
                 .build();
         Calendar calendar = mService.calendars().get(calID).execute();

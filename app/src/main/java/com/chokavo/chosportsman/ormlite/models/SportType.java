@@ -8,8 +8,10 @@ import com.j256.ormlite.table.DatabaseTable;
 /**
  * Created by ilyapyavkin on 06.04.16.
  */
-@DatabaseTable(tableName = "sporttypes")
+@DatabaseTable(tableName = "sporttype")
 public class SportType {
+
+    public final static String ID_FIELD_NAME = "id";
 
     @SerializedName("sport_type_id")
     @Expose

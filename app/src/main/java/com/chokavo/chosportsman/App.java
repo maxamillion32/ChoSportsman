@@ -18,10 +18,7 @@ public class App extends Application {
         super.onCreate();
 
         application = this;
-        SharedPrefsManager.restoreGoogleAccount();
-        SharedPrefsManager.restoreCalendarGAPIid();
-        SharedPrefsManager.restoreCalendarCPid();
-        SharedPrefsManager.restoreUserSportsChosen();
+        SharedPrefsManager.restoreAllData();
 
         // Инициализация VK
         VKSdk.initialize(this);

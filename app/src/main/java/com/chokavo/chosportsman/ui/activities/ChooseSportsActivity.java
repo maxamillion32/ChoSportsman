@@ -19,13 +19,14 @@ import com.chokavo.chosportsman.models.SharedPrefsManager;
 import com.chokavo.chosportsman.network.RFManager;
 import com.chokavo.chosportsman.ormlite.DBHelperFactory;
 import com.chokavo.chosportsman.ormlite.dao.SportTypeDao;
+import com.chokavo.chosportsman.ormlite.dao.SportsmanFavSportTypeDao;
 import com.chokavo.chosportsman.ormlite.models.SportType;
+import com.chokavo.chosportsman.ormlite.models.Sportsman;
 import com.chokavo.chosportsman.ui.adapters.ChooseSportsAdapter;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -130,7 +131,7 @@ public class ChooseSportsActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_continue) {
-            List<SportType> mCheckedSports = new ArrayList<>();
+            final List<SportType> mCheckedSports = new ArrayList<>();
             Iterator<SportType> iterator = DataManager.getInstance().getSportTypes().iterator();
             boolean isEmpty = true;
             while(iterator.hasNext()) {
@@ -149,12 +150,38 @@ public class ChooseSportsActivity extends AppCompatActivity {
             SharedPrefsManager.saveUserSportsChosen();
 
             DataManager.getInstance().setUserSports(mCheckedSports, getString(R.string.sport_kinds));
-            startActivity(new Intent(ChooseSportsActivity.this, MainActivity.class));
-            finish();
+            RFManager.getInstance().setUserSportTypes(DataManager.getInstance().mSportsman.getServerId(),
+                    mCheckedSports, new Callback<Void>() {
+                        @Override
+                        public void onResponse(Call<Void> call, Response<Void> response) {
+                            Log.e(ChooseSportsActivity.class.getSimpleName(), "onResponse");
+                            // TODO save in SQLite
+                            saveFavSportsSQLite(DataManager.getInstance().mSportsman,
+                                    mCheckedSports);
+                            startActivity(new Intent(ChooseSportsActivity.this, MainActivity.class));
+                            finish();
+                        }
+
+                        @Override
+                        public void onFailure(Call<Void> call, Throwable t) {
+                            Log.e(ChooseSportsActivity.class.getSimpleName(), "onFailure: "+t);
+                        }
+                    });
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+    private void saveFavSportsSQLite(Sportsman sportsman, List<SportType> favSportTypes) {
+        try {
+            SportsmanFavSportTypeDao dao = DBHelperFactory.getHelper().getSportsmanFavSportTypeDao();
+            dao.createListIfNotExist(sportsman, favSportTypes);
+            DataManager.getInstance().mSportsman.setFavSportTypes(favSportTypes);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 

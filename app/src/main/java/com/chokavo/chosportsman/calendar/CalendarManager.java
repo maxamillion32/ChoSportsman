@@ -75,7 +75,7 @@ public class CalendarManager {
     }
 
     public boolean haveGoogleCalendar() {
-        if (DataManager.getInstance().googleCredential == null) {
+        if (DataManager.getInstance().getGoogleCredential() == null) {
             return false;
         }
         if (DataManager.getInstance().calendarCPid <= 0l &&
@@ -93,7 +93,11 @@ public class CalendarManager {
     }
 
     public Calendar getSportCalendar() {
-        if (DataManager.getInstance().getGoogleAccount() == null) {
+        if (DataManager.getInstance().mSportsman == null) {
+            Log.e(CalendarManager.class.getName(), "user is null!");
+            return null;
+        }
+        if (DataManager.getInstance().mSportsman.getGoogleAccount() == null) {
             Log.e(CalendarManager.class.getName(), "googleAccount is null!");
             return null;
         }
