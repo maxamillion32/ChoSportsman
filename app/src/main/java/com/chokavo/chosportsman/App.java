@@ -1,6 +1,6 @@
 package com.chokavo.chosportsman;
 
-import android.app.Application;
+import android.support.multidex.MultiDexApplication;
 
 import com.chokavo.chosportsman.models.SharedPrefsManager;
 import com.chokavo.chosportsman.ormlite.DBHelperFactory;
@@ -8,7 +8,7 @@ import com.vk.sdk.VKSdk;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
-public class App extends Application {
+public class App extends MultiDexApplication {
     public static final String TAG = "Chokavo logs";
 
     private static App application;

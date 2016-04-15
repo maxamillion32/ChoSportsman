@@ -31,6 +31,7 @@ import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiUserFull;
 import com.vk.sdk.api.model.VKList;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -120,12 +121,27 @@ public class HelloScreenActivity extends BaseActivity {
                 new Callback<Sportsman>() {
                     @Override
                     public void onResponse(Call<Sportsman> call, Response<Sportsman> response) {
-                        // регистрация на сайте успешна
-                        Sportsman sportsman = response.body();
-                        // сохранине в базе данных SQLite
-                        saveUserSQLite(sportsman);
-                        // проверим - есть ли у данного юзера на сервере "любимые виды спорта"
-                        checkUserSportTypes(sportsman);
+                        if (response != null && response.isSuccess()) {
+                            // регистрация на сайте успешна
+                            Sportsman sportsman = response.body();
+                            // сохранине в базе данных SQLite
+                            saveUserSQLite(sportsman);
+                            // проверим - есть ли у данного юзера на сервере "любимые виды спорта"
+                            checkUserSportTypes(sportsman);
+                        } else {
+                            // error
+                            int code = response.raw().code();
+                            try {
+                                String errorStr = response.errorBody().string();
+                                Log.e(HelloScreenActivity.class.getSimpleName(),
+                                        "Response error: "+errorStr);
+                                ImageSnackbar.make(mContentFrame, ImageSnackbar.TYPE_ERROR,
+                                        String.format("Ошибка %d на сайте", code), Snackbar.LENGTH_LONG).show();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
                     }
 
                     @Override

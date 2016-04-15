@@ -52,6 +52,12 @@ public class RFManager {
         call.enqueue(callback);
     }
 
+    public void getUser(int userId,
+                           Callback<Sportsman> callback) {
+        Call<Sportsman> call = mRestInterface.getUser(userId);
+        call.enqueue(callback);
+    }
+
     public void updateUser(Sportsman sportsman,
                            Callback<Sportsman> callback) {
         Call<Sportsman> call = mRestInterface.updateUser(sportsman.getServerId(), sportsman);

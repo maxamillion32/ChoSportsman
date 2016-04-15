@@ -10,6 +10,8 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        // Enabling multidex support.
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -41,7 +43,7 @@ dependencies {
     compile 'de.hdodenhof:circleimageview:2.0.0'
     compile 'com.github.AAkira:ExpandableLayout:v1.4.3'
     compile 'com.github.prolificinteractive:material-calendarview:v1.2.0'
-    compile 'junit:junit:4.12'
+//    compile 'junit:junit:4.12'
     compile 'io.reactivex:rxandroid:1.1.0'
     compile 'io.reactivex:rxjava:1.1.0'
     compile 'me.everything:providers-android:1.0.1'

@@ -22,9 +22,8 @@ public class Sportsman {
      + dateJoined : DateTime
      */
 
-
     @DatabaseField(generatedId = true)
-    private int id;
+    private transient int id;
 
     @SerializedName("user_id")
     @Expose
@@ -36,7 +35,7 @@ public class Sportsman {
     @DatabaseField()
     private int vkid;
 
-    @SerializedName("googleAccount")
+    @SerializedName("google_account")
     @Expose
     @DatabaseField()
     private String googleAccount;
@@ -51,7 +50,7 @@ public class Sportsman {
     @DatabaseField()
     private Date lastUpdate;
 
-    List<SportType> favSportTypes;
+    transient List<SportType> favSportTypes;
 
     public Sportsman() {
 

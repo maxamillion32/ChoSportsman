@@ -20,6 +20,7 @@ import com.chokavo.chosportsman.AppUtils;
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.calendar.GoogleCalendarAPI;
 import com.chokavo.chosportsman.models.DataManager;
+import com.chokavo.chosportsman.network.ErrorManager;
 import com.chokavo.chosportsman.network.RFManager;
 import com.chokavo.chosportsman.ormlite.DBHelperFactory;
 import com.chokavo.chosportsman.ormlite.models.Sportsman;
@@ -144,11 +145,13 @@ public class NoSportCalendarFragment extends BaseFragment {
                 new Callback<Sportsman>() {
                     @Override
                     public void onResponse(Call<Sportsman> call, Response<Sportsman> response) {
-                        // TODO приходит 500 ошибка, надо исправить
+                        if (response.isSuccess()) {
+                            beginCreatingCalendar();
+                        } else {
+                            String strError = ErrorManager.getErrorString(response);
+                            Log.e(NoSportCalendarFragment.getFragmentTag(), "strError: "+strError);
+                        }
                         mProgressUpdateAccount.hide();
-                        Sportsman sportsman = response.body();
-                        Log.e(NoSportCalendarFragment.getFragmentTag(), "onResponse when updateUser: ");
-                        beginCreatingCalendar();
                     }
 
                     @Override
@@ -164,13 +167,15 @@ public class NoSportCalendarFragment extends BaseFragment {
      * Данная функция вызывается по нажитю на кнопкуу "новый календарь"
      */
     private void beginCreatingCalendar() {
+        Sportsman sportsman = DataManager.getInstance().mSportsman;
         // 1 аккаунт google
-        if (DataManager.getInstance().mSportsman == null) {
+        if (sportsman == null) {
             // no sportsman
             Log.e(NoSportCalendarFragment.getFragmentTag(), "no sportsman");
             return;
         }
-        if (DataManager.getInstance().mSportsman.getGoogleAccount() == null) {
+        if (sportsman.getGoogleAccount() == null ||
+                sportsman.getGoogleAccount().isEmpty()) {
             // позволяем юзеру выбрать аккаунт гугл из списка
             chooseAccount();
             return;
