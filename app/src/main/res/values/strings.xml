@@ -56,4 +56,6 @@
         Название: %s\nОписание: %s\nЧасовой пояс: %s\n
     </string>
     <string name="wait_second">Подождите секунду...</string>
+    <string name="share_event">поделиться</string>
+    <string name="delete_event">удалить</string>
 </resources>
