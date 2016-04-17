@@ -1,7 +1,7 @@
 package com.chokavo.chosportsman.network;
 
 import com.chokavo.chosportsman.Constants;
-import com.chokavo.chosportsman.ormlite.models.SportType;
+import com.chokavo.chosportsman.ormlite.models.SSportType;
 import com.chokavo.chosportsman.ormlite.models.Sportsman;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -41,8 +41,8 @@ public class RFManager {
         return sRFManager;
     }
 
-    public void getSportTypes(Callback<List<SportType>> callback) {
-        Call<List<SportType>> call = mRestInterface.getSportTypes();
+    public void getSportTypes(Callback<List<SSportType>> callback) {
+        Call<List<SSportType>> call = mRestInterface.getSportTypes();
         call.enqueue(callback);
     }
 
@@ -65,15 +65,15 @@ public class RFManager {
     }
 
     public void setUserSportTypes(int userId,
-                                  List<SportType> sportTypes,
+                                  List<SSportType> sportTypes,
                        Callback<Void> callback) {
         Call<Void> call = mRestInterface.setUserSportTypes(userId, sportTypes);
         call.enqueue(callback);
     }
 
     public void getUserSportTypes(int userId,
-                                  Callback<List<SportType>> callback) {
-        Call<List<SportType>> call = mRestInterface.getUserSportTypes(userId);
+                                  Callback<List<SSportType>> callback) {
+        Call<List<SSportType>> call = mRestInterface.getUserSportTypes(userId);
         call.enqueue(callback);
     }
 

@@ -27,7 +27,8 @@ import com.chokavo.chosportsman.calendar.GoogleCalendarAPI;
 import com.chokavo.chosportsman.calendar.RecurrenceItem;
 import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.models.SportEventType;
-import com.chokavo.chosportsman.ormlite.models.SportType;
+import com.chokavo.chosportsman.ormlite.models.SEvent;
+import com.chokavo.chosportsman.ormlite.models.SSportType;
 import com.chokavo.chosportsman.ui.activities.calendar.CreateEventActivity;
 import com.chokavo.chosportsman.ui.adapters.CheckableItemAdapter;
 import com.chokavo.chosportsman.ui.adapters.EventReminderAdapter;
@@ -52,7 +53,7 @@ import rx.Subscriber;
 /**
  * Created by repitch on 15.03.16.
  */
-public class CreateEventFragment extends BaseFragment {
+public class EditEventFragment extends BaseFragment {
     private static final String DATE_PICKER_TAG = "DATE_PICKER_TAG";
     @Override
     public String getFragmentTitle() {
@@ -69,6 +70,8 @@ public class CreateEventFragment extends BaseFragment {
     private MaterialDialog mDialogSportType, mDialogSportEventType,
             mDialogRecurrence, mDialogReminder, mDialogTimeError;
 
+    private SEvent mSEvent;
+
     private Date mDefaultDate;
     private Calendar mCalendarStart, mCalendarEnd;
     private Calendar mCalendarStartDate, mCalendarEndDate; // only date, no time
@@ -77,14 +80,14 @@ public class CreateEventFragment extends BaseFragment {
 
     private ProgressDialog mProgress;
 
-    private SportType mChosenSportType;
+    private SSportType mChosenSportType;
     private int mChosenSportKindId;
     private int mChosenSportEventType, mChosenRecurrence;
     private CharSequence mEventTypes[], mSportTypes[], mRecurrenceTypes[], mDefaultReminders[];
     private List<EventReminder> mEventReminders = new ArrayList<>();
 
-    public static CreateEventFragment newInstance(Bundle args) {
-        CreateEventFragment fragment = new CreateEventFragment();
+    public static EditEventFragment newInstance(Bundle args) {
+        EditEventFragment fragment = new EditEventFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -96,6 +99,7 @@ public class CreateEventFragment extends BaseFragment {
         // args
         if (getArguments() != null) {
             mDefaultDate = (Date) getArguments().getSerializable(CreateEventActivity.EXTRA_DATE);
+            mSEvent = (SEvent) getArguments().getSerializable(CreateEventActivity.EXTRA_EVENT);
         }
     }
 

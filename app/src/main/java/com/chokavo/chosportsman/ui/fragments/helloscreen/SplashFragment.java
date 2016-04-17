@@ -15,10 +15,10 @@ import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.network.RFManager;
 import com.chokavo.chosportsman.ormlite.DBHelperFactory;
-import com.chokavo.chosportsman.ormlite.dao.SportTypeDao;
+import com.chokavo.chosportsman.ormlite.dao.SSportTypeDao;
 import com.chokavo.chosportsman.ormlite.dao.SportsmanDao;
 import com.chokavo.chosportsman.ormlite.dao.SportsmanFavSportTypeDao;
-import com.chokavo.chosportsman.ormlite.models.SportType;
+import com.chokavo.chosportsman.ormlite.models.SSportType;
 import com.chokavo.chosportsman.ormlite.models.Sportsman;
 import com.chokavo.chosportsman.ui.activities.BaseActivity;
 import com.chokavo.chosportsman.ui.activities.MainActivity;
@@ -77,7 +77,7 @@ public class SplashFragment extends BaseFragment {
             // тестируем sqlite
             try {
                 SportsmanDao sportsmanDao = DBHelperFactory.getHelper().getSportsmanDao();
-                SportTypeDao sportTypeDao = DBHelperFactory.getHelper().getSportTypeDao();
+                SSportTypeDao sportTypeDao = DBHelperFactory.getHelper().getSportTypeDao();
                 SportsmanFavSportTypeDao sportsmanFavSportTypeDao = DBHelperFactory.getHelper().getSportsmanFavSportTypeDao();
                 // берем id текущего юзера в sqlite таблице
                 int userIdSQLite = DataManager.getInstance().userIdOTMLite;
@@ -125,14 +125,14 @@ public class SplashFragment extends BaseFragment {
     private void loadFavSportTypes(final Sportsman sportsman) {
         try {
             final SportsmanFavSportTypeDao dao = DBHelperFactory.getHelper().getSportsmanFavSportTypeDao();
-            final List<SportType> favSportTypes = dao.getFavSportTypesForSportsman(sportsman);
+            final List<SSportType> favSportTypes = dao.getFavSportTypesForSportsman(sportsman);
             if (favSportTypes == null || favSportTypes.size() == 0) {
                 // в базе данных видов спорта нет, добавим их через retrofit
                 RFManager.getInstance().getUserSportTypes(sportsman.getServerId(),
-                        new Callback<List<SportType>>() {
+                        new Callback<List<SSportType>>() {
                     @Override
-                    public void onResponse(Call<List<SportType>> call, Response<List<SportType>> response) {
-                        List<SportType> favSportTypes = response.body();
+                    public void onResponse(Call<List<SSportType>> call, Response<List<SSportType>> response) {
+                        List<SSportType> favSportTypes = response.body();
                         DataManager.getInstance().mSportsman.setFavSportTypes(favSportTypes);
 
                         try {
@@ -146,7 +146,7 @@ public class SplashFragment extends BaseFragment {
                     }
 
                     @Override
-                    public void onFailure(Call<List<SportType>> call, Throwable t) {
+                    public void onFailure(Call<List<SSportType>> call, Throwable t) {
                         Log.e("RETRO", "onFailure: "+t.toString());
                         mProgressSplash.setVisibility(View.GONE);
                         ImageSnackbar.make(mProgressSplash, ImageSnackbar.TYPE_ERROR, String.format("Возникла ошибка при загрузке избранных видов спорта"), Snackbar.LENGTH_SHORT).show();
@@ -165,13 +165,13 @@ public class SplashFragment extends BaseFragment {
 
     private void loadSportTypes() {
         try {
-            final SportTypeDao stDao = DBHelperFactory.getHelper().getSportTypeDao();
-            final List<SportType> sportTypes = stDao.getAll();
+            final SSportTypeDao stDao = DBHelperFactory.getHelper().getSportTypeDao();
+            final List<SSportType> sportTypes = stDao.getAll();
             if (sportTypes == null || sportTypes.size() == 0) {
                 // в базе данных видов спорта нет, добавим их через retrofit
-                RFManager.getInstance().getSportTypes(new Callback<List<SportType>>() {
+                RFManager.getInstance().getSportTypes(new Callback<List<SSportType>>() {
                     @Override
-                    public void onResponse(Call<List<SportType>> call, Response<List<SportType>> response) {
+                    public void onResponse(Call<List<SSportType>> call, Response<List<SSportType>> response) {
                         DataManager.getInstance().setSportTypes(response.body());
                         try {
                             stDao.createList(response.body());
@@ -184,7 +184,7 @@ public class SplashFragment extends BaseFragment {
                     }
 
                     @Override
-                    public void onFailure(Call<List<SportType>> call, Throwable t) {
+                    public void onFailure(Call<List<SSportType>> call, Throwable t) {
                         Log.e("RETRO", "onFailure: "+t.toString());
                         mProgressSplash.setVisibility(View.GONE);
                         ImageSnackbar.make(mProgressSplash, ImageSnackbar.TYPE_ERROR, String.format("Возникла ошибка при загрузке видов спорта"), Snackbar.LENGTH_SHORT).show();

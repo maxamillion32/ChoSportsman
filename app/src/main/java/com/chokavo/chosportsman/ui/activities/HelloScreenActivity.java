@@ -15,7 +15,7 @@ import com.chokavo.chosportsman.models.SharedPrefsManager;
 import com.chokavo.chosportsman.network.RFManager;
 import com.chokavo.chosportsman.ormlite.DBHelperFactory;
 import com.chokavo.chosportsman.ormlite.dao.SportsmanFavSportTypeDao;
-import com.chokavo.chosportsman.ormlite.models.SportType;
+import com.chokavo.chosportsman.ormlite.models.SSportType;
 import com.chokavo.chosportsman.ormlite.models.Sportsman;
 import com.chokavo.chosportsman.ui.fragments.helloscreen.SplashFragment;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
@@ -156,11 +156,11 @@ public class HelloScreenActivity extends BaseActivity {
 
     private void checkUserSportTypes(final Sportsman sportsman) {
         RFManager.getInstance().getUserSportTypes(sportsman.getServerId(),
-                new Callback<List<SportType>>() {
+                new Callback<List<SSportType>>() {
                     @Override
-                    public void onResponse(Call<List<SportType>> call, Response<List<SportType>> response) {
+                    public void onResponse(Call<List<SSportType>> call, Response<List<SSportType>> response) {
                         mProgress.hide();
-                        List<SportType> favSportTypes = response.body();
+                        List<SSportType> favSportTypes = response.body();
                         if (favSportTypes.size() == 0) {
                             // любимых видов спорта нет - открываем соответствующее активити
                             startActivity(new Intent(HelloScreenActivity.this, ChooseSportsActivity.class));
@@ -174,7 +174,7 @@ public class HelloScreenActivity extends BaseActivity {
                     }
 
                     @Override
-                    public void onFailure(Call<List<SportType>> call, Throwable t) {
+                    public void onFailure(Call<List<SSportType>> call, Throwable t) {
                         mProgress.hide();
                         Log.e(HelloScreenActivity.class.getSimpleName(), "Ошибка при получении избранных видов спорта: "+t);
                         ImageSnackbar.make(mContentFrame, ImageSnackbar.TYPE_ERROR,
@@ -183,7 +183,7 @@ public class HelloScreenActivity extends BaseActivity {
                 });
     }
 
-    private void saveFavSportsSQLite(Sportsman sportsman, List<SportType> favSportTypes) {
+    private void saveFavSportsSQLite(Sportsman sportsman, List<SSportType> favSportTypes) {
         try {
             SportsmanFavSportTypeDao dao = DBHelperFactory.getHelper().getSportsmanFavSportTypeDao();
             dao.createListIfNotExist(sportsman, favSportTypes);

@@ -18,9 +18,9 @@ import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.models.SharedPrefsManager;
 import com.chokavo.chosportsman.network.RFManager;
 import com.chokavo.chosportsman.ormlite.DBHelperFactory;
-import com.chokavo.chosportsman.ormlite.dao.SportTypeDao;
+import com.chokavo.chosportsman.ormlite.dao.SSportTypeDao;
 import com.chokavo.chosportsman.ormlite.dao.SportsmanFavSportTypeDao;
-import com.chokavo.chosportsman.ormlite.models.SportType;
+import com.chokavo.chosportsman.ormlite.models.SSportType;
 import com.chokavo.chosportsman.ormlite.models.Sportsman;
 import com.chokavo.chosportsman.ui.adapters.ChooseSportsAdapter;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
@@ -60,7 +60,7 @@ public class ChooseSportsActivity extends AppCompatActivity {
         mSwipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         mSwipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         recyclerView = (RecyclerView)findViewById(R.id.choose_sports_recview);
-        List<SportType> sportTypes = DataManager.getInstance().getSportTypes();
+        List<SSportType> sportTypes = DataManager.getInstance().getSportTypes();
         adapter = new ChooseSportsAdapter(sportTypes);
         layoutManager = new LinearLayoutManager(this);
 
@@ -93,12 +93,12 @@ public class ChooseSportsActivity extends AppCompatActivity {
     }
 
     private void loadSportTypes() {
-        RFManager.getInstance().getSportTypes(new Callback<List<SportType>>() {
+        RFManager.getInstance().getSportTypes(new Callback<List<SSportType>>() {
             @Override
-            public void onResponse(Call<List<SportType>> call, Response<List<SportType>> response) {
+            public void onResponse(Call<List<SSportType>> call, Response<List<SSportType>> response) {
                 DataManager.getInstance().setSportTypes(response.body());
                 try {
-                    SportTypeDao stDao = DBHelperFactory.getHelper().getSportTypeDao();
+                    SSportTypeDao stDao = DBHelperFactory.getHelper().getSportTypeDao();
                     stDao.createList(response.body());
                     setSportTypes();
                 } catch (SQLException e) {
@@ -107,7 +107,7 @@ public class ChooseSportsActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<List<SportType>> call, Throwable t) {
+            public void onFailure(Call<List<SSportType>> call, Throwable t) {
                 Log.e("RETRO", "onFailure: "+t.toString());
                 mSwipeRefresh.setRefreshing(false);
                 ImageSnackbar.make(mSwipeRefresh, ImageSnackbar.TYPE_ERROR, String.format("Возникла ошибка при загрузке данных"), Snackbar.LENGTH_SHORT).show();
@@ -131,11 +131,11 @@ public class ChooseSportsActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_continue) {
-            final List<SportType> mCheckedSports = new ArrayList<>();
-            Iterator<SportType> iterator = DataManager.getInstance().getSportTypes().iterator();
+            final List<SSportType> mCheckedSports = new ArrayList<>();
+            Iterator<SSportType> iterator = DataManager.getInstance().getSportTypes().iterator();
             boolean isEmpty = true;
             while(iterator.hasNext()) {
-                SportType sport = iterator.next();
+                SSportType sport = iterator.next();
                 if (sport.isChecked()) {
                     mCheckedSports.add(sport);
                     if (isEmpty)
@@ -174,7 +174,7 @@ public class ChooseSportsActivity extends AppCompatActivity {
     }
 
 
-    private void saveFavSportsSQLite(Sportsman sportsman, List<SportType> favSportTypes) {
+    private void saveFavSportsSQLite(Sportsman sportsman, List<SSportType> favSportTypes) {
         try {
             SportsmanFavSportTypeDao dao = DBHelperFactory.getHelper().getSportsmanFavSportTypeDao();
             dao.createListIfNotExist(sportsman, favSportTypes);

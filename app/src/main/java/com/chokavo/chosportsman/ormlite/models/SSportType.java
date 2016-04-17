@@ -9,7 +9,7 @@ import com.j256.ormlite.table.DatabaseTable;
  * Created by ilyapyavkin on 06.04.16.
  */
 @DatabaseTable(tableName = "sporttype")
-public class SportType {
+public class SSportType {
 
     public final static String ID_FIELD_NAME = "id";
 
@@ -57,15 +57,15 @@ public class SportType {
         this.iconUrl = iconUrl;
     }
 
-    SportType() {
+    SSportType() {
 
     }
 
-    public SportType(int id) {
+    public SSportType(int id) {
         this.id = id;
     }
 
-    public SportType(String title) {
+    public SSportType(String title) {
         this.title = title;
     }
 

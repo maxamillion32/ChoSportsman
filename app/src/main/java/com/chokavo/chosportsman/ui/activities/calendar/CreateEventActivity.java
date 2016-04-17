@@ -6,7 +6,7 @@ import android.view.MenuItem;
 
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.ui.activities.BaseActivity;
-import com.chokavo.chosportsman.ui.fragments.calendar.CreateEventFragment;
+import com.chokavo.chosportsman.ui.fragments.calendar.EditEventFragment;
 
 /**
  * Created by ilyapyavkin on 28.03.16.
@@ -14,6 +14,7 @@ import com.chokavo.chosportsman.ui.fragments.calendar.CreateEventFragment;
 public class CreateEventActivity extends BaseActivity {
     public static final int REQUEST_CREATE_EVENT = 1;
     public static final String EXTRA_DATE = "EXTRA_DATE";
+    public static final String EXTRA_EVENT = "EXTRA_EVENT";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,8 +27,8 @@ public class CreateEventActivity extends BaseActivity {
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close_white_24dp);
         }
 
-        launchFragmentNoBackStack(CreateEventFragment.newInstance(getIntent().getExtras()),
-                CreateEventFragment.getFragmentTag());
+        launchFragmentNoBackStack(EditEventFragment.newInstance(getIntent().getExtras()),
+                EditEventFragment.getFragmentTag());
     }
 
     @Override

@@ -9,7 +9,7 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.chokavo.chosportsman.R;
-import com.chokavo.chosportsman.ormlite.models.SportType;
+import com.chokavo.chosportsman.ormlite.models.SSportType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +19,9 @@ import java.util.List;
  */
 public class ChooseSportsAdapter extends RecyclerView.Adapter<ChooseSportsAdapter.ViewHolder> {
 
-    private List<SportType> sports = new ArrayList<>();
+    private List<SSportType> sports = new ArrayList<>();
 
-    public ChooseSportsAdapter(List<SportType> sportKinds) {
+    public ChooseSportsAdapter(List<SSportType> sportKinds) {
         sports = sportKinds;
     }
 
@@ -33,7 +33,7 @@ public class ChooseSportsAdapter extends RecyclerView.Adapter<ChooseSportsAdapte
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final SportType sport = sports.get(position);
+        final SSportType sport = sports.get(position);
         holder.sportKindName.setText(sport.getTitle());
         holder.isChoosed.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override

@@ -25,13 +25,13 @@ public class SportsmanFavSportType {
 
     // This is a foreign object which just stores the id from the Post object in this table.
     @DatabaseField(foreign = true, columnName = SPORTTYPE_ID_FIELD_NAME)
-    SportType sportType;
+    SSportType sportType;
 
     SportsmanFavSportType() {
         // for ormlite
     }
 
-    public SportsmanFavSportType(Sportsman sportsman, SportType sportType) {
+    public SportsmanFavSportType(Sportsman sportsman, SSportType sportType) {
         this.sportsman = sportsman;
         this.sportType = sportType;
     }

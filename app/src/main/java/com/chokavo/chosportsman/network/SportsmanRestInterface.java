@@ -1,6 +1,6 @@
 package com.chokavo.chosportsman.network;
 
-import com.chokavo.chosportsman.ormlite.models.SportType;
+import com.chokavo.chosportsman.ormlite.models.SSportType;
 import com.chokavo.chosportsman.ormlite.models.Sportsman;
 
 import java.util.List;
@@ -19,18 +19,18 @@ import retrofit2.http.Path;
 public interface SportsmanRestInterface {
 
     @GET("sporttype/get")
-    Call<List<SportType>> getSportTypes();
+    Call<List<SSportType>> getSportTypes();
 
     @FormUrlEncoded
     @POST("auth/vk")
     Call<Sportsman> vkAuth(@Field("vk_id") int vkId);
 
     @GET("user/{id}/sporttypes")
-    Call<List<SportType>> getUserSportTypes(@Path("id") int userId);
+    Call<List<SSportType>> getUserSportTypes(@Path("id") int userId);
 
     @POST("user/{id}/sporttypes")
     Call<Void> setUserSportTypes(@Path("id") int userId,
-                                 @Body List<SportType> sportTypes);
+                                 @Body List<SSportType> sportTypes);
 
     @POST("user/{id}")
     Call<Sportsman> updateUser(@Path("id") int userId,

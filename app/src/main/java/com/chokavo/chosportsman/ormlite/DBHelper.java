@@ -4,12 +4,12 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.chokavo.chosportsman.ormlite.dao.SportCalendarDao;
-import com.chokavo.chosportsman.ormlite.dao.SportTypeDao;
+import com.chokavo.chosportsman.ormlite.dao.SCalendarDao;
+import com.chokavo.chosportsman.ormlite.dao.SSportTypeDao;
 import com.chokavo.chosportsman.ormlite.dao.SportsmanDao;
 import com.chokavo.chosportsman.ormlite.dao.SportsmanFavSportTypeDao;
-import com.chokavo.chosportsman.ormlite.models.SportCalendar;
-import com.chokavo.chosportsman.ormlite.models.SportType;
+import com.chokavo.chosportsman.ormlite.models.SSportType;
+import com.chokavo.chosportsman.ormlite.models.SCalendar;
 import com.chokavo.chosportsman.ormlite.models.Sportsman;
 import com.chokavo.chosportsman.ormlite.models.SportsmanFavSportType;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
@@ -27,9 +27,9 @@ public class DBHelper extends OrmLiteSqliteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static Context mContext;
 
-    private SportCalendarDao mSportCalendarDao = null;
+    private SCalendarDao mSCalendarDao = null;
     private SportsmanDao mSportsmanDao = null;
-    private SportTypeDao mSportTypeDao = null;
+    private SSportTypeDao mSportTypeDao = null;
     private SportsmanFavSportTypeDao mSportsmanFavSportTypeDao = null;
 
     public DBHelper(Context context) {
@@ -41,8 +41,8 @@ public class DBHelper extends OrmLiteSqliteOpenHelper {
         try
         {
             TableUtils.createTableIfNotExists(connectionSource, Sportsman.class);
-            TableUtils.createTableIfNotExists(connectionSource, SportCalendar.class);
-            TableUtils.createTableIfNotExists(connectionSource, SportType.class);
+            TableUtils.createTableIfNotExists(connectionSource, SCalendar.class);
+            TableUtils.createTableIfNotExists(connectionSource, SSportType.class);
             TableUtils.createTableIfNotExists(connectionSource, SportsmanFavSportType.class);
         }
         catch (SQLException e){
@@ -56,8 +56,8 @@ public class DBHelper extends OrmLiteSqliteOpenHelper {
         try{
             //Так делают ленивые, гораздо предпочтительнее не удаляя БД аккуратно вносить изменения
             TableUtils.dropTable(connectionSource, Sportsman.class, true);
-            TableUtils.dropTable(connectionSource, SportCalendar.class, true);
-            TableUtils.dropTable(connectionSource, SportType.class, true);
+            TableUtils.dropTable(connectionSource, SCalendar.class, true);
+            TableUtils.dropTable(connectionSource, SSportType.class, true);
             TableUtils.dropTable(connectionSource, SportsmanFavSportType.class, true);
             onCreate(database, connectionSource);
         }
@@ -67,11 +67,11 @@ public class DBHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public SportCalendarDao getSportCalendarDao() throws SQLException {
-        if (mSportCalendarDao == null) {
-            mSportCalendarDao = new SportCalendarDao(getConnectionSource());
+    public SCalendarDao getSCalendarDao() throws SQLException {
+        if (mSCalendarDao == null) {
+            mSCalendarDao = new SCalendarDao(getConnectionSource());
         }
-        return mSportCalendarDao;
+        return mSCalendarDao;
     }
 
     public SportsmanDao getSportsmanDao() throws SQLException {
@@ -81,9 +81,9 @@ public class DBHelper extends OrmLiteSqliteOpenHelper {
         return mSportsmanDao;
     }
 
-    public SportTypeDao getSportTypeDao() throws SQLException {
+    public SSportTypeDao getSportTypeDao() throws SQLException {
         if (mSportTypeDao == null) {
-            mSportTypeDao = new SportTypeDao(getConnectionSource());
+            mSportTypeDao = new SSportTypeDao(getConnectionSource());
         }
         return mSportTypeDao;
     }
@@ -99,7 +99,7 @@ public class DBHelper extends OrmLiteSqliteOpenHelper {
     @Override
     public void close(){
         super.close();
-        mSportCalendarDao = null;
+        mSCalendarDao = null;
         mSportsmanDao = null;
         mSportTypeDao = null;
         mSportsmanFavSportTypeDao = null;

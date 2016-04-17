@@ -11,12 +11,13 @@ import java.util.List;
 /**
  * Created by ilyapyavkin on 06.04.16.
  */
+// TODO replace -> SUser
 @DatabaseTable(tableName = "sportsman")
 public class Sportsman {
     /**
      * + id : Primary Integer
      + vkid : Integer // id вконтакте
-     + sportTypes : SportType[] // массив избранных видов спорта
+     + sportTypes : SSportType[] // массив избранных видов спорта
      + googleAccount : String
      + teams : SportTeam[]
      + dateJoined : DateTime
@@ -50,7 +51,7 @@ public class Sportsman {
     @DatabaseField()
     private Date lastUpdate;
 
-    transient List<SportType> favSportTypes;
+    transient List<SSportType> favSportTypes;
 
     public Sportsman() {
 
@@ -100,11 +101,11 @@ public class Sportsman {
         this.lastUpdate = lastUpdate;
     }
 
-    public List<SportType> getFavSportTypes() {
+    public List<SSportType> getFavSportTypes() {
         return favSportTypes;
     }
 
-    public void setFavSportTypes(List<SportType> favSportTypes) {
+    public void setFavSportTypes(List<SSportType> favSportTypes) {
         this.favSportTypes = favSportTypes;
     }
 }

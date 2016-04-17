@@ -10,7 +10,7 @@ import java.util.Date;
  * Created by ilyapyavkin on 06.04.16.
  */
 @DatabaseTable(tableName = "sportcalendar")
-public class SportCalendar {
+public class SCalendar {
 
     public static final String SPORTSMAN_ID_FIELD_NAME = "sportsman_id";
 
@@ -29,11 +29,11 @@ public class SportCalendar {
     @DatabaseField(dataType = DataType.DATE, useGetSet = true)
     private Date dateCreated;
 
-    SportCalendar() {
+    SCalendar() {
         // all persisted classes must define a no-arg constructor with at least package visibility
     }
 
-    public SportCalendar(int id) {
+    public SCalendar(int id) {
         this.id = id;
     }
 
