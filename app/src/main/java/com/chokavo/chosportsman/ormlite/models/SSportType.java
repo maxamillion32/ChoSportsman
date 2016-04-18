@@ -8,7 +8,7 @@ import com.j256.ormlite.table.DatabaseTable;
 /**
  * Created by ilyapyavkin on 06.04.16.
  */
-@DatabaseTable(tableName = "sporttype")
+@DatabaseTable(tableName = "sport_type")
 public class SSportType {
 
     public final static String ID_FIELD_NAME = "id";

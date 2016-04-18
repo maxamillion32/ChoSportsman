@@ -117,7 +117,7 @@ public class HelloScreenActivity extends BaseActivity {
     }
 
     private void vkAuth(int id) {
-        RFManager.getInstance().vkAuth(id,
+        RFManager.vkAuth(id,
                 new Callback<Sportsman>() {
                     @Override
                     public void onResponse(Call<Sportsman> call, Response<Sportsman> response) {
@@ -155,7 +155,7 @@ public class HelloScreenActivity extends BaseActivity {
     }
 
     private void checkUserSportTypes(final Sportsman sportsman) {
-        RFManager.getInstance().getUserSportTypes(sportsman.getServerId(),
+        RFManager.getUserSportTypes(sportsman.getServerId(),
                 new Callback<List<SSportType>>() {
                     @Override
                     public void onResponse(Call<List<SSportType>> call, Response<List<SSportType>> response) {

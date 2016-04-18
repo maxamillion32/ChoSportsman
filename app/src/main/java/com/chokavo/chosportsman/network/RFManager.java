@@ -41,39 +41,39 @@ public class RFManager {
         return sRFManager;
     }
 
-    public void getSportTypes(Callback<List<SSportType>> callback) {
-        Call<List<SSportType>> call = mRestInterface.getSportTypes();
+    public static void getSportTypes(Callback<List<SSportType>> callback) {
+        Call<List<SSportType>> call = getInstance().mRestInterface.getSportTypes();
         call.enqueue(callback);
     }
 
-    public void vkAuth(int vkId,
+    public static void vkAuth(int vkId,
                        Callback<Sportsman> callback) {
-        Call<Sportsman> call = mRestInterface.vkAuth(vkId);
+        Call<Sportsman> call = getInstance().mRestInterface.vkAuth(vkId);
         call.enqueue(callback);
     }
 
-    public void getUser(int userId,
+    public static void getUser(int userId,
                            Callback<Sportsman> callback) {
-        Call<Sportsman> call = mRestInterface.getUser(userId);
+        Call<Sportsman> call = getInstance().mRestInterface.getUser(userId);
         call.enqueue(callback);
     }
 
-    public void updateUser(Sportsman sportsman,
+    public static void updateUser(Sportsman sportsman,
                            Callback<Sportsman> callback) {
-        Call<Sportsman> call = mRestInterface.updateUser(sportsman.getServerId(), sportsman);
+        Call<Sportsman> call = getInstance().mRestInterface.updateUser(sportsman.getServerId(), sportsman);
         call.enqueue(callback);
     }
 
-    public void setUserSportTypes(int userId,
+    public static void setUserSportTypes(int userId,
                                   List<SSportType> sportTypes,
                        Callback<Void> callback) {
-        Call<Void> call = mRestInterface.setUserSportTypes(userId, sportTypes);
+        Call<Void> call = getInstance().mRestInterface.setUserSportTypes(userId, sportTypes);
         call.enqueue(callback);
     }
 
-    public void getUserSportTypes(int userId,
+    public static void getUserSportTypes(int userId,
                                   Callback<List<SSportType>> callback) {
-        Call<List<SSportType>> call = mRestInterface.getUserSportTypes(userId);
+        Call<List<SSportType>> call = getInstance().mRestInterface.getUserSportTypes(userId);
         call.enqueue(callback);
     }
 

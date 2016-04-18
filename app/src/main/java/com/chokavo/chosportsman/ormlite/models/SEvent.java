@@ -21,13 +21,13 @@ public class SEvent {
     @DatabaseField()
     private int serverId;
 
+    private String googleAPIid;
+    private SUser owner;
     private SCalendar calendar;
 
-    private Date dateCreated;
-
     private SSportType sportType;
-
     private String type; // тренировка или соревнование
 
-
+    private Date dateCreated;
+    private Date lastUpdate;
 }

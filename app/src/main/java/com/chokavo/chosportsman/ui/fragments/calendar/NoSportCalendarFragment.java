@@ -141,7 +141,7 @@ public class NoSportCalendarFragment extends BaseFragment {
             e.printStackTrace();
         }
         // 2 сохраним аккаунт на сервере
-        RFManager.getInstance().updateUser(sportsman,
+        RFManager.updateUser(sportsman,
                 new Callback<Sportsman>() {
                     @Override
                     public void onResponse(Call<Sportsman> call, Response<Sportsman> response) {

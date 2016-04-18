@@ -128,7 +128,7 @@ public class SplashFragment extends BaseFragment {
             final List<SSportType> favSportTypes = dao.getFavSportTypesForSportsman(sportsman);
             if (favSportTypes == null || favSportTypes.size() == 0) {
                 // в базе данных видов спорта нет, добавим их через retrofit
-                RFManager.getInstance().getUserSportTypes(sportsman.getServerId(),
+                RFManager.getUserSportTypes(sportsman.getServerId(),
                         new Callback<List<SSportType>>() {
                     @Override
                     public void onResponse(Call<List<SSportType>> call, Response<List<SSportType>> response) {
@@ -169,7 +169,7 @@ public class SplashFragment extends BaseFragment {
             final List<SSportType> sportTypes = stDao.getAll();
             if (sportTypes == null || sportTypes.size() == 0) {
                 // в базе данных видов спорта нет, добавим их через retrofit
-                RFManager.getInstance().getSportTypes(new Callback<List<SSportType>>() {
+                RFManager.getSportTypes(new Callback<List<SSportType>>() {
                     @Override
                     public void onResponse(Call<List<SSportType>> call, Response<List<SSportType>> response) {
                         DataManager.getInstance().setSportTypes(response.body());

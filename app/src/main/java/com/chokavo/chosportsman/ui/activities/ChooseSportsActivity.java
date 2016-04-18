@@ -93,7 +93,7 @@ public class ChooseSportsActivity extends AppCompatActivity {
     }
 
     private void loadSportTypes() {
-        RFManager.getInstance().getSportTypes(new Callback<List<SSportType>>() {
+        RFManager.getSportTypes(new Callback<List<SSportType>>() {
             @Override
             public void onResponse(Call<List<SSportType>> call, Response<List<SSportType>> response) {
                 DataManager.getInstance().setSportTypes(response.body());
@@ -150,7 +150,7 @@ public class ChooseSportsActivity extends AppCompatActivity {
             SharedPrefsManager.saveUserSportsChosen();
 
             DataManager.getInstance().setUserSports(mCheckedSports, getString(R.string.sport_kinds));
-            RFManager.getInstance().setUserSportTypes(DataManager.getInstance().mSportsman.getServerId(),
+            RFManager.setUserSportTypes(DataManager.getInstance().mSportsman.getServerId(),
                     mCheckedSports, new Callback<Void>() {
                         @Override
                         public void onResponse(Call<Void> call, Response<Void> response) {
