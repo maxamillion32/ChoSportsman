@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.models.DataManager;
+import com.chokavo.chosportsman.ormlite.models.Sportsman;
 import com.chokavo.chosportsman.ui.adapters.UserSportsAdapter;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 import com.squareup.picasso.Picasso;
@@ -73,7 +74,7 @@ public class LockerRoomActivity extends NavigationDrawerActivity implements AppB
         });
 
         mRecyclerSports = (RecyclerView)findViewById(R.id.recview_sports_ilove);
-        adapter = new UserSportsAdapter(DataManager.getInstance().loadUserSports(getString(R.string.sport_kinds)));
+        adapter = new UserSportsAdapter(DataManager.getInstance().mSportsman.getFavSportTypes());
         layoutManager = new LinearLayoutManager(this);
 
         mRecyclerSports.setAdapter(adapter);
@@ -187,7 +188,7 @@ public class LockerRoomActivity extends NavigationDrawerActivity implements AppB
             public void onComplete(VKResponse response) {
                 VKList<VKApiUserFull> vkUsers = ((VKList) response.parsedModel);
                 VKApiUserFull vkUser = vkUsers.get(0);
-                DataManager.getInstance().setVkUser(vkUser,getString(R.string.vk_user_id));
+                DataManager.getInstance().vkUser = vkUser;
                 String fullName = String.format("%s %s", vkUser.first_name, vkUser.last_name);
                 mTextName.setText(fullName);
                 mTxtNavName.setText(fullName);

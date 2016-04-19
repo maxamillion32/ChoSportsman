@@ -114,7 +114,7 @@ public class SplashFragment extends BaseFragment {
             public void onComplete(VKResponse response) {
                 VKList<VKApiUserFull> vkUsers = ((VKList) response.parsedModel);
                 VKApiUserFull vkUser = vkUsers.get(0);
-                DataManager.getInstance().setVkUser(vkUser,getString(R.string.vk_user_id));
+                DataManager.getInstance().vkUser = vkUser;
                 vkProfileLoaded = true;
                 tryMovingOut();
                 super.onComplete(response);

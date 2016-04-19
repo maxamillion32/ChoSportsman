@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,12 +15,12 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.chokavo.chosportsman.App;
 import com.chokavo.chosportsman.R;
-import com.chokavo.chosportsman.ormlite.models.SEvent;
+import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.ui.activities.calendar.DetailEventActivity;
 import com.chokavo.chosportsman.ui.fragments.BaseFragment;
 import com.chokavo.chosportsman.ui.widgets.NewEventRowView;
+import com.google.api.services.calendar.model.Event;
 
 /**
  * Created by Дашицырен on 17.04.2016.
@@ -31,7 +32,8 @@ public class DetailEventFragment extends BaseFragment {
     private TextView mTxtDataLine1, mTxtDataLine2, mTxtRepeat, mTextLocation;
     private RecyclerView mRvReminders;
 
-    private SEvent mSEvent;
+//    private SEvent mSEvent;
+    private Event mEvent;
 
     public static DetailEventFragment newInstance(Bundle args) {
         DetailEventFragment fragment = new DetailEventFragment();
@@ -49,9 +51,15 @@ public class DetailEventFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         // args
-        if (getArguments() != null) {
-            mSEvent = (SEvent) getArguments().getSerializable(DetailEventActivity.EXTRA_EVENT);
+        mEvent = DataManager.getInstance().currentEvent;
+        if (mEvent == null) {
+            Log.e(DetailEventFragment.getFragmentTag(), "Error: currentEvent is null");
+            // TODO делать что то если события вообще нет
+            getActivity().finish();
         }
+        /*if (getArguments() != null) {
+            mSEvent = (SEvent) getArguments().getSerializable(DetailEventActivity.EXTRA_EVENT);
+        }*/
     }
 
     @Nullable

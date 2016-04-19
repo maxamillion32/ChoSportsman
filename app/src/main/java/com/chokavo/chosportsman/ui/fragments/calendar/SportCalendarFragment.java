@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -28,15 +29,20 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.calendar.CalendarManager;
+import com.chokavo.chosportsman.calendar.CalendarX;
 import com.chokavo.chosportsman.calendar.GoogleCalendarAPI;
 import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.ui.activities.calendar.CalendarActivity;
 import com.chokavo.chosportsman.ui.activities.calendar.CreateEventActivity;
+import com.chokavo.chosportsman.ui.adapters.DayEventAdapter;
 import com.chokavo.chosportsman.ui.fragments.BaseFragment;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 import com.github.aakira.expandablelayout.ExpandableRelativeLayout;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.CalendarList;
+import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.Events;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.DayViewDecorator;
@@ -46,9 +52,11 @@ import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.prolificinteractive.materialcalendarview.spans.DotSpan;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 
 import me.everything.providers.android.calendar.Calendar;
 import rx.Subscriber;
@@ -151,6 +159,7 @@ public class SportCalendarFragment extends BaseFragment {
         mFabAddEvent = (FloatingActionButton) rootView.findViewById(R.id.fab_add_event);
         mTxtCurrentDay = (TextView) rootView.findViewById(R.id.txt_current_day);
         mRvDayEvents = (RecyclerView) rootView.findViewById(R.id.rv_day_events);
+        mRvDayEvents.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         mBtnHideCalendar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -211,14 +220,15 @@ public class SportCalendarFragment extends BaseFragment {
         }
     }
 
+
+    HashSet<CalendarDay> eventDays = new HashSet<>();
+
     private void initCalendar() {
         // выбранная дата - сегодня
         Date today = java.util.Calendar.getInstance().getTime();
         mCalendarView.setSelectedDate(today);
         selectDate(today);
-        HashSet<CalendarDay> hashSet = new HashSet<>();
-        hashSet.add(new CalendarDay(2016,3,12));
-        mCalendarView.addDecorator(new EventDecorator(Color.RED, hashSet));
+        mCalendarView.addDecorator(new EventDecorator(Color.RED, eventDays));
         mCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
@@ -228,10 +238,61 @@ public class SportCalendarFragment extends BaseFragment {
         });
     }
 
+    public static java.util.Calendar eventDateTimeToCalendar(EventDateTime eventDateTime) {
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        if (eventDateTime.getDate() != null) {
+            cal.setTimeInMillis(eventDateTime.getDate().getValue());
+        } else {
+            cal.setTimeInMillis(eventDateTime.getDateTime().getValue());
+        }
+        return cal;
+    }
+
+    private void setEventDays(List<Event> eventList) {
+        eventDays = new HashSet<>();
+        for (Event event: eventList) {
+            java.util.Calendar start = eventDateTimeToCalendar(event.getStart());
+            eventDays.add(CalendarDay.from(start));
+        }
+        mCalendarView.addDecorator(new EventDecorator(Color.RED, eventDays));
+    }
+
     private void selectDate(Date date) {
         SimpleDateFormat dateFormat = new SimpleDateFormat(getString(R.string.current_day_format),
                 getResources().getConfiguration().locale);
         mTxtCurrentDay.setText(dateFormat.format(date));
+        List<Event> dateEvents = getDateEvents(date);
+        if (!dateEvents.isEmpty()) {
+            mRvDayEvents.swapAdapter(new DayEventAdapter(dateEvents), true);
+            mWrapNoEvent.setVisibility(View.GONE);
+        } else {
+            // пусто
+            mRvDayEvents.swapAdapter(new DayEventAdapter(null), true);
+            mWrapNoEvent.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private List<Event> getDateEvents(Date date) {
+        java.util.Calendar calDay = java.util.Calendar.getInstance();
+        calDay.setTime(date);
+        List<Event> dateEvents = new ArrayList<>();
+        for (Event event: DataManager.getInstance().eventlist) {
+            DateTime eDate = event.getStart().getDate();
+            DateTime eDateTime = event.getStart().getDateTime();
+            java.util.Calendar startCal = java.util.Calendar.getInstance();
+            if (eDate != null) {
+                // full day
+                startCal.setTimeInMillis(eDate.getValue());
+            } else {
+                // datetime
+                startCal.setTimeInMillis(eDateTime.getValue());
+            }
+            if (CalendarX.sameDay(startCal, calDay)) {
+                Log.e("sport", "this date!$ "+date.toString());
+                dateEvents.add(event);
+            }
+        }
+        return dateEvents;
     }
 
     @Override
@@ -291,6 +352,7 @@ public class SportCalendarFragment extends BaseFragment {
             public void onCompleted() {
                 mProgress.hide();
                 Log.e("getEventList", "onCompleted");
+                setEventDays(DataManager.getInstance().eventlist);
             }
 
             @Override

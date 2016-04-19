@@ -32,9 +32,9 @@ public class DataManager {
     public boolean userSportsChosen;
     private List<SSportType> mSportTypes = new ArrayList<>();
     private List<SSportType> mUserSports = new ArrayList<>();
+    public List<Event> eventlist = new ArrayList<>();
 
 //    private List<SportKind> mSportKinds = new ArrayList<>();
-    public SharedPreferences mPreferences;
 
 
     public int userIdOTMLite; // id текущего юзера в локальной бд
@@ -46,6 +46,7 @@ public class DataManager {
     public me.everything.providers.android.calendar.Calendar calendarCP; // календарь, получаем из ContentProvider с помощью me.every
     public Calendar calendarGAPI; // календарь, который получаем из Google API
     public Event lastEvent; // последнее созданное событие
+    public Event currentEvent; // текущее событие - для которого смотрим DetailEventFragment
 
     private static DataManager ourInstance = new DataManager();
 
@@ -54,22 +55,10 @@ public class DataManager {
     }
 
     private DataManager() {
-        mPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
     }
 
-    public void setVkUser(VKApiUserFull vkUser, String key) {
-        this.vkUser = vkUser;
-        mPreferences.edit().putInt(key, vkUser.getId()).apply();
-    }
-
-    public void setUserSports(List<SSportType> sports, String key) {
+    public void setUserSports(List<SSportType> sports) {
         mUserSports = sports;
-        Set<String> sportNames = new HashSet<>();
-        for (SSportType sport :
-                sports) {
-            sportNames.add(sport.getTitle());
-        }
-        mPreferences.edit().putStringSet(key, sportNames).apply();
     }
 
     public SSportType getSportTypeByName(@NonNull CharSequence sportTypeChar) {
@@ -92,21 +81,6 @@ public class DataManager {
     }
 
     public List<SSportType> getUserSports() {
-        return mUserSports;
-    }
-
-    public List<SSportType> loadUserSports(String key) {
-        if (getUserSports().size() != 0)
-            return getUserSports();
-        Set<String> sportNames = mPreferences.getStringSet(key, null);
-        if (sportNames == null)
-            return new ArrayList<>();
-        mUserSports.clear();
-        for (SSportType sport :
-                mSportTypes) {
-            if (sportNames.contains(sport.getTitle()))
-                mUserSports.add(sport);
-        }
         return mUserSports;
     }
 

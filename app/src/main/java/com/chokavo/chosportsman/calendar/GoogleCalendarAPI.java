@@ -8,6 +8,8 @@ import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.models.SharedPrefsManager;
 import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -71,6 +73,10 @@ public class GoogleCalendarAPI {
                     String calendarId = DataManager.getInstance().calendarGAPIid;
                     Events events = mService.events().list(calendarId).execute();
                     // TODO дальше то что делать с этими событиями?
+                    DataManager.getInstance().eventlist = events.getItems();
+                    for (Event event: DataManager.getInstance().eventlist) {
+                        Log.e("Events", event.getSummary()+": "+event.getLocation());
+                    }
                     Log.e("","");
                     subscriber.onCompleted();
                 } catch (IOException e) {

@@ -108,7 +108,7 @@ public class HelloScreenActivity extends BaseActivity {
             public void onComplete(VKResponse response) {
                 VKList<VKApiUserFull> vkUsers = ((VKList) response.parsedModel);
                 VKApiUserFull vkUser = vkUsers.get(0);
-                DataManager.getInstance().setVkUser(vkUser, getString(R.string.vk_user_id));
+                DataManager.getInstance().vkUser = vkUser;
 
                 vkAuth(vkUser.id);
                 super.onComplete(response);

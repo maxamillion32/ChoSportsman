@@ -23,8 +23,8 @@
                 android:layout_height="wrap_content">
 
                 <com.prolificinteractive.materialcalendarview.MaterialCalendarView
-                    android:id="@+id/calendar_view"
                     xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/calendar_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:mcv_selectionColor="#00F"
@@ -73,28 +73,39 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/wrap_no_event"
+        <android.support.v7.widget.CardView
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:background="@color/colorPrimary_10">
+            android:layout_margin="12dp"
+            card_view:cardBackgroundColor="#e96a6a"
+            card_view:cardCornerRadius="4dp"
+            >
 
-            <ImageView
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_margin="16dp"
-                android:src="@drawable/ic_add_24dp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/wrap_no_event"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:gravity="center_horizontal"
-                android:text="Событий на текущий день не запланировано\nНажмите, чтобы создать"/>
-        </LinearLayout>
+                android:background="@color/colorPrimary_10"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_margin="16dp"
+                    android:src="@drawable/ic_add_white_24dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_horizontal"
+                    android:text="Событий на текущий день не запланировано\nНажмите, чтобы создать"
+                    android:textColor="@color/white_100"/>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_day_events"
@@ -111,8 +122,8 @@
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_add_event"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/fab_add_event"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"

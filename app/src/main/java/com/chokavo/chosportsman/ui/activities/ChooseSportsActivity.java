@@ -50,9 +50,7 @@ public class ChooseSportsActivity extends AppCompatActivity {
         if (getSupportActionBar()!=null)
             getSupportActionBar().setTitle(R.string.choose_sport_please);
 
-        SharedPreferences preferences = DataManager.getInstance().mPreferences;
-        Set<String> sportKinds = preferences.getStringSet(getString(R.string.sport_kinds),null);
-        if (sportKinds != null) {
+        if (DataManager.getInstance().getSportTypes() != null) {
             startActivity(new Intent(this, MainActivity.class));
             finish();
         }
@@ -149,7 +147,7 @@ public class ChooseSportsActivity extends AppCompatActivity {
             DataManager.getInstance().userSportsChosen = true;
             SharedPrefsManager.saveUserSportsChosen();
 
-            DataManager.getInstance().setUserSports(mCheckedSports, getString(R.string.sport_kinds));
+            DataManager.getInstance().setUserSports(mCheckedSports);
             RFManager.setUserSportTypes(DataManager.getInstance().mSportsman.getServerId(),
                     mCheckedSports, new Callback<Void>() {
                         @Override

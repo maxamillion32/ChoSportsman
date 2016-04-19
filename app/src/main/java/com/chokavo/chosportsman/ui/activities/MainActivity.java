@@ -9,20 +9,16 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.chokavo.chosportsman.App;
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.models.DataManager;
+import com.chokavo.chosportsman.ormlite.models.SSportType;
 import com.vk.sdk.VKSdk;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 public class MainActivity extends NavigationDrawerActivity {
 
@@ -30,23 +26,21 @@ public class MainActivity extends NavigationDrawerActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         super.onCreate(R.layout.activity_main, NAV_NO_CHOSEN);
-        SharedPreferences preferences = DataManager.getInstance().mPreferences;
-        int userId = preferences.getInt(getString(R.string.vk_user_id), -1);
-        Log.d(App.TAG, Boolean.toString(VKSdk.isLoggedIn()));
-        boolean isHelloStarted = false;
-        if (!VKSdk.isLoggedIn() || (userId == -1)) {
+        if (!VKSdk.isLoggedIn()) {
             Intent intent = new Intent(getApplicationContext(), HelloScreenActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
-            isHelloStarted = true;
+            finish();
         }
 
 //        DataManager.getInstance().loadSports();
-        Set<String> sportKinds = preferences.getStringSet(getString(R.string.sport_kinds), null);
-        if (sportKinds == null && !isHelloStarted) {
+        // get sporttypes
+        List<SSportType> favSportTypes = DataManager.getInstance().mSportsman.getFavSportTypes();
+        if (favSportTypes == null) {
             Intent intent = new Intent(getApplicationContext(), ChooseSportsActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
+            finish();
         }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
