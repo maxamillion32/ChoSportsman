@@ -41,6 +41,7 @@ public class DayEventAdapter extends RecyclerView.Adapter<DayEventAdapter.ViewHo
         if (allDay) {
             startMs = event.getStart().getDate().getValue();
             holder.mTxtTimeStart.setText("Весь день");
+            holder.mTxtTimeEnd.setText("");
         } else {
             startMs = event.getStart().getDateTime().getValue();
             DateFormat dateFormat = new SimpleDateFormat("HH:mm");
