@@ -16,21 +16,29 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="75dp"
+            android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            android:elevation="4dp"
             android:minHeight="?attr/actionBarSize"
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            android:gravity="top">
+            android:gravity="bottom">
+        </android.support.v7.widget.Toolbar>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
 
             <TextView
+                tools:text="Hello world"
                 android:id="@+id/text_title_toolbar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/white_100"
+                android:padding="16dp"
+
                 android:textSize="22sp"/>
-        </android.support.v7.widget.Toolbar>
+        </FrameLayout>
 
     </android.support.design.widget.AppBarLayout>
 
@@ -44,7 +52,7 @@
     </FrameLayout>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_edit"
+        android:id="@+id/fab_edit_event"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"

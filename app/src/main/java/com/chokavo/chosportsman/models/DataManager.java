@@ -126,7 +126,8 @@ public class DataManager {
     }
 
     public GoogleAccountCredential getGoogleCredential() {
-        if (googleCredential == null) {
+        if (googleCredential == null || googleCredential.getSelectedAccountName() == null ||
+                googleCredential.getSelectedAccountName().isEmpty()) {
             googleCredential = GoogleAccountCredential.usingOAuth2(
                     App.getInstance(), Arrays.asList(GoogleCalendarAPI.SCOPES))
                     .setBackOff(new ExponentialBackOff())

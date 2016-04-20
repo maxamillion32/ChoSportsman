@@ -7,6 +7,7 @@ import android.view.View;
 
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.calendar.CalendarManager;
+import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.ui.activities.NavigationDrawerActivity;
 import com.chokavo.chosportsman.ui.fragments.calendar.NoSportCalendarFragment;
 import com.chokavo.chosportsman.ui.fragments.calendar.SportCalendarFragment;

@@ -175,7 +175,9 @@ public class NoSportCalendarFragment extends BaseFragment {
             return;
         }
         if (sportsman.getGoogleAccount() == null ||
-                sportsman.getGoogleAccount().isEmpty()) {
+                sportsman.getGoogleAccount().isEmpty() ||
+                DataManager.getInstance().getGoogleCredential().getSelectedAccountName() == null||
+                DataManager.getInstance().getGoogleCredential().getSelectedAccountName().isEmpty()) {
             // позволяем юзеру выбрать аккаунт гугл из списка
             chooseAccount();
             return;
@@ -195,6 +197,7 @@ public class NoSportCalendarFragment extends BaseFragment {
             // проверяем доступ к интернету
             if (AppUtils.isDeviceOnline()) {
                 mProgress.show();
+                initSubscriberGetCalendarGAPI();
                 GoogleCalendarAPI.getCalendarGAPI(mSubscriberGetCalendarGAPI);
             } else {
                 ImageSnackbar.make(mBtnCreateCal, ImageSnackbar.TYPE_ERROR, getString(R.string.no_internet_connection), Snackbar.LENGTH_SHORT).show();
@@ -203,6 +206,7 @@ public class NoSportCalendarFragment extends BaseFragment {
         }
         // календарь есть на сервере, у нас есть его GAPI, но пока его нет в CoPr
         // поэтому работаем с GAPI
+        initSubscriberGetCalendarGAPI();
         GoogleCalendarAPI.getInstance().getCalendarGAPIbyId(mSubscriberGetCalendarGAPI, DataManager.getInstance().calendarGAPIid);
 
     }
@@ -211,31 +215,37 @@ public class NoSportCalendarFragment extends BaseFragment {
         launchFragmentNoBackStack(new SportCalendarFragment(), SportCalendarFragment.getFragmentTag());
     }
 
-    Subscriber<CalendarList> mSubscriberGetCalendarGAPI = new Subscriber<CalendarList>() {
-        @Override
-        public void onCompleted() {
-            // здесь мы уже получили calendarGAPI с сервера, отобразим данные в UI
-            mProgress.hide();
-            showCalendar();
-        }
-
-        @Override
-        public void onError(Throwable e) {
-            if (e instanceof UserRecoverableAuthIOException) {
-                startActivityForResult(
-                        ((UserRecoverableAuthIOException) e).getIntent(),
-                        REQUEST_AUTHORIZATION);
-            } else {
-                Log.e(CalendarActivity.class.getName(), "error: " + e.toString());
-                ImageSnackbar.make(getView(), "Ошибка! " + e.getMessage(), Snackbar.LENGTH_SHORT).show();
+    /**
+     * Подписчик получения календаря из Google API
+     */
+    Subscriber<CalendarList> mSubscriberGetCalendarGAPI;
+    private void initSubscriberGetCalendarGAPI() {
+        mSubscriberGetCalendarGAPI = new Subscriber<CalendarList>() {
+            @Override
+            public void onCompleted() {
+                // здесь мы уже получили calendarGAPI с сервера, отобразим данные в UI
+                mProgress.hide();
+                showCalendar();
             }
-        }
 
-        @Override
-        public void onNext(CalendarList calendarList) {
-            System.out.println("onNext: " + calendarList.size());
-        }
-    };
+            @Override
+            public void onError(Throwable e) {
+                if (e instanceof UserRecoverableAuthIOException) {
+                    startActivityForResult(
+                            ((UserRecoverableAuthIOException) e).getIntent(),
+                            REQUEST_AUTHORIZATION);
+                } else {
+                    Log.e(CalendarActivity.class.getName(), "error: " + e.toString());
+                    ImageSnackbar.make(getView(), "Ошибка! " + e.getMessage(), Snackbar.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onNext(CalendarList calendarList) {
+                System.out.println("onNext: " + calendarList.size());
+            }
+        };
+    }
 
     /**
      * Starts an activity in Google Play Services so the user can pick an

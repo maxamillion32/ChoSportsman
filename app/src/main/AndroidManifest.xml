@@ -43,7 +43,7 @@
             android:label="Календарь" >
         </activity>
         <activity
-            android:name=".ui.activities.calendar.CreateEventActivity"
+            android:name=".ui.activities.calendar.EditEventActivity"
             android:label="Новое событие" >
         </activity>
         <activity

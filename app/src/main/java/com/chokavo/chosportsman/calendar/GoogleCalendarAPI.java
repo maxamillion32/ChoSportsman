@@ -88,64 +88,77 @@ public class GoogleCalendarAPI {
         observable.subscribe(subscriber);
     }
 
-    public void createEvent(Subscriber<Event> subscriber,
-                            final String summary,
+    public static Event buildEvent(final String summary,
                             final String location,
                             final boolean allday,
                             final java.util.Calendar calendarStart,
                             final java.util.Calendar calendarEnd,
                             final RecurrenceItem recurrenceItem,
-                            final List<EventReminder> eventReminders
+                            final List<EventReminder> eventReminders,
+                            Event event) {
+        if (event == null) {
+            event = new Event();
+        }
+        event.setSummary(summary)
+                .setLocation(location);
+        DateTime startDateTime;
+        EventDateTime start = new EventDateTime();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        if (allday) {
+            String strStart = dateFormat.format(calendarStart.getTime());
+            startDateTime = new DateTime(strStart);
+            start.setDate(startDateTime);
+        } else {
+            startDateTime = new DateTime(calendarStart.getTimeInMillis());
+            start.setDateTime(startDateTime);
+        }
+        start.setTimeZone(TimeZone.getDefault().getID());
+        event.setStart(start);
+
+        DateTime endDateTime;
+        EventDateTime end = new EventDateTime();
+        if (allday) {
+            String strEnd = dateFormat.format(calendarEnd.getTime());
+            endDateTime = new DateTime(strEnd);
+            end.setDate(endDateTime);
+        } else {
+            endDateTime = new DateTime(calendarEnd.getTimeInMillis());
+            end.setDateTime(endDateTime);
+        }
+        end.setTimeZone(TimeZone.getDefault().getID());
+        event.setEnd(end);
+
+        if (recurrenceItem.getType() != RecurrenceItem.TYPE_NO) {
+            String[] recurrence = new String[]{recurrenceItem.getAsRule()};
+            event.setRecurrence(Arrays.asList(recurrence));
+        }
+
+        Event.Reminders reminders = new Event.Reminders()
+                .setUseDefault(false)
+                .setOverrides(eventReminders);
+        event.setReminders(reminders);
+        return event;
+    }
+
+    public void createOrUpdateEvent(Subscriber<Event> subscriber,
+                                    final Event event
     ) {
+        final String calendarId = DataManager.getInstance().calendarGAPIid;
+        final Event finalEvent = event;
         Observable<Event> myObservable = Observable.create(new Observable.OnSubscribe<Event>() {
             @Override
             public void call(Subscriber<? super Event> sub) {
                 try {
-                    Event event = new Event()
-                            .setSummary(summary)
-                            .setLocation(location);
-
-                    DateTime startDateTime;
-                    EventDateTime start = new EventDateTime();
-                    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                    if (allday) {
-                        String strStart = dateFormat.format(calendarStart.getTime());
-                        startDateTime = new DateTime(strStart);
-                        start.setDate(startDateTime);
+                    Event resEvent;
+                    if (event.getId() == null) {
+                        // создаем событие
+                        resEvent = mService.events().insert(calendarId, finalEvent).execute();
                     } else {
-                        startDateTime = new DateTime(calendarStart.getTimeInMillis());
-                        start.setDateTime(startDateTime);
+                        // обновляем
+                        resEvent = mService.events().update(calendarId, finalEvent.getId(), finalEvent).execute();
                     }
-                    start.setTimeZone(TimeZone.getDefault().getID());
-                    event.setStart(start);
-
-                    DateTime endDateTime;
-                    EventDateTime end = new EventDateTime();
-                    if (allday) {
-                        String strEnd = dateFormat.format(calendarEnd.getTime());
-                        endDateTime = new DateTime(strEnd);
-                        end.setDate(endDateTime);
-                    } else {
-                        endDateTime = new DateTime(calendarEnd.getTimeInMillis());
-                        end.setDateTime(endDateTime);
-                    }
-                    end.setTimeZone(TimeZone.getDefault().getID());
-                    event.setEnd(end);
-
-                    if (recurrenceItem.getType() != RecurrenceItem.TYPE_NO) {
-                        String[] recurrence = new String[]{recurrenceItem.getAsRule()};
-                        event.setRecurrence(Arrays.asList(recurrence));
-                    }
-
-                    Event.Reminders reminders = new Event.Reminders()
-                            .setUseDefault(false)
-                            .setOverrides(eventReminders);
-                    event.setReminders(reminders);
-
-                    String calendarId = DataManager.getInstance().calendarGAPIid;
-                    event = mService.events().insert(calendarId, event).execute();
-                    DataManager.getInstance().lastEvent = event;
-                    sub.onNext(event);
+                    DataManager.getInstance().lastEvent = resEvent;
+                    sub.onNext(resEvent);
                     sub.onCompleted();
                 } catch (Exception e) {
                     e.printStackTrace();

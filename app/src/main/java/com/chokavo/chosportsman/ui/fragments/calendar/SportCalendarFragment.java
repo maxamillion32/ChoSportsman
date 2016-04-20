@@ -33,7 +33,7 @@ import com.chokavo.chosportsman.calendar.CalendarX;
 import com.chokavo.chosportsman.calendar.GoogleCalendarAPI;
 import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.ui.activities.calendar.CalendarActivity;
-import com.chokavo.chosportsman.ui.activities.calendar.CreateEventActivity;
+import com.chokavo.chosportsman.ui.activities.calendar.EditEventActivity;
 import com.chokavo.chosportsman.ui.activities.calendar.DetailEventActivity;
 import com.chokavo.chosportsman.ui.adapters.DayEventAdapter;
 import com.chokavo.chosportsman.ui.fragments.BaseFragment;
@@ -117,8 +117,15 @@ public class SportCalendarFragment extends BaseFragment {
             case R.id.action_info:
                 showCalendarInfo();
                 return true;
+            case R.id.action_refresh:
+                refreshCalendar();
+                return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void refreshCalendar() {
+        workWithCalendarGAPI();
     }
 
     private void showCalendarInfo() {
@@ -173,7 +180,7 @@ public class SportCalendarFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 // для текущей даты откроем окно создания события
-                Intent intent = new Intent(getActivity(), CreateEventActivity.class);
+                Intent intent = new Intent(getActivity(), EditEventActivity.class);
                 Date extraDate;
                 if (mCalendarView.getSelectedDate() == null ||
                         DateUtils.isToday(mCalendarView.getSelectedDate().getDate().getTime())) {
@@ -181,8 +188,8 @@ public class SportCalendarFragment extends BaseFragment {
                 } else {
                     extraDate = mCalendarView.getSelectedDate().getDate();
                 }
-                intent.putExtra(CreateEventActivity.EXTRA_DATE, extraDate);
-                startActivityForResult(intent, CreateEventActivity.REQUEST_CREATE_EVENT);
+                intent.putExtra(EditEventActivity.EXTRA_DATE, extraDate);
+                startActivityForResult(intent, EditEventActivity.REQUEST_CREATE_EVENT);
             }
         });
 
@@ -193,8 +200,8 @@ public class SportCalendarFragment extends BaseFragment {
         mFabAddEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(new Intent(getActivity(), CreateEventActivity.class),
-                        CreateEventActivity.REQUEST_CREATE_EVENT);
+                startActivityForResult(new Intent(getActivity(), EditEventActivity.class),
+                        EditEventActivity.REQUEST_CREATE_EVENT);
             }
         });
 
@@ -240,6 +247,9 @@ public class SportCalendarFragment extends BaseFragment {
     }
 
     public static java.util.Calendar eventDateTimeToCalendar(EventDateTime eventDateTime) {
+        if (eventDateTime == null) {
+            return null;
+        }
         java.util.Calendar cal = java.util.Calendar.getInstance();
         if (eventDateTime.getDate() != null) {
             cal.setTimeInMillis(eventDateTime.getDate().getValue());
@@ -285,6 +295,7 @@ public class SportCalendarFragment extends BaseFragment {
         calDay.setTime(date);
         List<Event> dateEvents = new ArrayList<>();
         for (Event event: DataManager.getInstance().eventlist) {
+            if (event.getStart() == null) continue;
             DateTime eDate = event.getStart().getDate();
             DateTime eDateTime = event.getStart().getDateTime();
             java.util.Calendar startCal = java.util.Calendar.getInstance();
@@ -312,7 +323,7 @@ public class SportCalendarFragment extends BaseFragment {
                     launchFragmentNoBackStack(new NoSportCalendarFragment(), NoSportCalendarFragment.getFragmentTag());
                 }
                 break;
-            case CreateEventActivity.REQUEST_CREATE_EVENT:
+            case EditEventActivity.REQUEST_CREATE_EVENT:
                 if (resultCode == Activity.RESULT_OK) {
                     ImageSnackbar.make(mBtnHideCalendar, ImageSnackbar.TYPE_SUCCESS,
                             String.format("Событие '%s' успешно создано", DataManager.getInstance().lastEvent.getSummary()),
@@ -355,12 +366,25 @@ public class SportCalendarFragment extends BaseFragment {
         }
         // TODO отработать получение списка событий
         mProgress.show();
-        GoogleCalendarAPI.getInstance().getEventList(new Subscriber<Events>() {
+        initSubGetEventList();
+        GoogleCalendarAPI.getInstance().getEventList(mSubGetEventList);
+
+    }
+
+    /**
+     * Подписчик на получение списка событий
+     */
+    Subscriber<Events> mSubGetEventList;
+    private void initSubGetEventList() {
+        mSubGetEventList = new Subscriber<Events>() {
             @Override
             public void onCompleted() {
                 mProgress.hide();
-                Log.e("getEventList", "onCompleted");
                 setEventDays(DataManager.getInstance().eventlist);
+                Date selectedDate = mCalendarView.getSelectedDate()==null ?
+                        java.util.Calendar.getInstance().getTime() :
+                        mCalendarView.getSelectedDate().getDate();
+                selectDate(selectedDate);
             }
 
             @Override
@@ -370,11 +394,10 @@ public class SportCalendarFragment extends BaseFragment {
 
             @Override
             public void onNext(Events events) {
-                Log.e("getEventList", "onNext");
             }
-        });
-
+        };
     }
+
 
     private void workWithCalendarCP() {
         mCalendar = CalendarManager.getInstance(getActivity())

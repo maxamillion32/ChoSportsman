@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,14 +28,14 @@ import com.chokavo.chosportsman.calendar.GoogleCalendarAPI;
 import com.chokavo.chosportsman.calendar.RecurrenceItem;
 import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.models.SportEventType;
-import com.chokavo.chosportsman.ormlite.models.SEvent;
 import com.chokavo.chosportsman.ormlite.models.SSportType;
-import com.chokavo.chosportsman.ui.activities.calendar.CreateEventActivity;
+import com.chokavo.chosportsman.ui.activities.calendar.EditEventActivity;
 import com.chokavo.chosportsman.ui.adapters.CheckableItemAdapter;
 import com.chokavo.chosportsman.ui.adapters.EventReminderAdapter;
 import com.chokavo.chosportsman.ui.fragments.BaseFragment;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 import com.chokavo.chosportsman.ui.widgets.NewEventRowView;
+import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventReminder;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
@@ -55,9 +56,11 @@ import rx.Subscriber;
  */
 public class EditEventFragment extends BaseFragment {
     private static final String DATE_PICKER_TAG = "DATE_PICKER_TAG";
+    private static final String KEY_NEW_EVENT = "KEY_NEW_EVENT";
+
     @Override
     public String getFragmentTitle() {
-        return "Новое событие";
+        return "Редактирование события";
     }
 
     private NewEventRowView mRowSportType, mRowEventType, mRowRepeat;
@@ -70,7 +73,8 @@ public class EditEventFragment extends BaseFragment {
     private MaterialDialog mDialogSportType, mDialogSportEventType,
             mDialogRecurrence, mDialogReminder, mDialogTimeError;
 
-    private SEvent mSEvent;
+//  TODO  private SEvent mSEvent;
+    private Event mEvent;
 
     private Date mDefaultDate;
     private Calendar mCalendarStart, mCalendarEnd;
@@ -98,9 +102,9 @@ public class EditEventFragment extends BaseFragment {
         setHasOptionsMenu(true);
         // args
         if (getArguments() != null) {
-            mDefaultDate = (Date) getArguments().getSerializable(CreateEventActivity.EXTRA_DATE);
-            mSEvent = (SEvent) getArguments().getSerializable(CreateEventActivity.EXTRA_EVENT);
+            mDefaultDate = (Date) getArguments().getSerializable(EditEventActivity.EXTRA_DATE);
         }
+        mEvent = DataManager.getInstance().currentEvent;
     }
 
     @Nullable
@@ -109,10 +113,45 @@ public class EditEventFragment extends BaseFragment {
         View rootView = inflater.inflate(R.layout.fragment_create_event, container, false);
         initViews(rootView);
         initActions();
+        if (mEvent != null) {
+            fillEventData();
+        }
         return rootView;
     }
 
+    private void fillEventData() {
+        mEditSummary.setText(mEvent.getSummary());
+        mEditLocation.setText(mEvent.getLocation());
+
+        boolean allDay = mEvent.getStart().getDate() != null;
+        mSwitchWholeDay.setChecked(allDay);
+        // init start date and time
+        mCalendarStart = Calendar.getInstance();
+        mCalendarStartDate = Calendar.getInstance();
+        mCalendarEndDate = Calendar.getInstance();
+        mCalendarEnd = Calendar.getInstance();
+        DateTime startDate, endDate;
+        if (allDay) {
+            startDate = mEvent.getStart().getDate();
+            endDate = mEvent.getEnd().getDate();
+        } else {
+            startDate = mEvent.getStart().getDateTime();
+            endDate = mEvent.getEnd().getDateTime();
+        }
+        mCalendarStart.setTimeInMillis(startDate.getValue());
+        mCalendarStartDate.setTimeInMillis(startDate.getValue());
+        mCalendarEnd.setTimeInMillis(endDate.getValue());
+        mCalendarEndDate.setTimeInMillis(endDate.getValue());
+        fillDataAndTime();
+        // TODO повторение
+        // TODO reminders
+    }
+
     private void initViews(View rootView) {
+        // goto toolbar
+        AppBarLayout appBar = ((EditEventActivity)getActivity()).getAppBarLayout();
+        mEditSummary = (EditText) appBar.findViewById(R.id.edit_summary);
+
         mRowSportType = (NewEventRowView) rootView.findViewById(R.id.row_sport_type);
         mRowEventType = (NewEventRowView) rootView.findViewById(R.id.row_event_type);
         mRowRepeat = (NewEventRowView) rootView.findViewById(R.id.row_repeat);
@@ -125,7 +164,6 @@ public class EditEventFragment extends BaseFragment {
         mTxtTimeEnd = (TextView) rootView.findViewById(R.id.txt_time_end);
         mTxtAddReminder = (TextView) rootView.findViewById(R.id.txt_add_reminder);
         mEditLocation = (EditText) rootView.findViewById(R.id.edit_location);
-        mEditSummary = (EditText) rootView.findViewById(R.id.edit_summary);
         mSwitchWholeDay = (Switch) rootView.findViewById(R.id.switch_whole_day);
         mRvReminders = (RecyclerView) rootView.findViewById(R.id.rv_reminders);
 
@@ -449,19 +487,33 @@ public class EditEventFragment extends BaseFragment {
     }
 
     private void saveNewEvent() {
+        // либо сохраняем новое, либо обновляем старое
         if (timeStartEndError) {
             showDialogTimeError();
             return;
         }
 
+        String summary = mEditSummary.getText().toString();
+        String location = mEditLocation.getText().toString();
+
         boolean allday = mSwitchWholeDay.isChecked();
         mProgress.show();
         RecurrenceItem recItem = RecurrenceItem.getItemById(mChosenRecurrence);
-        GoogleCalendarAPI.getInstance().createEvent(
+        Event event = GoogleCalendarAPI.buildEvent(
+                summary,
+                location,
+                allday,
+                allday ? mCalendarStartDate : mCalendarStart,
+                allday ? mCalendarEndDate : mCalendarEnd,
+                recItem,
+                mEventReminders,
+                mEvent // если оно null - создатся новое событие
+        );
+        GoogleCalendarAPI.getInstance().createOrUpdateEvent(
                 new Subscriber<Event>() {
                     @Override
                     public void onCompleted() {
-                        Log.e("createEvent", "onCompleted");
+                        Log.e("createOrUpdateEvent", "onCompleted");
                         mProgress.hide();
                         getActivity().setResult(Activity.RESULT_OK);
                         getActivity().finish();
@@ -469,7 +521,7 @@ public class EditEventFragment extends BaseFragment {
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.e("createEvent", String.format("onError: %s", e));
+                        Log.e("createOrUpdateEvent", String.format("onError: %s", e));
                         mProgress.hide();
                         ImageSnackbar.make(mEditLocation, ImageSnackbar.TYPE_ERROR,
                                 "При создании события произошла ошибка", Snackbar.LENGTH_LONG)
@@ -478,16 +530,10 @@ public class EditEventFragment extends BaseFragment {
 
                     @Override
                     public void onNext(Event event) {
-                        Log.e("createEvent", String.format("Event created: %s\n", event.getHtmlLink()));
+                        Log.e("createOrUpdateEvent", String.format("Event created: %s\n", event.getHtmlLink()));
                     }
                 },
-                mEditSummary.getText().toString(),
-                mEditLocation.getText().toString(),
-                allday,
-                allday ? mCalendarStartDate : mCalendarStart,
-                allday ? mCalendarEndDate : mCalendarEnd,
-                recItem,
-                mEventReminders
+                event
         );
     }
 
