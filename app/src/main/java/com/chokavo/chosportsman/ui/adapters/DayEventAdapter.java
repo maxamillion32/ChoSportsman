@@ -17,12 +17,18 @@ import java.util.List;
 /**
  * Created by Дашицырен on 13.03.2016.
  */
-public class DayEventAdapter extends RecyclerView.Adapter<DayEventAdapter.ViewHolder> {
+public class DayEventAdapter extends RecyclerView.Adapter<DayEventAdapter.ViewHolder>{
+
+    public interface OnItemClickListener {
+        void onItemClick(Event event);
+    }
 
     private List<Event> mDayEvents = new ArrayList<>();
+    private final OnItemClickListener mListener;
 
-    public DayEventAdapter(List<Event> dayEvents) {
+    public DayEventAdapter(List<Event> dayEvents, OnItemClickListener listener) {
         mDayEvents = dayEvents;
+        mListener = listener;
     }
 
     @Override
@@ -61,6 +67,8 @@ public class DayEventAdapter extends RecyclerView.Adapter<DayEventAdapter.ViewHo
         } else {
             holder.mTxtLocation.setText(event.getLocation());
         }
+
+        holder.bind(mDayEvents.get(position), mListener);
     }
 
     @Override
@@ -68,7 +76,7 @@ public class DayEventAdapter extends RecyclerView.Adapter<DayEventAdapter.ViewHo
         return mDayEvents == null ? 0 : mDayEvents.size();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder{
 
         public TextView mTxtTimeStart, mTxtTimeEnd, mTxtSummary, mTxtLocation;
 
@@ -78,6 +86,15 @@ public class DayEventAdapter extends RecyclerView.Adapter<DayEventAdapter.ViewHo
             mTxtTimeEnd = (TextView) itemView.findViewById(R.id.txt_time_end);
             mTxtSummary = (TextView) itemView.findViewById(R.id.txt_summary);
             mTxtLocation = (TextView) itemView.findViewById(R.id.txt_location);
+        }
+
+        public void bind(final Event item, final OnItemClickListener listener) {
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onItemClick(item);
+                }
+            });
         }
     }
 }

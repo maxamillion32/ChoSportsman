@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,11 +17,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.chokavo.chosportsman.R;
+import com.chokavo.chosportsman.calendar.RecurrenceItem;
 import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.ui.activities.calendar.DetailEventActivity;
 import com.chokavo.chosportsman.ui.fragments.BaseFragment;
 import com.chokavo.chosportsman.ui.widgets.NewEventRowView;
 import com.google.api.services.calendar.model.Event;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 /**
  * Created by Дашицырен on 17.04.2016.
@@ -43,7 +49,11 @@ public class DetailEventFragment extends BaseFragment {
 
     @Override
     public String getFragmentTitle() {
-        return "Мое событие";
+        if (mEvent.getSummary() == null || mEvent.getSummary().isEmpty()) {
+            return "Без названия";
+        }
+        else
+            return mEvent.getSummary();
     }
 
     @Override
@@ -87,14 +97,53 @@ public class DetailEventFragment extends BaseFragment {
     }
 
     private void showDetailEvent() {
-        //TODO:
+        //TODO:Вид спорта, events type, Reminders
+        boolean allDay = mEvent.getStart().getDate() != null;
+        long startMs, endMs;
+        DateFormat dateFormat = new SimpleDateFormat("ccc, dd MMMM, yyyy");
+        DateFormat timeFormat = new SimpleDateFormat("HH:mm");
+        if (mEvent.getLocation() == null || mEvent.getLocation().isEmpty())
+            mTextLocation.setText("Без позиции");
+        else
+            mTextLocation.setText(mEvent.getLocation());
+        ((DetailEventActivity) getActivity()).setToolbarTitle(getFragmentTitle());
+        if (allDay) {
+            startMs = mEvent.getStart().getDate().getValue();
+            endMs = mEvent.getEnd().getDate().getValue();
+            boolean sameDay = dateFormat.format(startMs).equals(dateFormat.format(endMs));
+            mTxtDataLine1.setText(dateFormat.format(startMs));
+            if (sameDay) {
+                mTxtDataLine2.setVisibility(View.GONE);
+            }
+            else {
+                mTxtDataLine2.setText(dateFormat.format(endMs));
+            }
+        } else {
+            startMs = mEvent.getStart().getDateTime().getValue();
+            endMs = mEvent.getEnd().getDateTime().getValue();
+            boolean sameDay = dateFormat.format(startMs).equals(dateFormat.format(endMs));
+            if (sameDay){
+                mTxtDataLine1.setText(dateFormat.format(startMs));
+                mTxtDataLine2.setText("c "+timeFormat.format(startMs).concat(" до ").concat(timeFormat.format(endMs)));
+            } else {
+                mTxtDataLine1.setText(dateFormat.format(startMs).concat("  ").concat(timeFormat.format(startMs)));
+                mTxtDataLine2.setText(dateFormat.format(endMs).concat("  ").concat(timeFormat.format(endMs)));
+            }
+        }
+        if ((mEvent.getRecurrence() != null)) {
+            RecurrenceItem item = new RecurrenceItem(RecurrenceItem.getTypeFromRule(mEvent.getRecurrence().get(0)));
+            mTxtRepeat.setText(item.getStringId());
+        }
+        else
+            mTxtRepeat.setVisibility(View.GONE);
     }
 
     private void initActions() {
         mRowLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO:open Google maps and parse place
+                if (mTextLocation.getText().equals("Без позиции"))
+                    return;
                 // Create a Uri from an intent string. Use the result to create an Intent.
                 Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + mTextLocation.getText());
 

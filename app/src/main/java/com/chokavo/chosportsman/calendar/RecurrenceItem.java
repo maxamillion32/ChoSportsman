@@ -116,4 +116,18 @@ public class RecurrenceItem {
     public int getType() {
         return mType;
     }
+
+    public static int getTypeFromRule(String rule){
+        switch (rule) {
+            case RRULE+FREQ+FREQ_EVERY_DAY:
+                return TYPE_EVERY_DAY;
+            case RRULE+FREQ+FREQ_EVERY_WEEK:
+                return TYPE_EVERY_WEEK;
+            case RRULE+FREQ+FREQ_EVERY_MONTH:
+                return TYPE_EVERY_MONTH;
+            case RRULE+FREQ+FREQ_EVERY_YEAR:
+                return TYPE_EVERY_YEAR;
+        }
+        return -1;
+    }
 }

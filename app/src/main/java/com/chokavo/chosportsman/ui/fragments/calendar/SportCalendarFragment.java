@@ -34,6 +34,7 @@ import com.chokavo.chosportsman.calendar.GoogleCalendarAPI;
 import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.ui.activities.calendar.CalendarActivity;
 import com.chokavo.chosportsman.ui.activities.calendar.CreateEventActivity;
+import com.chokavo.chosportsman.ui.activities.calendar.DetailEventActivity;
 import com.chokavo.chosportsman.ui.adapters.DayEventAdapter;
 import com.chokavo.chosportsman.ui.fragments.BaseFragment;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
@@ -263,11 +264,18 @@ public class SportCalendarFragment extends BaseFragment {
         mTxtCurrentDay.setText(dateFormat.format(date));
         List<Event> dateEvents = getDateEvents(date);
         if (!dateEvents.isEmpty()) {
-            mRvDayEvents.swapAdapter(new DayEventAdapter(dateEvents), true);
+            mRvDayEvents.swapAdapter(new DayEventAdapter(dateEvents, new DayEventAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(Event event) {
+                    DataManager.getInstance().currentEvent = event;
+                    Intent intent = new Intent(getActivity(), DetailEventActivity.class);
+                    startActivity(intent);
+                }
+            }), true);
             mWrapNoEvent.setVisibility(View.GONE);
         } else {
             // пусто
-            mRvDayEvents.swapAdapter(new DayEventAdapter(null), true);
+            mRvDayEvents.swapAdapter(new DayEventAdapter(null,null), true);
             mWrapNoEvent.setVisibility(View.VISIBLE);
         }
     }
