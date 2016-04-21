@@ -30,6 +30,10 @@
                 android:id="@+id/nav_calendar"
                 android:icon="@drawable/ic_today_24dp"
                 android:title="Календарь"/>
+            <item
+                android:id="@+id/nav_teams"
+                android:icon="@drawable/ic_group_24dp"
+                android:title="Мои команды"/>
         </menu>
     </item>
 

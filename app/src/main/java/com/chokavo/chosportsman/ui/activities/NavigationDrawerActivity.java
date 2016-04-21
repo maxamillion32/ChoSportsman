@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.ui.activities.calendar.CalendarActivity;
 import com.chokavo.chosportsman.models.DataManager;
+import com.chokavo.chosportsman.ui.activities.teams.TeamsActivity;
 import com.squareup.picasso.Picasso;
 import com.vk.sdk.VKSdk;
 import com.vk.sdk.api.model.VKApiUserFull;
@@ -94,6 +95,11 @@ public abstract class NavigationDrawerActivity extends BaseActivity implements N
         } else if (id == R.id.nav_calendar) {
             if (!(this instanceof CalendarActivity)) {
                 startActivity(new Intent(this, CalendarActivity.class));
+                finish();
+            }
+        } else if (id == R.id.nav_teams) {
+            if (!(this instanceof TeamsActivity)) {
+                startActivity(new Intent(this, TeamsActivity.class));
                 finish();
             }
         }

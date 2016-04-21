@@ -64,6 +64,12 @@
                   android:label="Мое событие" >
         </activity>
 
+        <activity android:name=".ui.activities.teams.CreateTeamActivity">
+        </activity>
+
+        <activity android:name=".ui.activities.teams.TeamsActivity">
+        </activity>
+
 
         <meta-data
             android:name="com.google.android.gms.version"
