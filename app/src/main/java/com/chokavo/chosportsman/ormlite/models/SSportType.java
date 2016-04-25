@@ -18,7 +18,7 @@ public class SSportType {
     @DatabaseField(id = true)
     private int id;
 
-    @SerializedName("name")
+    @SerializedName("sport_type_name")
     @Expose
     @DatabaseField(useGetSet = true)
     private String title;

@@ -17,4 +17,12 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 
+    <style name="MyDarkToolbarStyle" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:textColorPrimary">@color/white_100</item>
+
+        <item name="actionMenuTextColor">@color/white_100</item>
+
+        <item name="android:textColorSecondary">@color/white_100</item>
+
+    </style>
 </resources>

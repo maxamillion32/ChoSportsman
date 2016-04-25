@@ -4,6 +4,7 @@
               android:layout_width="match_parent"
               android:layout_height="60dp">
     <ImageView
+        android:visibility="gone"
         android:layout_width="35dp"
         android:layout_height="35dp"
         android:layout_marginLeft="20dp"
@@ -12,7 +13,8 @@
         android:id="@+id/image_sport"
         android:src="@drawable/ic_today_24dp"/>
     <TextView
-        android:layout_width="247dp"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="match_parent"
         android:text="Футбол"
         android:gravity="center_vertical"

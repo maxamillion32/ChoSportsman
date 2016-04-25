@@ -7,4 +7,6 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="img_group_member">40dp</dimen>
+
+    <dimen name="lockerroom_avatar_height">250dp</dimen>
 </resources>

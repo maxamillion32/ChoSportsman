@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout
+    android:id="@+id/drawer_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <ScrollView
+            android:id="@+id/base_scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <android.support.design.widget.AppBarLayout
+                    android:id="@+id/appbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:id="@+id/img_avatar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="@dimen/lockerroom_avatar_height"
+                            android:background="@drawable/test_ava"
+                            android:scaleType="centerCrop"/>
+
+                        <FrameLayout
+                            android:id="@+id/wrap_blacky"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <FrameLayout
+                                android:id="@+id/blacky_top"
+                                android:layout_width="match_parent"
+                                android:layout_height="80dp"
+                                android:layout_gravity="top"
+                                android:background="@drawable/lockerroom_avatar_gradient_reversed"/>
+
+                            <FrameLayout
+                                android:id="@+id/blacky_bottom"
+                                android:layout_width="match_parent"
+                                android:layout_height="80dp"
+                                android:layout_gravity="bottom"
+                                android:background="@drawable/lockerroom_avatar_gradient"/>
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom"
+                            android:padding="16dp">
+
+                            <TextView
+                                android:id="@+id/text_name"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Валентина Легкоступова"
+                                android:textSize="18sp"/>
+                        </LinearLayout>
+
+                        <FrameLayout
+                            android:id="@+id/blue_top_overlay"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:alpha="0"
+                            android:background="@color/colorPrimary">
+
+                        </FrameLayout>
+                        <!--</FrameLayout>-->
+
+                    </FrameLayout>
+
+
+                </android.support.design.widget.AppBarLayout>
+
+                <include layout="@layout/lockerroom_inside"/>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+        <FrameLayout
+            android:id="@+id/wrap_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true">
+
+            <com.chokavo.chosportsman.ui.widgets.MarqueeToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:theme="@style/MyDarkToolbarStyle"
+                app:popupTheme="@style/Theme.AppCompat.NoActionBar"/>
+        </FrameLayout>
+
+    </FrameLayout>
+
+    <android.support.design.widget.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:headerLayout="@layout/nav_header_main"
+        app:menu="@menu/activity_main_drawer"/>
+
+</android.support.v4.widget.DrawerLayout>

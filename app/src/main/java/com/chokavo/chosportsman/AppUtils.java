@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.util.TypedValue;
 
 /**
  * Created by repitch on 06.03.16.
@@ -47,6 +48,27 @@ public class AppUtils {
         Context context = App.getInstance();
         int stringId = context.getApplicationInfo().labelRes;
         return context.getString(stringId);
+    }
+
+    public static int getToolbarHeight(Context context) {
+        // Calculate ActionBar height
+        int actionBarHeight = -1;
+        TypedValue tv = new TypedValue();
+        if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
+        {
+            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data,context.getResources().getDisplayMetrics());
+        }
+        return actionBarHeight;
+    }
+
+    public static int getStatusBarHeight() {
+        Context context = App.getInstance();
+        int result = 0;
+        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = context.getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
     }
 
 }
