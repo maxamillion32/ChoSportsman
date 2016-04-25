@@ -99,7 +99,8 @@
             android:id="@+id/wrap_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fitsSystemWindows="true">
+            android:fitsSystemWindows="true"
+            android:elevation="4dp">
 
             <com.chokavo.chosportsman.ui.widgets.MarqueeToolbar
                 android:id="@+id/toolbar"

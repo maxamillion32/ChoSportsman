@@ -111,14 +111,12 @@ public class LockerRoomActivity extends NavigationDrawerActivity /*implements Ap
                     // меняем цвет от прозрачного к синему у appbarlayout
                     float scrollPercent = (float) scrollY / (float) delta;
                     mBlueTopOverlay.setAlpha(scrollPercent);
-                    mToolbar.setBackgroundResource(android.R.color.transparent);
                     mWrapToolbar.setBackgroundResource(android.R.color.transparent);
                     getSupportActionBar().setDisplayShowTitleEnabled(false);
                 } else {
                     mBlueTopOverlay.setAlpha(1);
                     // меняем background у toolbara на синий
-                    mToolbar.setBackgroundResource(R.color.colorPrimary);
-                    mWrapToolbar.setBackgroundResource(R.color.colorPrimaryDark);
+                    mWrapToolbar.setBackgroundResource(R.color.colorPrimary);
                     getSupportActionBar().setDisplayShowTitleEnabled(true);
                 }
             }
