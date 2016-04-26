@@ -13,6 +13,7 @@ import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.models.SharedPrefsManager;
 import com.chokavo.chosportsman.network.RFManager;
+import com.chokavo.chosportsman.network.vk.VKHelper;
 import com.chokavo.chosportsman.ormlite.DBHelperFactory;
 import com.chokavo.chosportsman.ormlite.dao.SportsmanFavSportTypeDao;
 import com.chokavo.chosportsman.ormlite.models.SSportType;
@@ -22,10 +23,7 @@ import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.VKCallback;
 import com.vk.sdk.VKSdk;
-import com.vk.sdk.api.VKApi;
-import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKError;
-import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiUserFull;
@@ -102,14 +100,12 @@ public class HelloScreenActivity extends BaseActivity {
 
     public void saveUser() {
         mProgress.show();
-        VKRequest vkRequest = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "photo_200,sex,bdate,city"));
-        vkRequest.executeWithListener(new VKRequest.VKRequestListener() {
+        VKHelper.loadVKUser(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {
                 VKList<VKApiUserFull> vkUsers = ((VKList) response.parsedModel);
                 VKApiUserFull vkUser = vkUsers.get(0);
                 DataManager.getInstance().vkUser = vkUser;
-
                 vkAuth(vkUser.id);
                 super.onComplete(response);
             }

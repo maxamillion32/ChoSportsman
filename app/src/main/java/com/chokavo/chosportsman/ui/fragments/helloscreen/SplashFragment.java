@@ -14,6 +14,7 @@ import android.widget.ProgressBar;
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.network.RFManager;
+import com.chokavo.chosportsman.network.vk.VKHelper;
 import com.chokavo.chosportsman.ormlite.DBHelperFactory;
 import com.chokavo.chosportsman.ormlite.dao.SSportTypeDao;
 import com.chokavo.chosportsman.ormlite.dao.SportsmanDao;
@@ -25,9 +26,6 @@ import com.chokavo.chosportsman.ui.activities.MainActivity;
 import com.chokavo.chosportsman.ui.fragments.BaseFragment;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 import com.vk.sdk.VKSdk;
-import com.vk.sdk.api.VKApi;
-import com.vk.sdk.api.VKApiConst;
-import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiUserFull;
@@ -45,7 +43,7 @@ import retrofit2.Response;
  */
 public class SplashFragment extends BaseFragment {
 
-    private static final int WAIT_MS = 3000;
+    private static final int WAIT_MS = 1400;
     ProgressBar mProgressSplash;
 
     private boolean
@@ -108,8 +106,7 @@ public class SplashFragment extends BaseFragment {
     }
 
     private void loadVKProfile() {
-        VKRequest vkRequest = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "photo_200,photo_400_orig,sex,bdate,city"));
-        vkRequest.executeWithListener(new VKRequest.VKRequestListener() {
+        VKHelper.loadVKUser(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {
                 VKList<VKApiUserFull> vkUsers = ((VKList) response.parsedModel);

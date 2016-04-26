@@ -1,5 +1,7 @@
 package com.chokavo.chosportsman.network;
 
+import com.chokavo.chosportsman.ormlite.models.SCalendar;
+import com.chokavo.chosportsman.ormlite.models.SEvent;
 import com.chokavo.chosportsman.ormlite.models.SSportType;
 import com.chokavo.chosportsman.ormlite.models.Sportsman;
 
@@ -38,4 +40,21 @@ public interface SportsmanRestInterface {
 
     @GET("user/{id}")
     Call<Sportsman> getUser(@Path("id") int userId);
+
+    /**
+     * Календарь / SCalendar
+     */
+    @FormUrlEncoded
+    @POST("calendar")
+    Call<SCalendar> createCalendar(@Field("user_id") int userId,
+                                   @Field("googleApi") String googleApiId);
+
+    /**
+     * Событие / SEvent
+     */
+    @POST("calendars/<calendarId>/events")
+    Call<SEvent> createEvent(@Field("id") int userId,
+                             @Path("calendarId") String calendarId,
+                             @Body SEvent event);
+
 }

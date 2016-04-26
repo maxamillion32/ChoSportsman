@@ -23,6 +23,7 @@ import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.network.ErrorManager;
 import com.chokavo.chosportsman.network.RFManager;
 import com.chokavo.chosportsman.ormlite.DBHelperFactory;
+import com.chokavo.chosportsman.ormlite.models.SCalendar;
 import com.chokavo.chosportsman.ormlite.models.Sportsman;
 import com.chokavo.chosportsman.ui.activities.BaseActivity;
 import com.chokavo.chosportsman.ui.activities.calendar.CalendarActivity;
@@ -224,6 +225,27 @@ public class NoSportCalendarFragment extends BaseFragment {
             @Override
             public void onCompleted() {
                 // здесь мы уже получили calendarGAPI с сервера, отобразим данные в UI
+                // теперь сохраняем календарь на нашем сервере
+                RFManager.createCalendar(DataManager.getInstance().mSportsman.getServerId(),
+                        DataManager.getInstance().calendarGAPIid,
+                        new Callback<SCalendar>() {
+                            @Override
+                            public void onResponse(Call<SCalendar> call, Response<SCalendar> response) {
+                                Log.d("CreateCalendar", "onResponse");
+                                if (response.isSuccess()) {
+                                    Log.d("CreateCalendar", "isSuccess");
+                                } else {
+                                    Log.e("CreateCalendar", "notSuccess");
+                                }
+                                DataManager.getInstance().mSCalendar = response.body();
+                            }
+
+                            @Override
+                            public void onFailure(Call<SCalendar> call, Throwable t) {
+                                Log.e("CreateCalendar", "onFailure");
+
+                            }
+                        });
                 mProgress.hide();
                 showCalendar();
             }

@@ -8,8 +8,6 @@ import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.models.SharedPrefsManager;
 import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -224,16 +222,15 @@ public class GoogleCalendarAPI {
                         calendarGAPIid = sportCalendarListEntry.getId();
                         calendarGAPI = getCalendarById(calendarGAPIid);
                     }
-                    // здесь мы уже имеем календарь c id=calendarGAPIid
-                    DataManager.getInstance().calendarGAPIid = calendarGAPIid;
-                    SharedPrefsManager.saveCalendarGAPIid();
                     if (calendarGAPIid == null) {
                         sub.onNext(null);
                         Log.e(GoogleCalendarAPI.class.getName(), "no calendarGAPIid");
                         sub.onCompleted();
                         return;
                     }
-                    // имеем id и сам календарь, можно спокойно выходить
+                    // здесь мы уже имеем календарь c id=calendarGAPIid
+                    DataManager.getInstance().calendarGAPIid = calendarGAPIid;
+                    SharedPrefsManager.saveCalendarGAPIid();
                     sub.onNext(calendarList);
                     sub.onCompleted();
                 } catch (Exception e) {

@@ -32,6 +32,8 @@ import com.chokavo.chosportsman.calendar.CalendarManager;
 import com.chokavo.chosportsman.calendar.CalendarX;
 import com.chokavo.chosportsman.calendar.GoogleCalendarAPI;
 import com.chokavo.chosportsman.models.DataManager;
+import com.chokavo.chosportsman.network.RFManager;
+import com.chokavo.chosportsman.ormlite.models.SCalendar;
 import com.chokavo.chosportsman.ui.activities.calendar.CalendarActivity;
 import com.chokavo.chosportsman.ui.activities.calendar.EditEventActivity;
 import com.chokavo.chosportsman.ui.activities.calendar.DetailEventActivity;
@@ -60,6 +62,9 @@ import java.util.HashSet;
 import java.util.List;
 
 import me.everything.providers.android.calendar.Calendar;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import rx.Subscriber;
 
 /**
@@ -325,6 +330,7 @@ public class SportCalendarFragment extends BaseFragment {
                 break;
             case EditEventActivity.REQUEST_CREATE_EVENT:
                 if (resultCode == Activity.RESULT_OK) {
+                    workWithCalendarGAPI();
                     ImageSnackbar.make(mBtnHideCalendar, ImageSnackbar.TYPE_SUCCESS,
                             String.format("Событие '%s' успешно создано", DataManager.getInstance().lastEvent.getSummary()),
                             Snackbar.LENGTH_LONG).show();
@@ -335,6 +341,21 @@ public class SportCalendarFragment extends BaseFragment {
     }
 
     private void workWithCalendarGAPI() {
+        /*int userId = DataManager.getInstance().mSportsman.getServerId();
+        String googleAPIid = DataManager.getInstance().calendarGAPIid;
+        RFManager.createCalendar(userId, googleAPIid, new Callback<SCalendar>() {
+            @Override
+            public void onResponse(Call<SCalendar> call, Response<SCalendar> response) {
+                SCalendar serverCal = response.body();
+                Log.e("","");
+            }
+
+            @Override
+            public void onFailure(Call<SCalendar> call, Throwable t) {
+                Log.e("CreateCalendar", "onFailure: "+t.getLocalizedMessage());
+            }
+        });*/
+
         if (DataManager.getInstance().calendarGAPI == null) {
             // придется делать асинхронный запрос к серверу google
             mProgress.show();
@@ -364,7 +385,6 @@ public class SportCalendarFragment extends BaseFragment {
             }, DataManager.getInstance().calendarGAPIid);
             return;
         }
-        // TODO отработать получение списка событий
         mProgress.show();
         initSubGetEventList();
         GoogleCalendarAPI.getInstance().getEventList(mSubGetEventList);

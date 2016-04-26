@@ -1,12 +1,11 @@
 package com.chokavo.chosportsman.models;
 
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
 import com.chokavo.chosportsman.App;
 import com.chokavo.chosportsman.calendar.GoogleCalendarAPI;
 import com.chokavo.chosportsman.network.datarows.SportObjectDataRow;
+import com.chokavo.chosportsman.ormlite.models.SCalendar;
 import com.chokavo.chosportsman.ormlite.models.SSportType;
 import com.chokavo.chosportsman.ormlite.models.Sportsman;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
@@ -17,9 +16,7 @@ import com.vk.sdk.api.model.VKApiUserFull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by ilyapyavkin on 02.03.16.
@@ -40,6 +37,7 @@ public class DataManager {
     public int userIdOTMLite; // id текущего юзера в локальной бд
     private String mGoogleAccount;
     private GoogleAccountCredential googleCredential;
+    public SCalendar mSCalendar; // scalendar
     public String calendarGAPIid; // id for a google calendar на сервере гугл
     public long calendarCPid; // id for a google calendar в Content provider
 

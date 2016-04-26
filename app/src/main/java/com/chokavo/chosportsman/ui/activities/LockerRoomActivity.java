@@ -25,14 +25,12 @@ import android.widget.Toast;
 import com.chokavo.chosportsman.AppUtils;
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.models.DataManager;
+import com.chokavo.chosportsman.network.vk.VKHelper;
 import com.chokavo.chosportsman.ormlite.models.SSportType;
 import com.chokavo.chosportsman.ui.adapters.UserSportsAdapter;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
-import com.vk.sdk.api.VKApi;
-import com.vk.sdk.api.VKApiConst;
-import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiUserFull;
@@ -55,7 +53,7 @@ public class LockerRoomActivity extends NavigationDrawerActivity /*implements Ap
     private ActionBar mActionBar;
 
     // inside
-    private RecyclerView mRvFavSports;
+    private LinearLayout mLLFavSports;
 
     SwipeRefreshLayout mSwipeRefresh;
 
@@ -91,8 +89,7 @@ public class LockerRoomActivity extends NavigationDrawerActivity /*implements Ap
         mImgAvatar = (ImageView) findViewById(R.id.img_avatar);
         mTextName = (TextView) findViewById(R.id.text_name);
         // inside
-        mRvFavSports = (RecyclerView) findViewById(R.id.rv_fav_sports);
-
+        mLLFavSports = (LinearLayout) findViewById(R.id.ll_fav_sports);
     }
 
     private void initActions() {
@@ -124,13 +121,19 @@ public class LockerRoomActivity extends NavigationDrawerActivity /*implements Ap
 
         // список избранных видов спорта
         // TODO остановился тут
+        fillFavSportTypes();
+    }
 
+    private void fillFavSportTypes() {
         List<SSportType> favSportTypes = DataManager.getInstance().mSportsman.getFavSportTypes();
-        adapter = new UserSportsAdapter(DataManager.getInstance().mSportsman.getFavSportTypes());
-        layoutManager = new LinearLayoutManager(this);
-
-        mRvFavSports.setAdapter(adapter);
-        mRvFavSports.setLayoutManager(layoutManager);
+        for (SSportType favSport: favSportTypes) {
+            View child = getLayoutInflater().inflate(R.layout.item_user_sports, null);
+            TextView txtSportName = (TextView) child.findViewById(R.id.sporttype_tv);
+            txtSportName.setText(favSport.getTitle());
+            ImageView imgHaveSportProfile = (ImageView) child.findViewById(R.id.img_have_sport_profile);
+            // todo если у юзера есть спортивный профиль по данному виду спорта - ставим visible=true
+            mLLFavSports.addView(child);
+        }
     }
 
     private int getAvatarHeight() {
@@ -266,8 +269,7 @@ public class LockerRoomActivity extends NavigationDrawerActivity /*implements Ap
             picasoRequest1.into(mImgAvatar);
             return;
         }
-        VKRequest vkRequest = VKApi.users().get(VKParameters.from(VKApiConst.FIELDS, "photo_200,photo_400_orig,sex,bdate,city"));
-        vkRequest.executeWithListener(new VKRequest.VKRequestListener() {
+        VKHelper.loadVKUser(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {
                 VKList<VKApiUserFull> vkUsers = ((VKList) response.parsedModel);

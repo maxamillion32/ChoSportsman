@@ -2,37 +2,48 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="horizontal"
               android:layout_width="match_parent"
-              android:layout_height="60dp">
+              android:layout_height="wrap_content">
     <ImageView
         android:visibility="gone"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:layout_marginLeft="20dp"
-        android:layout_gravity="center"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:padding="16dp"
         android:shadowColor="@color/black_100"
         android:id="@+id/image_sport"
         android:src="@drawable/ic_today_24dp"/>
+
     <TextView
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
         android:layout_width="0dp"
         android:layout_weight="1"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:text="Футбол"
         android:gravity="center_vertical"
         android:textSize="20dp"
         android:textColor="@color/black_100"
-        android:paddingLeft="30dp"
+        android:paddingLeft="16dp"
         android:id="@+id/sporttype_tv"/>
 
+    <ImageView
+        android:id="@+id/img_have_sport_profile"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_margin="16dp"
+        android:src="@drawable/medal"/>
+
     <CheckBox
+        android:visibility="gone"
+        android:padding="16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/checkbox_delete_sport"/>
 
     <ImageView
-        android:layout_width="35dp"
-        android:layout_height="35dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginRight="10dp"
+        android:layout_marginRight="16dp"
         android:src="@drawable/ic_clear_24dp"
         android:id="@+id/delete_sport"
         android:visibility="gone"

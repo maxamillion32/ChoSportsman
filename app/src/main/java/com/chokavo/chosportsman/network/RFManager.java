@@ -1,6 +1,8 @@
 package com.chokavo.chosportsman.network;
 
 import com.chokavo.chosportsman.Constants;
+import com.chokavo.chosportsman.ormlite.models.SCalendar;
+import com.chokavo.chosportsman.ormlite.models.SEvent;
 import com.chokavo.chosportsman.ormlite.models.SSportType;
 import com.chokavo.chosportsman.ormlite.models.Sportsman;
 import com.google.gson.Gson;
@@ -74,6 +76,29 @@ public class RFManager {
     public static void getUserSportTypes(int userId,
                                   Callback<List<SSportType>> callback) {
         Call<List<SSportType>> call = getInstance().mRestInterface.getUserSportTypes(userId);
+        call.enqueue(callback);
+    }
+
+    /**
+     * SCalendar / Календарь
+     */
+    public static void createCalendar(
+            int userId,
+            String googleApiId,
+            Callback<SCalendar> callback) {
+        Call<SCalendar> call = getInstance().mRestInterface.createCalendar(userId, googleApiId);
+        call.enqueue(callback);
+    }
+
+    /**
+     * SEvent / Событие
+     */
+    public static void createEvent(
+            int userId,
+            String googleApiId,
+            SEvent event,
+            Callback<SEvent> callback) {
+        Call<SEvent> call = getInstance().mRestInterface.createEvent(userId, googleApiId, event);
         call.enqueue(callback);
     }
 
