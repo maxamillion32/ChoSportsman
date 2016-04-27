@@ -70,6 +70,8 @@
         <activity android:name=".ui.activities.teams.TeamsActivity">
         </activity>
 
+        <activity android:name=".ui.activities.EditUserSportsActivity">
+        </activity>
 
         <meta-data
             android:name="com.google.android.gms.version"

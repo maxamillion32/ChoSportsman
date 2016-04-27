@@ -53,4 +53,5 @@ dependencies {
         transitive = true
     }
     compile 'com.j256.ormlite:ormlite-android:4.48'
+    compile 'com.chauthai.swipereveallayout:swipe-reveal-layout:1.0.0'
 }
