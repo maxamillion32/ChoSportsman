@@ -10,6 +10,7 @@ import android.widget.Button;
 
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.ui.activities.teams.CreateTeamActivity;
+import com.chokavo.chosportsman.ui.activities.teams.TeamsListActivity;
 import com.chokavo.chosportsman.ui.fragments.BaseFragment;
 
 /**
@@ -23,6 +24,8 @@ public class NoTeamFragment extends BaseFragment {
 
     Button mBtnCreateTeam;
 
+    Button mBtnTestPlayerTeams;
+    Button mBtnTestFanTeams;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -37,6 +40,27 @@ public class NoTeamFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), CreateTeamActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+        mBtnTestPlayerTeams = (Button) rootView.findViewById(R.id.btn_test_player_teams);
+        mBtnTestPlayerTeams.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), TeamsListActivity.class);
+                intent.putExtra(TeamsListActivity.EXTRA_MODE, false);
+                startActivity(intent);
+            }
+        });
+
+        mBtnTestFanTeams = (Button) rootView.findViewById(R.id.btn_test_fan_teams);
+        mBtnTestFanTeams.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), TeamsListActivity.class);
+                intent.putExtra(TeamsListActivity.EXTRA_MODE, true);
                 startActivity(intent);
             }
         });

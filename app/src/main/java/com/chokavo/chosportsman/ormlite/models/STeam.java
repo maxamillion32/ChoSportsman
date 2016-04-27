@@ -1,5 +1,6 @@
 package com.chokavo.chosportsman.ormlite.models;
 
+import com.chokavo.chosportsman.R;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.j256.ormlite.field.DatabaseField;
@@ -38,4 +39,50 @@ public class STeam {
     private String site;
     private String email;
     private String photo; // URL
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public SSportType getSportType() {
+        return sportType;
+    }
+
+    public STeam() {
+    }
+
+    /**
+     * Hadrcode
+     */
+    public STeam(String name, SSportType sportType) {
+        this.name = name;
+        this.sportType = sportType;
+    }
+
+    public int getIconId() {
+        switch (name) {
+            case "Lakers":
+                return R.drawable.team_lakers;
+            case "Локомотив":
+                return R.drawable.team_loko;
+            case "Manchester United":
+                return R.drawable.team_mnu;
+            case "Зенит":
+                return R.drawable.team_zenit;
+            case "Челябинский тракторист":
+                return R.drawable.team_track;
+            case "Зеленоградский электрон":
+                return R.drawable.team_electron;
+            case "Еду":
+                return R.drawable.team_food;
+            case "Сборная МИЭТ по теннису":
+                return R.drawable.team_tennis;
+            default:
+                return R.drawable.team_tennis;
+        }
+    }
 }

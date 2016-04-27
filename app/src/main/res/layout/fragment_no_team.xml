@@ -41,6 +41,28 @@
     </FrameLayout>
 
     <Button
+        android:id="@+id/btn_test_player_teams"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_height="36dp"
+        android:paddingRight="16dp"
+        android:paddingLeft="16dp"
+        android:textColor="@android:color/white"
+        android:background="@drawable/button_selector"
+        android:text="Команды, в которых я играю"
+        android:layout_margin="6dp"/>
+    <Button
+        android:id="@+id/btn_test_fan_teams"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_height="36dp"
+        android:paddingRight="16dp"
+        android:paddingLeft="16dp"
+        android:textColor="@android:color/white"
+        android:background="@drawable/button_selector"
+        android:text="Команды, в которые я верю"
+        android:layout_margin="6dp"/>
+    <Button
         android:id="@+id/btn_create_team"
         android:layout_width="wrap_content"
         android:layout_gravity="center_horizontal"

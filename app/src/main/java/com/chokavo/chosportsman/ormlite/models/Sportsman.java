@@ -53,6 +53,9 @@ public class Sportsman {
 
     transient List<SSportType> favSportTypes;
 
+    transient List<STeam> fanTeams;
+    transient List<STeam> playerTeams;
+
     public Sportsman() {
 
     }
@@ -107,5 +110,21 @@ public class Sportsman {
 
     public void setFavSportTypes(List<SSportType> favSportTypes) {
         this.favSportTypes = favSportTypes;
+    }
+
+    public void setFanTeams(List<STeam> fanTeams) {
+        this.fanTeams = fanTeams;
+    }
+
+    public void setPlayerTeams(List<STeam> playerTeams) {
+        this.playerTeams = playerTeams;
+    }
+
+    public List<STeam> getFanTeams() {
+        return fanTeams;
+    }
+
+    public List<STeam> getPlayerTeams() {
+        return playerTeams;
     }
 }
