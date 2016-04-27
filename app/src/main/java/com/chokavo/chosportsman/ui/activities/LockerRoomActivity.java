@@ -11,11 +11,12 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -37,6 +38,9 @@ import com.vk.sdk.api.model.VKApiUserFull;
 import com.vk.sdk.api.model.VKList;
 
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
+import su.levenetc.android.badgeview.BadgeView;
 
 /**
  * Created by ilyapyavkin on 02.03.16.
@@ -124,15 +128,37 @@ public class LockerRoomActivity extends NavigationDrawerActivity /*implements Ap
         fillFavSportTypes();
     }
 
+    BadgeView mBadgeFavSports;
+    LinearLayout mWrapFavSportsIcons, mWrapFavSports;
+    public static final int MIN_ICONS_COUNT = 3;
+
     private void fillFavSportTypes() {
+        mBadgeFavSports = (BadgeView) findViewById(R.id.badge_fav_sports);
+        mWrapFavSportsIcons = (LinearLayout) findViewById(R.id.wrap_fav_sports_icons);
+        mWrapFavSports = (LinearLayout) findViewById(R.id.wrap_fav_sports);
+
+        mWrapFavSports.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(LockerRoomActivity.this, EditUserSportsActivity.class));
+            }
+        });
+
         List<SSportType> favSportTypes = DataManager.getInstance().mSportsman.getFavSportTypes();
-        for (SSportType favSport: favSportTypes) {
-            View child = getLayoutInflater().inflate(R.layout.item_user_sports, null);
-            TextView txtSportName = (TextView) child.findViewById(R.id.sporttype_tv);
-            txtSportName.setText(favSport.getTitle());
-            ImageView imgHaveSportProfile = (ImageView) child.findViewById(R.id.img_have_sport_profile);
-            // todo если у юзера есть спортивный профиль по данному виду спорта - ставим visible=true
-            mLLFavSports.addView(child);
+        mBadgeFavSports.setValue(favSportTypes.size());
+        for (SSportType favSport : favSportTypes) {
+            int num = favSportTypes.indexOf(favSport);
+            if (num < MIN_ICONS_COUNT) {
+                // первые три иконки отображаем
+                FrameLayout fl = (FrameLayout) getLayoutInflater().inflate(R.layout.widget_miniavatar_rtl, null);
+                CircleImageView widgetMiniavatar = (CircleImageView) fl.findViewById(R.id.mini_avatar);
+                widgetMiniavatar.setImageResource(favSport.getIconId());
+                mWrapFavSportsIcons.addView(fl);
+                ViewGroup.MarginLayoutParams params =
+                        (ViewGroup.MarginLayoutParams) fl.getLayoutParams();
+                params.leftMargin = (int) AppUtils.convertDpToPixel(-10, this);
+                fl.requestLayout();
+            }
         }
     }
 

@@ -68,6 +68,7 @@ public class EditUserSportsAdapter extends RecyclerView.Adapter<EditUserSportsAd
         }
 
         public void bind(final SSportType item, final OnItemClickListener listener, final OnItemClickListener deleteListener) {
+            mImgSport.setImageResource(item.getIconId());
             mTxtSportType.setText(item.getTitle());
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

@@ -1,7 +1,6 @@
 package com.chokavo.chosportsman.ui.activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -29,7 +28,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -50,7 +48,8 @@ public class ChooseSportsActivity extends AppCompatActivity {
         if (getSupportActionBar()!=null)
             getSupportActionBar().setTitle(R.string.choose_sport_please);
 
-        if (DataManager.getInstance().getSportTypes() != null) {
+        List<SSportType> favSportTypes = DataManager.getInstance().mSportsman.getFavSportTypes();
+        if (favSportTypes != null && !favSportTypes.isEmpty()) {
             startActivity(new Intent(this, MainActivity.class));
             finish();
         }

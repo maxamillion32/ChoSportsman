@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import com.chokavo.chosportsman.AppUtils;
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.network.RFManager;
@@ -22,6 +23,7 @@ import com.chokavo.chosportsman.ormlite.dao.SportsmanFavSportTypeDao;
 import com.chokavo.chosportsman.ormlite.models.SSportType;
 import com.chokavo.chosportsman.ormlite.models.Sportsman;
 import com.chokavo.chosportsman.ui.activities.BaseActivity;
+import com.chokavo.chosportsman.ui.activities.ChooseSportsActivity;
 import com.chokavo.chosportsman.ui.activities.MainActivity;
 import com.chokavo.chosportsman.ui.fragments.BaseFragment;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
@@ -65,13 +67,13 @@ public class SplashFragment extends BaseFragment {
         View rootView = inflater.inflate(R.layout.fragment_splash, container, false);
         initViews(rootView);
 
+        // 1 загружаем все виды спорта
+        loadSportTypes();
         if (VKSdk.isLoggedIn()) {
             // залогинены, подгружаем все необходимые данные
             // TODO: если устройство онлайн - то с сервера, иначе из SQLite
             // 0 загружаем информацию из ВКонтакте
             loadVKProfile();
-            // 1 загружаем все виды спорта
-            loadSportTypes();
             // тестируем sqlite
             try {
                 SportsmanDao sportsmanDao = DBHelperFactory.getHelper().getSportsmanDao();
@@ -89,8 +91,6 @@ public class SplashFragment extends BaseFragment {
                     // в SharedPrefs не сохранено id текущего юзера
                     // TODO либо взять с сервера, либо query по каким либо данным
                 }
-
-                Log.e("","");
             } catch (SQLException e) {
                 ImageSnackbar.make(rootView, ImageSnackbar.TYPE_ERROR, "SQLite error: "+e, Snackbar.LENGTH_LONG).show();
                 e.printStackTrace();
@@ -130,7 +130,14 @@ public class SplashFragment extends BaseFragment {
                     @Override
                     public void onResponse(Call<List<SSportType>> call, Response<List<SSportType>> response) {
                         List<SSportType> favSportTypes = response.body();
+                        List<SSportType> allSportTypes = DataManager.getInstance().getSportTypes();
                         DataManager.getInstance().mSportsman.setFavSportTypes(favSportTypes);
+
+                        for (int i=0; i<favSportTypes.size(); i++) {
+                            SSportType sportType = favSportTypes.get(i);
+                            SSportType normSportType = SSportType.findByName(allSportTypes, sportType.getTitle());
+                            favSportTypes.set(i, normSportType);
+                        }
 
                         try {
                             dao.createListIfNotExist(sportsman, favSportTypes);
@@ -164,7 +171,7 @@ public class SplashFragment extends BaseFragment {
         try {
             final SSportTypeDao stDao = DBHelperFactory.getHelper().getSportTypeDao();
             final List<SSportType> sportTypes = stDao.getAll();
-            if (sportTypes == null || sportTypes.size() == 0) {
+            if (sportTypes == null || sportTypes.size() == 0 || AppUtils.isDeviceOnline()) {
                 // в базе данных видов спорта нет, добавим их через retrofit
                 RFManager.getSportTypes(new Callback<List<SSportType>>() {
                     @Override
@@ -211,7 +218,13 @@ public class SplashFragment extends BaseFragment {
                         VKAuthFragment.getFragmentTag(),
                         BaseActivity.ANIM_LEFT2RIGHT);
             } else {
-                startActivity(new Intent(getActivity(), MainActivity.class));
+                List<SSportType> favSportTypes = DataManager.getInstance().mSportsman.getFavSportTypes();
+                if (favSportTypes == null || favSportTypes.isEmpty()) {
+                    // видов спорта нема
+                    startActivity(new Intent(getActivity(), ChooseSportsActivity.class));
+                } else {
+                    startActivity(new Intent(getActivity(), MainActivity.class));
+                }
                 getActivity().finish();
             }
         }

@@ -1,9 +1,14 @@
 package com.chokavo.chosportsman.ormlite.models;
 
+import android.support.annotation.NonNull;
+
+import com.chokavo.chosportsman.R;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+
+import java.util.List;
 
 /**
  * Created by ilyapyavkin on 06.04.16.
@@ -12,6 +17,59 @@ import com.j256.ormlite.table.DatabaseTable;
 public class SSportType {
 
     public final static String ID_FIELD_NAME = "id";
+
+    /**
+     * Hadrcode
+     */
+    public final static int SPORT_FOOTBAL = 1;
+    public final static int SPORT_BASKETBALL = 2;
+    public final static int SPORT_ICE_HOCKEY = 3;
+    public final static int SPORT_VOLLEYBALL= 4;
+    public final static int SPORT_TENNIS = 5;
+    public final static int SPORT_CURLING = 6;
+    public final static int SPORT_SWIMMING = 7;
+
+    public int getIconId() {
+        switch (id) {
+            case SPORT_FOOTBAL:
+                return R.drawable.sport_football;
+            case SPORT_BASKETBALL:
+                return R.drawable.sport_basketball;
+            case SPORT_ICE_HOCKEY:
+                return R.drawable.sport_ice_hockey;
+            case SPORT_VOLLEYBALL:
+                return R.drawable.sport_volleyball;
+            case SPORT_TENNIS:
+                return R.drawable.sport_tennis;
+            case SPORT_CURLING:
+                return R.drawable.sport_curling;
+            case SPORT_SWIMMING:
+                return R.drawable.sport_swimming;
+            default:
+                return R.drawable.sport_football;
+        }
+    }
+
+    public int getBigImageId() {
+        switch (id) {
+            case SPORT_FOOTBAL:
+                return R.drawable.sport_big_footbal;
+            case SPORT_BASKETBALL:
+                return R.drawable.sport_big_basketball;
+            case SPORT_ICE_HOCKEY:
+                return R.drawable.sport_big_ice_hockey;
+            case SPORT_VOLLEYBALL:
+                return R.drawable.sport_big_volleyball;
+            case SPORT_TENNIS:
+                return R.drawable.sport_big_tennis;
+            case SPORT_CURLING:
+                return R.drawable.sport_big_curling;
+            case SPORT_SWIMMING:
+                return R.drawable.sport_big_swimming;
+            default:
+                return R.drawable.test_ava;
+        }
+    }
 
     @SerializedName("sport_type_id")
     @Expose
@@ -77,5 +135,14 @@ public class SSportType {
 
     public void setChecked(boolean checked) {
         mChecked = checked;
+    }
+
+    public static SSportType findByName(List<SSportType> sportTypes, @NonNull String title) {
+        for (SSportType sportType: sportTypes) {
+            if (title.equals(sportType.getTitle())) {
+                return sportType;
+            }
+        }
+        return null;
     }
 }

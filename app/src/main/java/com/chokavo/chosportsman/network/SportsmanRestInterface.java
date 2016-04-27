@@ -25,7 +25,7 @@ public interface SportsmanRestInterface {
 
     @FormUrlEncoded
     @POST("auth/vk")
-    Call<Sportsman> vkAuth(@Field("vk_id") int vkId);
+    Call<Sportsman> vkAuth(@Field("vkid") int vkId);
 
     @GET("user/{id}/sporttypes")
     Call<List<SSportType>> getUserSportTypes(@Path("id") int userId);

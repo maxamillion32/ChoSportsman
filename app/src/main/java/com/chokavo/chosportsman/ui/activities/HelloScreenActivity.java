@@ -157,12 +157,19 @@ public class HelloScreenActivity extends BaseActivity {
                     public void onResponse(Call<List<SSportType>> call, Response<List<SSportType>> response) {
                         mProgress.hide();
                         List<SSportType> favSportTypes = response.body();
+                        List<SSportType> allSportTypes = DataManager.getInstance().getSportTypes();
                         if (favSportTypes.size() == 0) {
                             // любимых видов спорта нет - открываем соответствующее активити
                             startActivity(new Intent(HelloScreenActivity.this, ChooseSportsActivity.class));
                             finish();
                         } else {
-                            // любимые виды спорта есть - сохраняем их ORMLite и выходим
+                            // преобразуем из неполных моделей
+                            for (int i=0; i<favSportTypes.size(); i++) {
+                                SSportType sportType = favSportTypes.get(i);
+                                SSportType normSportType = SSportType.findByName(allSportTypes, sportType.getTitle());
+                                favSportTypes.set(i, normSportType);
+                            }
+                            // сохраняем их ORMLite и выходим
                             saveFavSportsSQLite(sportsman, favSportTypes);
                             startActivity(new Intent(HelloScreenActivity.this, MainActivity.class));
                             finish();

@@ -1,38 +1,208 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+              android:background="@color/white_100"
               android:orientation="vertical"
-    android:paddingTop="8dp">
+              android:paddingTop="8dp">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Избранные виды спорта"
-        android:paddingTop="16dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
 
-        />
     <LinearLayout
+        android:id="@+id/wrap_fav_sports"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         >
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_margin="16dp"
-            android:src="@drawable/gym"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:paddingBottom="8dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="8dp"
+            android:text="Виды спорта"
+
+            />
+
+        <su.levenetc.android.badgeview.BadgeView
+            android:id="@+id/badge_fav_sports"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            app:badgeBackgroundColor="@color/colorPrimary"
+            app:badgeText="3"
+            app:badgeTextSize="10sp"/>
 
         <LinearLayout
-            android:id="@+id/ll_fav_sports"
+            android:id="@+id/wrap_fav_sports_icons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:gravity="right|top"
+            android:layoutDirection="rtl"
+            android:minWidth="116dp"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:paddingTop="8dp">
 
         </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/wrap_team_member"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:paddingBottom="8dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="8dp"
+            android:text="Член команд"
+
+            />
+
+        <su.levenetc.android.badgeview.BadgeView
+            android:id="@+id/badge_team_member"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            app:badgeBackgroundColor="@color/colorPrimary"
+            app:badgeText="2"
+            app:badgeTextSize="10sp"/>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="right|top"
+            android:minWidth="116dp"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:paddingTop="8dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/img_team_member1"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/test_ava"
+                app:civ_border_color="#fff"
+                app:civ_border_width="2dp"
+                />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/img_team_member2"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginRight="-12dp"
+                android:layout_toLeftOf="@id/img_team_member1"
+                android:gravity="right"
+                android:src="@drawable/ic_launcher_2"
+                app:civ_border_color="#fff"
+                app:civ_border_width="2dp"
+                />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/wrap_team_fan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:paddingBottom="8dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="8dp"
+            android:text="Болею за"
+
+            />
+
+        <su.levenetc.android.badgeview.BadgeView
+            android:id="@+id/badge_team_fan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            app:badgeBackgroundColor="@color/colorPrimary"
+            app:badgeText="21"
+            app:badgeTextSize="10sp"/>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="right|top"
+            android:minWidth="116dp"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:paddingTop="8dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/img_team_fan1"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/test_ava"
+                app:civ_border_color="#fff"
+                app:civ_border_width="2dp"
+                />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/img_team_fan2"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginRight="-12dp"
+                android:layout_toLeftOf="@id/img_team_fan1"
+                android:gravity="right"
+                android:src="@drawable/ic_launcher_2"
+                app:civ_border_color="#fff"
+                app:civ_border_width="2dp"
+                />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/img_team_fan3"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginRight="-12dp"
+                android:layout_toLeftOf="@id/img_team_fan2"
+                android:gravity="right"
+                android:src="@drawable/test_ava"
+                app:civ_border_color="#fff"
+                app:civ_border_width="2dp"
+                />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/ll_fav_sports"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
     </LinearLayout>
 
     <TextView
