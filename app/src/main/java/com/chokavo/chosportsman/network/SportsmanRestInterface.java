@@ -13,6 +13,7 @@ import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 /**
@@ -20,7 +21,7 @@ import retrofit2.http.Path;
  */
 public interface SportsmanRestInterface {
 
-    @GET("sporttype/get")
+    @GET("sporttype/list")
     Call<List<SSportType>> getSportTypes();
 
     @FormUrlEncoded
@@ -34,7 +35,7 @@ public interface SportsmanRestInterface {
     Call<Void> setUserSportTypes(@Path("id") int userId,
                                  @Body List<SSportType> sportTypes);
 
-    @POST("user/{id}")
+    @PUT("user/{id}")
     Call<Sportsman> updateUser(@Path("id") int userId,
                                @Body Sportsman sportsman);
 

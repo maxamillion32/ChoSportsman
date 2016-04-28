@@ -47,6 +47,7 @@ public class SplashFragment extends BaseFragment {
 
     private static final int WAIT_MS = 1400;
     ProgressBar mProgressSplash;
+    private View rootView;
 
     private boolean
             waitDone = false,
@@ -64,7 +65,7 @@ public class SplashFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_splash, container, false);
+        rootView = inflater.inflate(R.layout.fragment_splash, container, false);
         initViews(rootView);
 
         // 1 загружаем все виды спорта
@@ -153,7 +154,7 @@ public class SplashFragment extends BaseFragment {
                     public void onFailure(Call<List<SSportType>> call, Throwable t) {
                         Log.e("RETRO", "onFailure: "+t.toString());
                         mProgressSplash.setVisibility(View.GONE);
-                        ImageSnackbar.make(mProgressSplash, ImageSnackbar.TYPE_ERROR, String.format("Возникла ошибка при загрузке избранных видов спорта"), Snackbar.LENGTH_SHORT).show();
+                        ImageSnackbar.make(rootView, ImageSnackbar.TYPE_ERROR, String.format("Возникла ошибка при загрузке избранных видов спорта"), Snackbar.LENGTH_SHORT).show();
                     }
                 });
             } else {
@@ -191,7 +192,7 @@ public class SplashFragment extends BaseFragment {
                     public void onFailure(Call<List<SSportType>> call, Throwable t) {
                         Log.e("RETRO", "onFailure: "+t.toString());
                         mProgressSplash.setVisibility(View.GONE);
-                        ImageSnackbar.make(mProgressSplash, ImageSnackbar.TYPE_ERROR, String.format("Возникла ошибка при загрузке видов спорта"), Snackbar.LENGTH_SHORT).show();
+                        ImageSnackbar.make(rootView, ImageSnackbar.TYPE_ERROR, String.format("Возникла ошибка при загрузке видов спорта"), Snackbar.LENGTH_SHORT).show();
                     }
                 });
             } else {

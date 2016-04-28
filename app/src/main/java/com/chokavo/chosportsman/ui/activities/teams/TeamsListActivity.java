@@ -15,6 +15,8 @@ import com.chokavo.chosportsman.ui.fragments.teams.TeamsListFragment;
 public class TeamsListActivity extends BaseActivity {
 
     public final static String EXTRA_MODE = "EXTRA_MODE";
+    public final static int EXTRA_MODE_FAN = 1;
+    public final static int EXTRA_MODE_MEMBER = 2;
 
     View mContentFrame;
 

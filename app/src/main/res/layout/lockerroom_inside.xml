@@ -81,10 +81,12 @@
             app:badgeText="2"
             app:badgeTextSize="10sp"/>
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/wrap_team_member_icons"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="right|top"
+            android:layoutDirection="rtl"
             android:minWidth="116dp"
             android:orientation="horizontal"
             android:paddingBottom="8dp"
@@ -92,29 +94,8 @@
             android:paddingRight="12dp"
             android:paddingTop="8dp">
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/img_team_member1"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_alignParentRight="true"
-                android:src="@drawable/test_ava"
-                app:civ_border_color="#fff"
-                app:civ_border_width="2dp"
-                />
+        </LinearLayout>
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/img_team_member2"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_marginRight="-12dp"
-                android:layout_toLeftOf="@id/img_team_member1"
-                android:gravity="right"
-                android:src="@drawable/ic_launcher_2"
-                app:civ_border_color="#fff"
-                app:civ_border_width="2dp"
-                />
-
-        </RelativeLayout>
 
     </LinearLayout>
 
@@ -146,10 +127,12 @@
             app:badgeText="21"
             app:badgeTextSize="10sp"/>
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/wrap_team_fan_icons"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="right|top"
+            android:layoutDirection="rtl"
             android:minWidth="116dp"
             android:orientation="horizontal"
             android:paddingBottom="8dp"
@@ -157,44 +140,10 @@
             android:paddingRight="12dp"
             android:paddingTop="8dp">
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/img_team_fan1"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_alignParentRight="true"
-                android:src="@drawable/test_ava"
-                app:civ_border_color="#fff"
-                app:civ_border_width="2dp"
-                />
+        </LinearLayout>
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/img_team_fan2"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_marginRight="-12dp"
-                android:layout_toLeftOf="@id/img_team_fan1"
-                android:gravity="right"
-                android:src="@drawable/ic_launcher_2"
-                app:civ_border_color="#fff"
-                app:civ_border_width="2dp"
-                />
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/img_team_fan3"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_marginRight="-12dp"
-                android:layout_toLeftOf="@id/img_team_fan2"
-                android:gravity="right"
-                android:src="@drawable/test_ava"
-                app:civ_border_color="#fff"
-                app:civ_border_width="2dp"
-                />
-
-        </RelativeLayout>
 
     </LinearLayout>
-
 
     <LinearLayout
         android:id="@+id/ll_fav_sports"

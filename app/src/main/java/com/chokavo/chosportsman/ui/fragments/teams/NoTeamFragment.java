@@ -50,7 +50,7 @@ public class NoTeamFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), TeamsListActivity.class);
-                intent.putExtra(TeamsListActivity.EXTRA_MODE, false);
+                intent.putExtra(TeamsListActivity.EXTRA_MODE, TeamsListActivity.EXTRA_MODE_MEMBER);
                 startActivity(intent);
             }
         });
@@ -60,7 +60,7 @@ public class NoTeamFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), TeamsListActivity.class);
-                intent.putExtra(TeamsListActivity.EXTRA_MODE, true);
+                intent.putExtra(TeamsListActivity.EXTRA_MODE, TeamsListActivity.EXTRA_MODE_FAN);
                 startActivity(intent);
             }
         });

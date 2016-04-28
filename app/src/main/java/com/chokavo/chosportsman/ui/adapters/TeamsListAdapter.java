@@ -10,9 +10,11 @@ import android.widget.TextView;
 
 import com.chauthai.swipereveallayout.SwipeRevealLayout;
 import com.chauthai.swipereveallayout.ViewBinderHelper;
+import com.chokavo.chosportsman.App;
+import com.chokavo.chosportsman.AppUtils;
 import com.chokavo.chosportsman.R;
-import com.chokavo.chosportsman.ormlite.models.SSportType;
 import com.chokavo.chosportsman.ormlite.models.STeam;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +76,10 @@ public class TeamsListAdapter extends RecyclerView.Adapter<TeamsListAdapter.View
         }
 
         public void bind(final STeam item, final OnItemClickListener listener, final OnItemClickListener deleteListener) {
-            mImgTeamPhoto.setImageResource(item.getIconId());
+            Picasso.with(App.getInstance())
+                    .load(item.getIconId())
+                    .resize((int) AppUtils.convertDpToPixel(56, App.getInstance()), 0)
+                    .into(mImgTeamPhoto);
             mTxtTeamName.setText(item.getName());
             mTxtSportType.setText(item.getSportType().getTitle());
             itemView.setOnClickListener(new View.OnClickListener() {

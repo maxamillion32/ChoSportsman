@@ -36,6 +36,15 @@ public class Sportsman {
     @DatabaseField()
     private int vkid;
 
+    /**
+     * id календаря на нашем сервере
+     * Получить с помощью метода /calendar/{id}
+     */
+    @SerializedName("calendar_id")
+    @Expose
+    @DatabaseField()
+    private int calendarId;
+
     @SerializedName("google_account")
     @Expose
     @DatabaseField()

@@ -28,7 +28,10 @@ import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.network.vk.VKHelper;
 import com.chokavo.chosportsman.ormlite.models.SSportType;
+import com.chokavo.chosportsman.ormlite.models.STeam;
+import com.chokavo.chosportsman.ui.activities.teams.TeamsListActivity;
 import com.chokavo.chosportsman.ui.adapters.UserSportsAdapter;
+import com.chokavo.chosportsman.ui.fragments.teams.TeamsListFragment;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
@@ -74,7 +77,6 @@ public class LockerRoomActivity extends NavigationDrawerActivity /*implements Ap
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_lockerroom_2);
         super.onCreate(R.layout.activity_lockerroom_new, R.id.nav_cloakroom);
 
         initViews();
@@ -94,6 +96,18 @@ public class LockerRoomActivity extends NavigationDrawerActivity /*implements Ap
         mTextName = (TextView) findViewById(R.id.text_name);
         // inside
         mLLFavSports = (LinearLayout) findViewById(R.id.ll_fav_sports);
+        // 1 fav sporttypes
+        mBadgeFavSports = (BadgeView) findViewById(R.id.badge_fav_sports);
+        mWrapFavSportsIcons = (LinearLayout) findViewById(R.id.wrap_fav_sports_icons);
+        mWrapFavSports = (LinearLayout) findViewById(R.id.wrap_fav_sports);
+        // 2 teamMembers
+        mBadgeTeamMember = (BadgeView) findViewById(R.id.badge_team_member);
+        mWrapTeamMemberIcons = (LinearLayout) findViewById(R.id.wrap_team_member_icons);
+        mWrapTeamMember = (LinearLayout) findViewById(R.id.wrap_team_member);
+        // 3 teamFans
+        mBadgeTeamFan = (BadgeView) findViewById(R.id.badge_team_fan);
+        mWrapTeamFan = (LinearLayout) findViewById(R.id.wrap_team_fan);
+        mWrapTeamFanIcons = (LinearLayout) findViewById(R.id.wrap_team_fan_icons);
     }
 
     private void initActions() {
@@ -123,20 +137,29 @@ public class LockerRoomActivity extends NavigationDrawerActivity /*implements Ap
             }
         });
 
-        // список избранных видов спорта
-        // TODO остановился тут
+        // TODO hardcoded
+        TeamsListFragment.loadUserTeams();
         fillFavSportTypes();
+        fillTeamMember();
+        fillTeamFan();
     }
 
-    BadgeView mBadgeFavSports;
-    LinearLayout mWrapFavSportsIcons, mWrapFavSports;
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // если вдруг что обновилось
+        fillFavSportTypes();
+        fillTeamMember();
+        fillTeamFan();
+    }
+
+    BadgeView mBadgeFavSports, mBadgeTeamMember, mBadgeTeamFan;
+    LinearLayout mWrapFavSportsIcons, mWrapFavSports,
+            mWrapTeamMemberIcons, mWrapTeamMember,
+        mWrapTeamFanIcons, mWrapTeamFan;
     public static final int MIN_ICONS_COUNT = 3;
 
     private void fillFavSportTypes() {
-        mBadgeFavSports = (BadgeView) findViewById(R.id.badge_fav_sports);
-        mWrapFavSportsIcons = (LinearLayout) findViewById(R.id.wrap_fav_sports_icons);
-        mWrapFavSports = (LinearLayout) findViewById(R.id.wrap_fav_sports);
-
         mWrapFavSports.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -145,7 +168,9 @@ public class LockerRoomActivity extends NavigationDrawerActivity /*implements Ap
         });
 
         List<SSportType> favSportTypes = DataManager.getInstance().mSportsman.getFavSportTypes();
+
         mBadgeFavSports.setValue(favSportTypes.size());
+        mWrapFavSportsIcons.removeAllViews();
         for (SSportType favSport : favSportTypes) {
             int num = favSportTypes.indexOf(favSport);
             if (num < MIN_ICONS_COUNT) {
@@ -160,6 +185,73 @@ public class LockerRoomActivity extends NavigationDrawerActivity /*implements Ap
                 fl.requestLayout();
             }
         }
+    }
+
+    private void fillTeamDescRow(List<STeam> teams,
+                             BadgeView badge,
+                             LinearLayout wrap,
+                             LinearLayout wrapIcons, final int onClickMode) {
+
+        wrap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LockerRoomActivity.this, TeamsListActivity.class);
+                intent.putExtra(TeamsListActivity.EXTRA_MODE, onClickMode);
+                startActivity(intent);
+            }
+        });
+        badge.setValue(teams.size());
+        wrapIcons.removeAllViews();
+        for (STeam team : teams) {
+            int num = teams.indexOf(team);
+            if (num < MIN_ICONS_COUNT) {
+                // первые три иконки отображаем
+                FrameLayout fl = (FrameLayout) getLayoutInflater().inflate(R.layout.widget_miniavatar_rtl, null);
+                CircleImageView widgetMiniavatar = (CircleImageView) fl.findViewById(R.id.mini_avatar);
+
+                // scale image
+                loadPicasso(team.getIconId(), widgetMiniavatar);
+
+                wrapIcons.addView(fl);
+                ViewGroup.MarginLayoutParams params =
+                        (ViewGroup.MarginLayoutParams) fl.getLayoutParams();
+                params.leftMargin = (int) AppUtils.convertDpToPixel(-10, this);
+                fl.requestLayout();
+            }
+        }
+    }
+
+    private void loadPicasso(int iconId, CircleImageView widgetMiniavatar) {
+        /*Drawable dr = getDrawable(iconId);
+        int imw = dr.getIntrinsicWidth();
+        int imh = dr.getIntrinsicHeight();
+        float ratio = (float) imw / (float) imh;*/
+        Picasso.with(LockerRoomActivity.this)
+                .load(iconId)
+                .resize((int) AppUtils.convertDpToPixel(36, this), 0)
+                .into(widgetMiniavatar);
+    }
+
+    private void fillTeamMember() {
+        List<STeam> playerTeams = DataManager.getInstance().mSportsman.getPlayerTeams();
+
+        fillTeamDescRow(playerTeams,
+                mBadgeTeamMember,
+                mWrapTeamMember,
+                mWrapTeamMemberIcons,
+                TeamsListActivity.EXTRA_MODE_MEMBER);
+
+    }
+
+    private void fillTeamFan() {
+        List<STeam> fanTeams = DataManager.getInstance().mSportsman.getFanTeams();
+
+        fillTeamDescRow(fanTeams,
+                mBadgeTeamFan,
+                mWrapTeamFan,
+                mWrapTeamFanIcons,
+                TeamsListActivity.EXTRA_MODE_FAN);
+
     }
 
     private int getAvatarHeight() {

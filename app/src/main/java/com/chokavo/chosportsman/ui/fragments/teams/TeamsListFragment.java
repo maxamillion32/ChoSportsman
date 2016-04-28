@@ -25,12 +25,20 @@ import java.util.List;
 public class TeamsListFragment extends BaseFragment {
     @Override
     public String getFragmentTitle() {
-        return isFanMode ? getActivity().getString(R.string.Im_fan_of) : getActivity().getString(R.string.Im_player_in);
+        switch (mMode) {
+            case TeamsListActivity.EXTRA_MODE_FAN:
+                return getString(R.string.Im_fan_of);
+            case TeamsListActivity.EXTRA_MODE_MEMBER:
+                return getString(R.string.Im_player_in);
+            default:
+                return "Список команд";
+        }
     }
 
     RecyclerView mRecViewTeams;
     TeamsListAdapter mTeamsListAdapter;
-    boolean isFanMode = true;
+//    boolean isFanMode = true;
+    private int mMode;
     List<STeam> mTeams = new ArrayList<>();
 
     @Nullable
@@ -39,7 +47,7 @@ public class TeamsListFragment extends BaseFragment {
         View rootView = inflater.inflate(R.layout.fragment_teams_list, container, false);
         mRecViewTeams = (RecyclerView) rootView.findViewById(R.id.recview_teams);
         loadUserTeams();
-        mTeams = isFanMode ? DataManager.getInstance().mSportsman.getFanTeams()
+        mTeams = mMode == TeamsListActivity.EXTRA_MODE_FAN ? DataManager.getInstance().mSportsman.getFanTeams()
                 : DataManager.getInstance().mSportsman.getPlayerTeams();
         mTeamsListAdapter = new TeamsListAdapter(mTeams, new TeamsListAdapter.OnItemClickListener() {
             @Override
@@ -62,7 +70,9 @@ public class TeamsListFragment extends BaseFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        isFanMode = getArguments().getBoolean(TeamsListActivity.EXTRA_MODE);
+        if (getArguments() != null) {
+            mMode = getArguments().getInt(TeamsListActivity.EXTRA_MODE);
+        }
         ((TeamsListActivity) getActivity()).setToolbarTitle(getFragmentTitle());
     }
 
@@ -73,9 +83,9 @@ public class TeamsListFragment extends BaseFragment {
     }
 
     /**
-     * Hadrcode method
+     * Hardcode method
      */
-    private void loadUserTeams() {
+    public static void loadUserTeams() {
         List<STeam> fanteams = new ArrayList<>();
         List<STeam> playerteams = new ArrayList<>();
         List<SSportType> sportTypes = DataManager.getInstance().getSportTypes();
