@@ -51,11 +51,40 @@ public interface SportsmanRestInterface {
                                    @Field("googleApi") String googleApiId);
 
     /**
+     * Получить календарь
+     * @param calendarId - id календаря
+     * @return календарь
+     */
+    @GET("calendar/{calendarId}")
+    Call<SCalendar> getCalendar(@Path("calendarId") int calendarId);
+
+    /**
+     * Обновить календарь
+     * @param calendarId - id календаря
+     * @param calendar - календарь
+     * @return обновленный календарь
+     */
+    @PUT("calendar/{calendarId}")
+    Call<SCalendar> updateCalendar(@Path("calendarId") int calendarId,
+                               @Body SCalendar calendar);
+
+    /**
      * Событие / SEvent
      */
-    @POST("calendars/<calendarId>/events")
-    Call<SEvent> createEvent(@Field("id") int userId,
-                             @Path("calendarId") String calendarId,
+    @GET("calendar/{calendarId}/events")
+    Call<List<SEvent>> getAllEvents(@Path("calendarId") int calendarId);
+
+    @POST("calendar/{calendarId}/event")
+    Call<SEvent> createEvent(@Path("calendarId") int calendarId,
+                             @Body SEvent event);
+
+    @GET("calendar/{calendarId}/event/{eventId}")
+    Call<SEvent> getEvent(@Path("calendarId") int calendarId,
+                          @Path("eventId") int eventId);
+
+    @PUT("calendar/{calendarId}/event/{eventId}")
+    Call<SEvent> updateEvent(@Path("calendarId") int calendarId,
+                             @Path("eventId") int eventId,
                              @Body SEvent event);
 
 }

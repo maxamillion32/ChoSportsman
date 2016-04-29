@@ -13,6 +13,7 @@ import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.models.SharedPrefsManager;
 import com.chokavo.chosportsman.network.RFManager;
+import com.chokavo.chosportsman.network.RestTest;
 import com.chokavo.chosportsman.network.vk.VKHelper;
 import com.chokavo.chosportsman.ormlite.DBHelperFactory;
 import com.chokavo.chosportsman.ormlite.dao.SportsmanFavSportTypeDao;
@@ -44,6 +45,8 @@ public class HelloScreenActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // testing REST
+        RestTest.testAPI();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hello_screen);
         mContentFrame = findViewById(R.id.content_frame);

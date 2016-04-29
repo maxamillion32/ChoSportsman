@@ -37,6 +37,11 @@ public class SCalendar {
         // all persisted classes must define a no-arg constructor with at least package visibility
     }
 
+    public SCalendar(int serverId, String googleAPIid) {
+        this.serverId = serverId;
+        this.googleAPIid = googleAPIid;
+    }
+
     public SCalendar(int id) {
         this.id = id;
     }

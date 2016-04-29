@@ -43,13 +43,6 @@ public class RFManager {
         return sRFManager;
     }
 
-    /**
-     * Testing all api methods
-     */
-    public static void testAPI() {
-
-    }
-
     public static void getSportTypes(Callback<List<SSportType>> callback) {
         Call<List<SSportType>> call = getInstance().mRestInterface.getSportTypes();
         call.enqueue(callback);
@@ -97,15 +90,50 @@ public class RFManager {
         call.enqueue(callback);
     }
 
+    public static void getCalendar(
+            int calId,
+            Callback<SCalendar> callback) {
+        Call<SCalendar> call = getInstance().mRestInterface.getCalendar(calId);
+        call.enqueue(callback);
+    }
+
+    public static void updateCalendar(SCalendar calendar,
+                                  Callback<SCalendar> callback) {
+        Call<SCalendar> call = getInstance().mRestInterface.updateCalendar(calendar.getServerId(), calendar);
+        call.enqueue(callback);
+    }
+
     /**
      * SEvent / Событие
      */
+    public static void getAllEvents(
+            int calendarId,
+            Callback<List<SEvent>> callback) {
+        Call<List<SEvent>> call = getInstance().mRestInterface.getAllEvents(calendarId);
+        call.enqueue(callback);
+    }
+
     public static void createEvent(
-            int userId,
-            String googleApiId,
+            int calendarId,
             SEvent event,
             Callback<SEvent> callback) {
-        Call<SEvent> call = getInstance().mRestInterface.createEvent(userId, googleApiId, event);
+        Call<SEvent> call = getInstance().mRestInterface.createEvent(calendarId, event);
+        call.enqueue(callback);
+    }
+
+    public static void getEvent(
+            int calendarId,
+            int eventId,
+            Callback<SEvent> callback) {
+        Call<SEvent> call = getInstance().mRestInterface.getEvent(calendarId, eventId);
+        call.enqueue(callback);
+    }
+
+    public static void updateEvent(
+            int calendarId,
+            SEvent event,
+            Callback<SEvent> callback) {
+        Call<SEvent> call = getInstance().mRestInterface.updateEvent(calendarId, event.getServerId(), event);
         call.enqueue(callback);
     }
 
