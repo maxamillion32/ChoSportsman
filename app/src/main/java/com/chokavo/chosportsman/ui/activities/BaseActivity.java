@@ -1,5 +1,6 @@
 package com.chokavo.chosportsman.ui.activities;
 
+import android.app.ActivityManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -8,10 +9,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 
 import com.chokavo.chosportsman.R;
+
+import java.util.List;
 
 /**
  * Created by ilyapyavkin on 02.03.16.
@@ -20,6 +24,8 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public static final int MY_PERMISSIONS_REQUEST_READ_CALENDAR = 1;
     public static final int MY_PERMISSIONS_REQUEST_ACCOUNTS = 2;
+
+    protected Toolbar mToolbar;
 
     public void launchActivityWithSharedElement(Class activity, View sharedElement, Bundle args) {
         Intent intent = new Intent(this, activity);
@@ -90,7 +96,69 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        shouldDisplayHomeUp();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    // methods for back stack toggle
+    private final FragmentManager.OnBackStackChangedListener
+            mOnBackStackChangedListener = new FragmentManager.OnBackStackChangedListener() {
+        @Override
+        public void onBackStackChanged() {
+            shouldDisplayHomeUp();
+        }
+    };
+
+    protected void showBackStackToggle() {
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        shouldDisplayHomeUp();
+        getSupportFragmentManager().addOnBackStackChangedListener(mOnBackStackChangedListener);
+    }
+
+    /**
+     * Является ли текущее активити последним в стеке
+     * @return true, если активити последнее в стеке
+     */
+    public boolean isLastActivityInStack() {
+        ActivityManager mngr = (ActivityManager) getSystemService( ACTIVITY_SERVICE );
+
+        List<ActivityManager.RunningTaskInfo> taskList = mngr.getRunningTasks(10);
+
+        if(taskList.get(0).numActivities == 1 &&
+                taskList.get(0).topActivity.getClassName().equals(this.getClass().getName())) {
+            return true;
+        }
+        return false;
+    }
+
+    public void shouldDisplayHomeUp() {
+        boolean canBack;
+        if (isLastActivityInStack()) {
+            // последний активити в стеке
+            canBack = getSupportFragmentManager().getBackStackEntryCount() > 0;
+        } else {
+            canBack = true;
+        }
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(canBack);
+        }
+        if (mToolbar != null && canBack) {
+            mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onBackPressed();
+                    shouldDisplayHomeUp();
+                }
+            });
+        }
     }
 }

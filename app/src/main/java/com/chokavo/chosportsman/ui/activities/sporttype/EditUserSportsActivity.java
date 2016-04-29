@@ -1,4 +1,4 @@
-package com.chokavo.chosportsman.ui.activities;
+package com.chokavo.chosportsman.ui.activities.sporttype;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,6 +18,8 @@ import com.chokavo.chosportsman.ormlite.DBHelperFactory;
 import com.chokavo.chosportsman.ormlite.dao.SportsmanFavSportTypeDao;
 import com.chokavo.chosportsman.ormlite.models.SSportType;
 import com.chokavo.chosportsman.ormlite.models.Sportsman;
+import com.chokavo.chosportsman.ui.activities.BaseActivity;
+import com.chokavo.chosportsman.ui.activities.ChooseSportsActivity;
 import com.chokavo.chosportsman.ui.adapters.CheckableItemAdapter;
 import com.chokavo.chosportsman.ui.adapters.EditUserSportsAdapter;
 
@@ -51,24 +53,24 @@ public class EditUserSportsActivity extends BaseActivity {
         setSupportActionBar(mActionBarToolbar);
         if (getSupportActionBar()!=null) {
             getSupportActionBar().setTitle(R.string.favorite_user_sports);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close_white_24dp);
         }
-
 
         mSportsRecyclerView = (RecyclerView)findViewById(R.id.recview_favorite_sports);
         mSportTypes = DataManager.getInstance().mSportsman.getFavSportTypes();
         mSportsAdapter = new EditUserSportsAdapter(mSportTypes, new EditUserSportsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(SSportType sportType) {
-                //TODO:intent to sport profile
+                Intent intent = new Intent(EditUserSportsActivity.this,
+                        DetailSportTypeActivity.class);
+                intent.putExtra(DetailSportTypeActivity.EXTRA_ID, sportType.getId());
+                startActivity(intent);
             }
         }, new EditUserSportsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(SSportType sportType) {
                 mSportTypes.remove(sportType);
                 DataManager.getInstance().mSportsman.setFavSportTypes(mSportTypes);
-                mSportsAdapter.notifyDataSetChanged();
+                notifyDataSetChanged();
             }
         });
         mSportsRecyclerView.setAdapter(mSportsAdapter);
@@ -81,6 +83,17 @@ public class EditUserSportsActivity extends BaseActivity {
                 showDialogSportKind();
             }
         });
+        notifyDataSetChanged();
+    }
+
+    private void notifyDataSetChanged() {
+        if (DataManager.getInstance().mSportsman.getFavSportTypes().size() ==
+                DataManager.getInstance().getSportTypes().size()) {
+            mBtnAddSport.setVisibility(View.GONE);
+        } else {
+            mBtnAddSport.setVisibility(View.VISIBLE);
+        }
+        mSportsAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -94,7 +107,9 @@ public class EditUserSportsActivity extends BaseActivity {
     }
 
     private void showDialogSportKind() {
-        final CharSequence[] mSportTypesChars = DataManager.getInstance().getSportTypesAsChars();
+        List<SSportType> sportTypesToChoose = SSportType.diffArrays(DataManager.getInstance().getSportTypes(),
+                DataManager.getInstance().mSportsman.getFavSportTypes());
+        final CharSequence[] mSportTypesChars = SSportType.getAsChars(sportTypesToChoose);
         mDialogSportType = new MaterialDialog.Builder(this)
                 .adapter(new CheckableItemAdapter(this, mSportTypesChars, mChosenSportKindId),
                         new MaterialDialog.ListCallback() {
@@ -104,7 +119,7 @@ public class EditUserSportsActivity extends BaseActivity {
                                 mChosenSportType = DataManager.getInstance().getSportTypeByName(mSportTypesChars[which]);
                                 mSportTypes.add(mChosenSportType);
                                 DataManager.getInstance().mSportsman.setFavSportTypes(mSportTypes);
-                                mSportsAdapter.notifyDataSetChanged();
+                                notifyDataSetChanged();
                                 dialog.cancel();
                             }
                         })

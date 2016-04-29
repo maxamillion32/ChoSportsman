@@ -25,7 +25,7 @@ import com.vk.sdk.api.model.VKApiUserFull;
  */
 public abstract class NavigationDrawerActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    protected final static int NAV_NO_CHOSEN = -1;
+    public final static int NAV_NO_CHOSEN = -1;
 
     protected NavigationView mNavigationView;
     protected ImageView mImgNavAvatar;
@@ -45,7 +45,6 @@ public abstract class NavigationDrawerActivity extends BaseActivity implements N
         if (checkedMenuItem != NAV_NO_CHOSEN) {
             mNavigationView.getMenu().findItem(checkedMenuItem).setChecked(true);
         }
-
     }
 
     @Override
@@ -68,7 +67,6 @@ public abstract class NavigationDrawerActivity extends BaseActivity implements N
                     .into(mImgNavAvatar);
         }
 
-//        if (DataManager.getInstance().getGoogleAccount() != null) {
         if (DataManager.getInstance().mSportsman.getGoogleAccount() != null) {
             mTxtNavEmail.setText(DataManager.getInstance().mSportsman.getGoogleAccount());
         }
@@ -77,7 +75,6 @@ public abstract class NavigationDrawerActivity extends BaseActivity implements N
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
 
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         if (id == R.id.nav_open_data) {

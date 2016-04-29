@@ -8,6 +8,7 @@ import com.google.gson.annotations.SerializedName;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -144,5 +145,45 @@ public class SSportType {
             }
         }
         return null;
+    }
+
+    public static SSportType getById(List<SSportType> sportTypes, int sportTypeId) {
+        for (SSportType sportType: sportTypes) {
+            if (sportType.getId() == sportTypeId) {
+                return sportType;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Remove all entries of listRemove from listSrc
+     * @param listSrc list FROM which we will remove
+     * @param listRemove list which we will remove
+     */
+    public static List<SSportType> diffArrays(List<SSportType> listSrc, List<SSportType> listRemove) {
+        List<SSportType> result = new ArrayList<>();
+        for (SSportType src: listSrc) {
+            boolean toAdd = true;
+            for (SSportType remove: listRemove) {
+                if (remove.getId() == src.getId()) {
+                    toAdd = false;
+                    break;
+                }
+            }
+            if (toAdd) {
+                result.add(src);
+            }
+        }
+        return result;
+    }
+
+    public static CharSequence[] getAsChars(List<SSportType> sportTypes) {
+        CharSequence[] chars = new CharSequence[sportTypes.size()];
+        int i = 0;
+        for (SSportType sportType: sportTypes) {
+            chars[i++] = sportType.getTitle();
+        }
+        return chars;
     }
 }

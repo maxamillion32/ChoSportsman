@@ -22,7 +22,7 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -31,14 +31,19 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recview_favorite_sports"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="64dp"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+            android:layout_gravity="bottom|center_horizontal"
             android:id="@+id/btn_add_sporttype"
+            android:layout_margin="12dp"
+            android:background="@drawable/button_selector"
+            android:textColor="@color/white_100"
             android:text="@string/add_user_sport"/>
-    </LinearLayout>
+    </FrameLayout>
 
 
 </android.support.design.widget.CoordinatorLayout>

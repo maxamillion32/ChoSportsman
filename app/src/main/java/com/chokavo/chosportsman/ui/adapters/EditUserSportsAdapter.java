@@ -57,10 +57,12 @@ public class EditUserSportsAdapter extends RecyclerView.Adapter<EditUserSportsAd
         public ImageView mImgSport, mImgHaveProfile;
         public SwipeRevealLayout mSwipeRevealLayout;
         public FrameLayout mFrameDeleteSport;
+        public View mSwipeMainLayout; // main layout where all main stuff situated
 
         public ViewHolder(View itemView) {
             super(itemView);
             mTxtSportType = (TextView) itemView.findViewById(R.id.txt_sporttype);
+            mSwipeMainLayout = itemView.findViewById(R.id.swipe_main_layout);
             mImgSport = (ImageView) itemView.findViewById(R.id.image_sport);
             mImgHaveProfile = (ImageView) itemView.findViewById(R.id.img_have_sport_profile);
             mSwipeRevealLayout = (SwipeRevealLayout) itemView.findViewById(R.id.swipe_layout);
@@ -70,7 +72,7 @@ public class EditUserSportsAdapter extends RecyclerView.Adapter<EditUserSportsAd
         public void bind(final SSportType item, final OnItemClickListener listener, final OnItemClickListener deleteListener) {
             mImgSport.setImageResource(item.getIconId());
             mTxtSportType.setText(item.getTitle());
-            itemView.setOnClickListener(new View.OnClickListener() {
+            mSwipeMainLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     listener.onItemClick(item);
@@ -79,9 +81,12 @@ public class EditUserSportsAdapter extends RecyclerView.Adapter<EditUserSportsAd
             mFrameDeleteSport.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    // TODO не закрывается swipeReveal
+                    mSwipeRevealLayout.close(false);
                     deleteListener.onItemClick(item);
                 }
             });
+
         }
     }
 }

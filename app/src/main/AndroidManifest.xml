@@ -59,6 +59,10 @@
             android:name=".ui.activities.ChooseSportsActivity"
             android:label="@string/title_activity_choose_sports" >
         </activity>
+        <activity
+            android:name=".ui.activities.sporttype.DetailSportTypeActivity"
+            android:label="@string/app_name" >
+        </activity>
 
         <activity android:name=".ui.activities.calendar.DetailEventActivity"
                   android:label="Мое событие" >
@@ -70,7 +74,7 @@
         <activity android:name=".ui.activities.teams.TeamsActivity">
         </activity>
 
-        <activity android:name=".ui.activities.EditUserSportsActivity">
+        <activity android:name=".ui.activities.sporttype.EditUserSportsActivity">
         </activity>
 
         <activity android:name=".ui.activities.teams.TeamsListActivity">

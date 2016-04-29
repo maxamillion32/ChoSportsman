@@ -29,6 +29,7 @@ import com.chokavo.chosportsman.models.DataManager;
 import com.chokavo.chosportsman.network.vk.VKHelper;
 import com.chokavo.chosportsman.ormlite.models.SSportType;
 import com.chokavo.chosportsman.ormlite.models.STeam;
+import com.chokavo.chosportsman.ui.activities.sporttype.EditUserSportsActivity;
 import com.chokavo.chosportsman.ui.activities.teams.TeamsListActivity;
 import com.chokavo.chosportsman.ui.adapters.UserSportsAdapter;
 import com.chokavo.chosportsman.ui.fragments.teams.TeamsListFragment;
@@ -48,23 +49,15 @@ import su.levenetc.android.badgeview.BadgeView;
 /**
  * Created by ilyapyavkin on 02.03.16.
  */
-public class LockerRoomActivity extends NavigationDrawerActivity /*implements AppBarLayout.OnOffsetChangedListener*/ {
+public class LockerRoomActivity extends HeaderImageDrawerActivity /*implements AppBarLayout.OnOffsetChangedListener*/ {
 //public class LockerRoomActivity extends BaseActivity implements AppBarLayout.OnOffsetChangedListener  {
 
-    private ScrollView mBaseScrollView;
-    private View mWrapToolbar;
-    private Toolbar mToolbar;
-    private View mBlueTopOverlay;
     private ImageView mImgAvatar;
     private TextView mTextName;
     private ActionBar mActionBar;
 
-    // inside
-    private LinearLayout mLLFavSports;
-
     SwipeRefreshLayout mSwipeRefresh;
 
-    private RecyclerView mRecyclerSports;
     private UserSportsAdapter adapter;
     private LinearLayoutManager layoutManager;
     private AppBarLayout mAppBarLayout;
@@ -88,14 +81,10 @@ public class LockerRoomActivity extends NavigationDrawerActivity /*implements Ap
     private void initViews() {
         mActionBar = getSupportActionBar();
         mActionBar.setDisplayShowTitleEnabled(false); // изначально title нет
-        mBaseScrollView = (ScrollView) findViewById(R.id.base_scroll_view);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        mWrapToolbar = findViewById(R.id.wrap_toolbar);
-        mBlueTopOverlay = findViewById(R.id.blue_top_overlay);
         mImgAvatar = (ImageView) findViewById(R.id.img_avatar);
         mTextName = (TextView) findViewById(R.id.text_name);
         // inside
-        mLLFavSports = (LinearLayout) findViewById(R.id.ll_fav_sports);
         // 1 fav sporttypes
         mBadgeFavSports = (BadgeView) findViewById(R.id.badge_fav_sports);
         mWrapFavSportsIcons = (LinearLayout) findViewById(R.id.wrap_fav_sports_icons);
@@ -111,33 +100,7 @@ public class LockerRoomActivity extends NavigationDrawerActivity /*implements Ap
     }
 
     private void initActions() {
-        mBaseScrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-
-            @Override
-            public void onScrollChanged() {
-                int avatarHeight = getAvatarHeight(); // высота аватарки вверху
-                int toolbarH = AppUtils.getToolbarHeight(LockerRoomActivity.this); // высота тулбара
-                int statusBarH = AppUtils.getStatusBarHeight();
-                int delta = avatarHeight - toolbarH - statusBarH; // после чего происходит магия
-
-                int scrollY = mBaseScrollView.getScrollY(); //for verticalScrollView
-
-                if (scrollY < delta) {
-                    // меняем цвет от прозрачного к синему у appbarlayout
-                    float scrollPercent = (float) scrollY / (float) delta;
-                    mBlueTopOverlay.setAlpha(scrollPercent);
-                    mWrapToolbar.setBackgroundResource(android.R.color.transparent);
-                    getSupportActionBar().setDisplayShowTitleEnabled(false);
-                } else {
-                    mBlueTopOverlay.setAlpha(1);
-                    // меняем background у toolbara на синий
-                    mWrapToolbar.setBackgroundResource(R.color.colorPrimary);
-                    getSupportActionBar().setDisplayShowTitleEnabled(true);
-                }
-            }
-        });
-
-        // TODO hardcoded
+       // TODO hardcoded
         TeamsListFragment.loadUserTeams();
         fillFavSportTypes();
         fillTeamMember();
@@ -153,8 +116,8 @@ public class LockerRoomActivity extends NavigationDrawerActivity /*implements Ap
         fillTeamFan();
     }
 
-    BadgeView mBadgeFavSports, mBadgeTeamMember, mBadgeTeamFan;
-    LinearLayout mWrapFavSportsIcons, mWrapFavSports,
+    private BadgeView mBadgeFavSports, mBadgeTeamMember, mBadgeTeamFan;
+    private LinearLayout mWrapFavSportsIcons, mWrapFavSports,
             mWrapTeamMemberIcons, mWrapTeamMember,
         mWrapTeamFanIcons, mWrapTeamFan;
     public static final int MIN_ICONS_COUNT = 3;
@@ -222,10 +185,6 @@ public class LockerRoomActivity extends NavigationDrawerActivity /*implements Ap
     }
 
     private void loadPicasso(int iconId, CircleImageView widgetMiniavatar) {
-        /*Drawable dr = getDrawable(iconId);
-        int imw = dr.getIntrinsicWidth();
-        int imh = dr.getIntrinsicHeight();
-        float ratio = (float) imw / (float) imh;*/
         Picasso.with(LockerRoomActivity.this)
                 .load(iconId)
                 .resize((int) AppUtils.convertDpToPixel(36, this), 0)
@@ -252,10 +211,6 @@ public class LockerRoomActivity extends NavigationDrawerActivity /*implements Ap
                 mWrapTeamFanIcons,
                 TeamsListActivity.EXTRA_MODE_FAN);
 
-    }
-
-    private int getAvatarHeight() {
-        return (int) getResources().getDimension(R.dimen.lockerroom_avatar_height);
     }
 
    /* @Override
@@ -332,7 +287,6 @@ public class LockerRoomActivity extends NavigationDrawerActivity /*implements Ap
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_save) {
             saveProfile();
             return true;

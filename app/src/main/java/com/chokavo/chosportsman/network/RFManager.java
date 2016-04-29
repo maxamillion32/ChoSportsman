@@ -43,6 +43,13 @@ public class RFManager {
         return sRFManager;
     }
 
+    /**
+     * Testing all api methods
+     */
+    public static void testAPI() {
+
+    }
+
     public static void getSportTypes(Callback<List<SSportType>> callback) {
         Call<List<SSportType>> call = getInstance().mRestInterface.getSportTypes();
         call.enqueue(callback);

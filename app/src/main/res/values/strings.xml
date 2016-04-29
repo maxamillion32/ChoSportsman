@@ -59,7 +59,7 @@
     <string name="share_event">поделиться</string>
     <string name="delete_event">удалить</string>
     <string name="favorite_user_sports">Избранные виды спорта</string>
-    <string name="add_user_sport">Добавить еще</string>
+    <string name="add_user_sport">Добавить</string>
     <string name="Im_fan_of">Я болею за</string>
     <string name="Im_player_in">Я играю за</string>
 </resources>
