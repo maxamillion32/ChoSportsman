@@ -95,12 +95,12 @@ public class DataManager {
         mSportTypes.add(basketball);
     }
 
-    public void setDeleteUserSports(boolean isDeleteAvailable){
+   /* public void setDeleteUserSports(boolean isDeleteAvailable){
         for (SSportType sport :
                 mUserSports) {
             sport.setChecked(isDeleteAvailable);
         }
-    }
+    }*/
 
     public String getGoogleAccount() {
         return mGoogleAccount;

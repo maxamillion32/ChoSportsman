@@ -9,6 +9,7 @@ import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.SelectArg;
 import com.j256.ormlite.support.ConnectionSource;
+import com.j256.ormlite.table.TableUtils;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -33,6 +34,7 @@ public class SportsmanFavSportTypeDao extends BaseDaoImpl<SportsmanFavSportType,
     }
 
     public void createListIfNotExist(Sportsman sportsman, List<SSportType> sportTypes) throws SQLException {
+        TableUtils.clearTable(getConnectionSource(), SportsmanFavSportType.class);
         for (SSportType sportType: sportTypes) {
             this.createIfNotExists(new SportsmanFavSportType(sportsman, sportType));
         }

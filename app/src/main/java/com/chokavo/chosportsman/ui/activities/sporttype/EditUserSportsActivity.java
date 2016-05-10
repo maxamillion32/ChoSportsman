@@ -1,14 +1,17 @@
 package com.chokavo.chosportsman.ui.activities.sporttype;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.chokavo.chosportsman.R;
@@ -38,10 +41,12 @@ public class EditUserSportsActivity extends BaseActivity {
     RecyclerView mSportsRecyclerView;
     EditUserSportsAdapter mSportsAdapter;
     Button mBtnAddSport;
+    private ProgressDialog mProgress;
 
     List<SSportType> mSportTypes = new ArrayList<>();
 
     private MaterialDialog mDialogSportType;
+    private FrameLayout mWrapPlaceholder;
     int mChosenSportKindId = -1;
     SSportType mChosenSportType;
 
@@ -55,8 +60,14 @@ public class EditUserSportsActivity extends BaseActivity {
             getSupportActionBar().setTitle(R.string.favorite_user_sports);
         }
 
+        mProgress = new ProgressDialog(this);
+        mProgress.setMessage(getString(R.string.wait_second));
+        mProgress.setCancelable(false);
+
+        mSportTypes.addAll(DataManager.getInstance().mSportsman.getFavSportTypes()); // создаем клон
+        mWrapPlaceholder = (FrameLayout) findViewById(R.id.wrap_placeholder);
+        mWrapPlaceholder.setVisibility(mSportTypes.isEmpty() ? View.VISIBLE : View.GONE);
         mSportsRecyclerView = (RecyclerView)findViewById(R.id.recview_favorite_sports);
-        mSportTypes = DataManager.getInstance().mSportsman.getFavSportTypes();
         mSportsAdapter = new EditUserSportsAdapter(mSportTypes, new EditUserSportsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(SSportType sportType) {
@@ -69,7 +80,6 @@ public class EditUserSportsActivity extends BaseActivity {
             @Override
             public void onItemClick(SSportType sportType) {
                 mSportTypes.remove(sportType);
-                DataManager.getInstance().mSportsman.setFavSportTypes(mSportTypes);
                 notifyDataSetChanged();
             }
         });
@@ -87,8 +97,9 @@ public class EditUserSportsActivity extends BaseActivity {
     }
 
     private void notifyDataSetChanged() {
-        if (DataManager.getInstance().mSportsman.getFavSportTypes().size() ==
-                DataManager.getInstance().getSportTypes().size()) {
+        mWrapPlaceholder.setVisibility(mSportTypes.isEmpty() ? View.VISIBLE : View.GONE);
+        mSportsRecyclerView.setVisibility(!mSportTypes.isEmpty() ? View.VISIBLE : View.GONE);
+        if (mSportTypes.size() == DataManager.getInstance().getSportTypes().size()) {
             mBtnAddSport.setVisibility(View.GONE);
         } else {
             mBtnAddSport.setVisibility(View.VISIBLE);
@@ -97,28 +108,43 @@ public class EditUserSportsActivity extends BaseActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_edit_sports, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
                 return true;
+            case R.id.action_save:
+                saveSportsAndQuit();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    private void saveSportsAndQuit() {
+        DataManager.getInstance().mSportsman.setFavSportTypes(mSportTypes);
+        saveFavSportsSQLite(DataManager.getInstance().mSportsman, mSportTypes);
+        setSportTypesOnServer(true);
+
+    }
+
     private void showDialogSportKind() {
         List<SSportType> sportTypesToChoose = SSportType.diffArrays(DataManager.getInstance().getSportTypes(),
-                DataManager.getInstance().mSportsman.getFavSportTypes());
+                mSportTypes);
         final CharSequence[] mSportTypesChars = SSportType.getAsChars(sportTypesToChoose);
         mDialogSportType = new MaterialDialog.Builder(this)
-                .adapter(new CheckableItemAdapter(this, mSportTypesChars, mChosenSportKindId),
+                .adapter(new CheckableItemAdapter(this, mSportTypesChars, -1),
                         new MaterialDialog.ListCallback() {
                             @Override
                             public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
                                 mChosenSportKindId = which;
                                 mChosenSportType = DataManager.getInstance().getSportTypeByName(mSportTypesChars[which]);
                                 mSportTypes.add(mChosenSportType);
-                                DataManager.getInstance().mSportsman.setFavSportTypes(mSportTypes);
                                 notifyDataSetChanged();
                                 dialog.cancel();
                             }
@@ -128,25 +154,22 @@ public class EditUserSportsActivity extends BaseActivity {
         mChosenSportKindId = -1;
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        setSportTypesOnServer();
-    }
-
-    private void setSportTypesOnServer() {
+    private void setSportTypesOnServer(final boolean quit) {
+        mProgress.show();
         RFManager.setUserSportTypes(DataManager.getInstance().mSportsman.getServerId(),
                 mSportTypes, new Callback<Void>() {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {
+                        mProgress.hide();
                         Log.e(ChooseSportsActivity.class.getSimpleName(), "onResponse");
-                        // TODO save in SQLite
-//                        saveFavSportsSQLite(DataManager.getInstance().mSportsman,
-//                                mSportTypes);
+                        if (quit) {
+                            finish();
+                        }
                     }
 
                     @Override
                     public void onFailure(Call<Void> call, Throwable t) {
+                        mProgress.hide();
                         Log.e(ChooseSportsActivity.class.getSimpleName(), "onFailure: " + t);
                     }
                 });
@@ -156,7 +179,6 @@ public class EditUserSportsActivity extends BaseActivity {
         try {
             SportsmanFavSportTypeDao dao = DBHelperFactory.getHelper().getSportsmanFavSportTypeDao();
             dao.createListIfNotExist(sportsman, favSportTypes);
-            DataManager.getInstance().mSportsman.setFavSportTypes(favSportTypes);
         } catch (SQLException e) {
             e.printStackTrace();
         }

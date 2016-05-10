@@ -1,12 +1,15 @@
 package com.chokavo.chosportsman.ormlite.models;
 
+import com.chokavo.chosportsman.MathUtils;
 import com.chokavo.chosportsman.R;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by repitch on 16.04.16.
@@ -84,5 +87,14 @@ public class STeam {
             default:
                 return R.drawable.team_tennis;
         }
+    }
+
+    public static List<STeam> randomTeams(List<STeam> teams, int count) {
+        List<STeam> result = new ArrayList<>();
+        List<Integer> randInts = MathUtils.getRandomNumbers(0, teams.size(), count);
+        for (Integer loc: randInts) {
+            result.add(teams.get(loc));
+        }
+        return result;
     }
 }

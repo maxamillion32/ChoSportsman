@@ -81,9 +81,8 @@ public class EditUserSportsAdapter extends RecyclerView.Adapter<EditUserSportsAd
             mFrameDeleteSport.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // TODO не закрывается swipeReveal
-                    mSwipeRevealLayout.close(false);
                     deleteListener.onItemClick(item);
+                    mSwipeRevealLayout.close(true);
                 }
             });
 

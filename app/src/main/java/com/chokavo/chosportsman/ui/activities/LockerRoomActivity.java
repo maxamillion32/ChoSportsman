@@ -134,19 +134,19 @@ public class LockerRoomActivity extends HeaderImageDrawerActivity /*implements A
 
         mBadgeFavSports.setValue(favSportTypes.size());
         mWrapFavSportsIcons.removeAllViews();
-        for (SSportType favSport : favSportTypes) {
-            int num = favSportTypes.indexOf(favSport);
-            if (num < MIN_ICONS_COUNT) {
-                // первые три иконки отображаем
-                FrameLayout fl = (FrameLayout) getLayoutInflater().inflate(R.layout.widget_miniavatar_rtl, null);
-                CircleImageView widgetMiniavatar = (CircleImageView) fl.findViewById(R.id.mini_avatar);
-                widgetMiniavatar.setImageResource(favSport.getIconId());
-                mWrapFavSportsIcons.addView(fl);
-                ViewGroup.MarginLayoutParams params =
-                        (ViewGroup.MarginLayoutParams) fl.getLayoutParams();
-                params.leftMargin = (int) AppUtils.convertDpToPixel(-10, this);
-                fl.requestLayout();
-            }
+        // берем рандомные три иконки
+        List<SSportType> randomSportTypes = SSportType.randomSportTypes(favSportTypes, MIN_ICONS_COUNT);
+        for (SSportType favSport : randomSportTypes) {
+            // рандомные три иконки отображаем
+            FrameLayout fl = (FrameLayout) getLayoutInflater().inflate(R.layout.widget_miniavatar_rtl, null);
+            CircleImageView widgetMiniavatar = (CircleImageView) fl.findViewById(R.id.mini_avatar);
+            widgetMiniavatar.setImageResource(favSport.getIconId());
+            mWrapFavSportsIcons.addView(fl);
+            ViewGroup.MarginLayoutParams params =
+                    (ViewGroup.MarginLayoutParams) fl.getLayoutParams();
+            params.leftMargin = (int) AppUtils.convertDpToPixel(-10, this);
+            fl.requestLayout();
+
         }
     }
 
@@ -165,22 +165,21 @@ public class LockerRoomActivity extends HeaderImageDrawerActivity /*implements A
         });
         badge.setValue(teams.size());
         wrapIcons.removeAllViews();
-        for (STeam team : teams) {
-            int num = teams.indexOf(team);
-            if (num < MIN_ICONS_COUNT) {
-                // первые три иконки отображаем
-                FrameLayout fl = (FrameLayout) getLayoutInflater().inflate(R.layout.widget_miniavatar_rtl, null);
-                CircleImageView widgetMiniavatar = (CircleImageView) fl.findViewById(R.id.mini_avatar);
 
-                // scale image
-                loadPicasso(team.getIconId(), widgetMiniavatar);
+        // берем рандомные три иконки
+        List<STeam> randomTeams = STeam.randomTeams(teams, MIN_ICONS_COUNT);
+        for (STeam team : randomTeams) {
+            FrameLayout fl = (FrameLayout) getLayoutInflater().inflate(R.layout.widget_miniavatar_rtl, null);
+            CircleImageView widgetMiniavatar = (CircleImageView) fl.findViewById(R.id.mini_avatar);
 
-                wrapIcons.addView(fl);
-                ViewGroup.MarginLayoutParams params =
-                        (ViewGroup.MarginLayoutParams) fl.getLayoutParams();
-                params.leftMargin = (int) AppUtils.convertDpToPixel(-10, this);
-                fl.requestLayout();
-            }
+            // scale image
+            loadPicasso(team.getIconId(), widgetMiniavatar);
+
+            wrapIcons.addView(fl);
+            ViewGroup.MarginLayoutParams params =
+                    (ViewGroup.MarginLayoutParams) fl.getLayoutParams();
+            params.leftMargin = (int) AppUtils.convertDpToPixel(-10, this);
+            fl.requestLayout();
         }
     }
 

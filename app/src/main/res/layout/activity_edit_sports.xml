@@ -22,6 +22,41 @@
 
     </android.support.design.widget.AppBarLayout>
 
+
+    <FrameLayout
+        android:id="@+id/wrap_placeholder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_running_man"
+                android:alpha=".6"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:maxWidth="165dp"
+                android:text="У Вас нет еще избранных видов спорта"
+                android:textColor="@color/black_60"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+    </FrameLayout>
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

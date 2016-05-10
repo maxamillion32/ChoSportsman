@@ -1,6 +1,7 @@
 package com.chokavo.chosportsman.ui.activities;
 
 import android.content.Intent;
+import android.graphics.Path;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -77,30 +78,40 @@ public abstract class NavigationDrawerActivity extends BaseActivity implements N
 
         int id = item.getItemId();
 
-        if (id == R.id.nav_open_data) {
-            if (!(this instanceof OpenDataActivity)) {
-                startActivity(new Intent(this, OpenDataActivity.class));
-                finish();
-            }
-        } else if (id == R.id.nav_cloakroom) {
+        Intent intent;
+        switch (id) {
+            case R.id.nav_open_data:
+                if (!(this instanceof OpenDataActivity)) {
+                    intent = new Intent(this, OpenDataActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }
+                break;
+            case R.id.nav_cloakroom:
 //            if (!(this instanceof LockerRoomActivity)) {
-                startActivity(new Intent(this, LockerRoomActivity.class));
-                finish();
+                intent = new Intent(this, LockerRoomActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
 //            }
-        } else if (id == R.id.nav_news) {
-            Toast.makeText(this, "Пока не доступно", Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.nav_calendar) {
-            if (!(this instanceof CalendarActivity)) {
-                startActivity(new Intent(this, CalendarActivity.class));
-                finish();
-            }
-        } else if (id == R.id.nav_teams) {
-            if (!(this instanceof TeamsActivity)) {
-                startActivity(new Intent(this, TeamsActivity.class));
-                finish();
-            }
+                break;
+            case R.id.nav_news:
+                Toast.makeText(this, "Пока не доступно", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.nav_calendar:
+                if (!(this instanceof CalendarActivity)) {
+                    intent = new Intent(this, CalendarActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }
+                break;
+            case R.id.nav_teams:
+                if (!(this instanceof TeamsActivity)) {
+                    intent = new Intent(this, TeamsActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }
+                break;
         }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;

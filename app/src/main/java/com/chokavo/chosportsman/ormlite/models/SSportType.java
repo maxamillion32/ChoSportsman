@@ -2,6 +2,7 @@ package com.chokavo.chosportsman.ormlite.models;
 
 import android.support.annotation.NonNull;
 
+import com.chokavo.chosportsman.MathUtils;
 import com.chokavo.chosportsman.R;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -185,5 +186,14 @@ public class SSportType {
             chars[i++] = sportType.getTitle();
         }
         return chars;
+    }
+
+    public static List<SSportType> randomSportTypes(List<SSportType> favSportTypes, int minIconsCount) {
+        List<SSportType> result = new ArrayList<>();
+        List<Integer> randInts = MathUtils.getRandomNumbers(0, favSportTypes.size(), minIconsCount);
+        for (Integer loc: randInts) {
+            result.add(favSportTypes.get(loc));
+        }
+        return result;
     }
 }
