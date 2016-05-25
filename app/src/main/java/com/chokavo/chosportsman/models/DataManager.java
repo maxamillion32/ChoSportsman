@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.chokavo.chosportsman.App;
 import com.chokavo.chosportsman.calendar.GoogleCalendarAPI;
-import com.chokavo.chosportsman.network.datarows.SportObjectDataRow;
+import com.chokavo.chosportsman.network.opendata.sportobject.SportObject;
 import com.chokavo.chosportsman.ormlite.models.SCalendar;
 import com.chokavo.chosportsman.ormlite.models.SSportType;
 import com.chokavo.chosportsman.ormlite.models.Sportsman;
@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class DataManager {
 
-    public List<SportObjectDataRow> sportObjects;
+    public List<SportObject> sportObjects;
     public VKApiUserFull vkUser;
     public Sportsman mSportsman;
     public boolean userSportsChosen;

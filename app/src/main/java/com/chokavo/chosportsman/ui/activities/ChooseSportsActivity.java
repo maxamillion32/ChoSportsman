@@ -50,7 +50,7 @@ public class ChooseSportsActivity extends AppCompatActivity {
 
         List<SSportType> favSportTypes = DataManager.getInstance().mSportsman.getFavSportTypes();
         if (favSportTypes != null && !favSportTypes.isEmpty()) {
-            startActivity(new Intent(this, MainActivity.class));
+            startActivity(new Intent(this, LockerRoomActivity.class));
             finish();
         }
 
@@ -84,7 +84,7 @@ public class ChooseSportsActivity extends AppCompatActivity {
         mSwipeRefresh.setRefreshing(false);
         ImageSnackbar.make(mSwipeRefresh, ImageSnackbar.TYPE_SUCCESS, String.format("Данные успешно загружены"), Snackbar.LENGTH_SHORT).show();
         if (DataManager.getInstance().userSportsChosen) {
-            startActivity(new Intent(ChooseSportsActivity.this, MainActivity.class));
+            startActivity(new Intent(ChooseSportsActivity.this, LockerRoomActivity.class));
             finish();
         }
     }
@@ -155,7 +155,7 @@ public class ChooseSportsActivity extends AppCompatActivity {
                             // TODO save in SQLite
                             saveFavSportsSQLite(DataManager.getInstance().mSportsman,
                                     mCheckedSports);
-                            startActivity(new Intent(ChooseSportsActivity.this, MainActivity.class));
+                            startActivity(new Intent(ChooseSportsActivity.this, LockerRoomActivity.class));
                             finish();
                         }
 

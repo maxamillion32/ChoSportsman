@@ -36,6 +36,7 @@ import com.chokavo.chosportsman.ui.fragments.teams.TeamsListFragment;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
+import com.vk.sdk.VKSdk;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiUserFull;
@@ -71,6 +72,18 @@ public class LockerRoomActivity extends HeaderImageDrawerActivity /*implements A
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         super.onCreate(R.layout.activity_lockerroom_new, R.id.nav_cloakroom);
+
+        if (!VKSdk.isLoggedIn()) {
+            Intent intent = new Intent(getApplicationContext(), HelloScreenActivity.class);
+            startActivity(intent);
+            finish();
+        }
+        List<SSportType> favSportTypes = DataManager.getInstance().mSportsman.getFavSportTypes();
+        if (favSportTypes == null) {
+            Intent intent = new Intent(getApplicationContext(), ChooseSportsActivity.class);
+            startActivity(intent);
+            finish();
+        }
 
         initViews();
         initActions();
@@ -212,52 +225,6 @@ public class LockerRoomActivity extends HeaderImageDrawerActivity /*implements A
 
     }
 
-   /* @Override
-    protected void onStart() {
-        super.onStart();
-        mTextName = (TextView) findViewById(R.id.text_name);
-        mImgAvatar = (ImageView) findViewById(R.id.img_avatar);
-        mSwipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
-        mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar);
-        mCollapsingToolbar =
-                (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar);
-
-        mSwipeRefresh.setColorSchemeResources(R.color.colorPrimary);
-        mSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                mSwipeRefresh.setRefreshing(true);
-                loadVKProfile();
-            }
-        });
-
-        mRecyclerSports = (RecyclerView)findViewById(R.id.recview_sports_ilove);
-        adapter = new UserSportsAdapter(DataManager.getInstance().mSportsman.getFavSportTypes());
-        layoutManager = new LinearLayoutManager(this);
-
-        mRecyclerSports.setAdapter(adapter);
-        mRecyclerSports.setLayoutManager(layoutManager);
-        mRecyclerSports.setItemAnimator(new DefaultItemAnimator());
-
-        mFabEdit = (FloatingActionButton) findViewById(R.id.fab_edit);
-        mlinearLayoutAdd = (LinearLayout) findViewById(R.id.linlayout_add);
-        mFabEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                editProfile();
-            }
-        });
-
-
-        if (!VKSdk.isLoggedIn()) {
-            startActivityForResult(new Intent(LockerRoomActivity.this, VKAuthActivity.class),
-                    VKAuthActivity.REQUEST_LOGIN_VK);
-            return;
-        }
-        loadVKProfile();
-    }*/
-
-
     private void editProfile() {
         Toast.makeText(this, "editProfile", Toast.LENGTH_SHORT).show();
         isEditing = true;
@@ -314,18 +281,6 @@ public class LockerRoomActivity extends HeaderImageDrawerActivity /*implements A
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    /*@Override
-    protected void onResume() {
-        super.onResume();
-        mAppBarLayout.addOnOffsetChangedListener(this);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mAppBarLayout.removeOnOffsetChangedListener(this);
-    }*/
-
     private void loadVKProfile() {
         if (DataManager.getInstance().vkUser != null) {
             // уже есть вк пользователь
@@ -366,12 +321,4 @@ public class LockerRoomActivity extends HeaderImageDrawerActivity /*implements A
             }
         });
     }
-    /*@Override
-    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-        if (verticalOffset == 0) {
-            mSwipeRefresh.setEnabled(true);
-        } else {
-            mSwipeRefresh.setEnabled(false);
-        }
-    }*/
 }

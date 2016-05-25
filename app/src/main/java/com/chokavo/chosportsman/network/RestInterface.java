@@ -1,6 +1,6 @@
 package com.chokavo.chosportsman.network;
 
-import com.chokavo.chosportsman.network.datarows.SportObjectDataRow;
+import com.chokavo.chosportsman.network.opendata.sportobject.SportObject;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ import retrofit2.http.Query;
 public interface RestInterface {
 
     @GET("datasets/{id}/rows")
-    Call<List<SportObjectDataRow>> getDataSet(
+    Call<List<SportObject>> getDataSet(
             @Path("id") Integer dataSetId,
             @Query("$top") Integer top,
             @Query("$skip") Integer skip,

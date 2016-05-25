@@ -24,7 +24,7 @@ import com.chokavo.chosportsman.ormlite.models.SSportType;
 import com.chokavo.chosportsman.ormlite.models.Sportsman;
 import com.chokavo.chosportsman.ui.activities.BaseActivity;
 import com.chokavo.chosportsman.ui.activities.ChooseSportsActivity;
-import com.chokavo.chosportsman.ui.activities.MainActivity;
+import com.chokavo.chosportsman.ui.activities.LockerRoomActivity;
 import com.chokavo.chosportsman.ui.fragments.BaseFragment;
 import com.chokavo.chosportsman.ui.views.ImageSnackbar;
 import com.vk.sdk.VKSdk;
@@ -224,7 +224,7 @@ public class SplashFragment extends BaseFragment {
                     // видов спорта нема
                     startActivity(new Intent(getActivity(), ChooseSportsActivity.class));
                 } else {
-                    startActivity(new Intent(getActivity(), MainActivity.class));
+                    startActivity(new Intent(getActivity(), LockerRoomActivity.class));
                 }
                 getActivity().finish();
             }

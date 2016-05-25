@@ -56,4 +56,6 @@ dependencies {
     compile 'com.chauthai.swipereveallayout:swipe-reveal-layout:1.0.0'
     compile 'com.github.elevenetc:badgeview:v1.0.0'
     compile 'com.google.android.gms:play-services-appindexing:8.4.0'
+
+    compile project(path: ':viewpagerindicator')
 }

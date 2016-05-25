@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:gravity="center_vertical"
+              tools:background="@drawable/intro_back"
+              android:orientation="vertical">
+
+    <!--  <TextView
+          android:lines="2"
+          android:id="@+id/txt_desc"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:gravity="center"
+          android:text="Описание номер раз"
+          android:textColor="@color/white_100"
+          android:textSize="18sp" />-->
+
+    <com.chokavo.chosportsman.ui.views.ResizableImageView
+        android:id="@+id/image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="false"
+        android:src="@drawable/intro_0"/>
+
+</LinearLayout>

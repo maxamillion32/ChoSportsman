@@ -10,8 +10,9 @@ import android.widget.TextView;
 
 import com.chokavo.chosportsman.AppUtils;
 import com.chokavo.chosportsman.R;
-import com.chokavo.chosportsman.network.cells.SportObjectCells;
-import com.chokavo.chosportsman.network.datarows.SportObjectDataRow;
+import com.chokavo.chosportsman.network.opendata.sportobject.Cells;
+import com.chokavo.chosportsman.network.opendata.sportobject.ObjectAddress;
+import com.chokavo.chosportsman.network.opendata.sportobject.SportObject;
 
 import java.util.List;
 
@@ -20,9 +21,9 @@ import java.util.List;
  */
 public class SportObjectAdapter extends RecyclerView.Adapter<SportObjectAdapter.ViewHolder> {
 
-    List<SportObjectDataRow> mDataRows;
+    List<SportObject> mDataRows;
 
-    public SportObjectAdapter(List<SportObjectDataRow> dataRows) {
+    public SportObjectAdapter(List<SportObject> dataRows) {
         mDataRows = dataRows;
     }
 
@@ -52,22 +53,30 @@ public class SportObjectAdapter extends RecyclerView.Adapter<SportObjectAdapter.
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final SportObjectDataRow dataRow = mDataRows.get(position);
-        final SportObjectCells cell = dataRow.getCells();
+        final SportObject dataRow = mDataRows.get(position);
+        final Cells cell = dataRow.getCells();
         holder.mTxtTitle.setText(cell.getCommonName());
-        holder.mTxtAddress.setText(cell.getFullAddress());
-        holder.mTxtWorkingHours.setText(cell.getWorkingHours());
+        List<ObjectAddress> address = cell.getObjectAddress();
+        String addressStr;
+        if (address == null || address.isEmpty()) {
+            addressStr = "";
+        } else {
+            addressStr = address.get(0).getAddress();
+        }
+        holder.mTxtAddress.setText(addressStr);
+
+        holder.mTxtWorkingHours.setText(cell.getReadableWorkingHours());
         holder.mBtnCall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AppUtils.callTo(cell.getHelpPhone());
+                AppUtils.callTo(cell.getFirstPublicPhone());
             }
         });
         holder.mBtnMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Snackbar.make(v, String.format("Координаты (%s %s)", cell.getLatitude(), cell.getLongitude()), Snackbar.LENGTH_SHORT).show();
-                AppUtils.openMaps(cell.getLatitude(), cell.getLongitude(), cell.getCommonName());
+                AppUtils.openMaps(cell.getLatStr(), cell.getLonStr(), cell.getCommonName());
             }
         });
     }

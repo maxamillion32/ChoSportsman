@@ -38,4 +38,5 @@
     <color name="white_00">#00ffffff</color>
 
     <color name="vk_color_darker">#4c6193</color>
+    <color name="white">#fff</color>
 </resources>

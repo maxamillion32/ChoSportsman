@@ -111,6 +111,10 @@ public abstract class NavigationDrawerActivity extends BaseActivity implements N
                     startActivity(intent);
                 }
                 break;
+            case R.id.nav_intro:
+                intent = new Intent(this, IntroActivity.class);
+                startActivity(intent);
+                break;
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

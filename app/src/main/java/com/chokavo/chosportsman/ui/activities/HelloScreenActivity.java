@@ -174,7 +174,7 @@ public class HelloScreenActivity extends BaseActivity {
                             }
                             // сохраняем их ORMLite и выходим
                             saveFavSportsSQLite(sportsman, favSportTypes);
-                            startActivity(new Intent(HelloScreenActivity.this, MainActivity.class));
+                            startActivity(new Intent(HelloScreenActivity.this, LockerRoomActivity.class));
                             finish();
                         }
                     }
