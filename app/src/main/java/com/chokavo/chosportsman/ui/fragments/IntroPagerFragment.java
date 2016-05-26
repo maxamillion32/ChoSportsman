@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.chokavo.chosportsman.R;
+import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NonNls;
 
@@ -17,6 +18,11 @@ import org.jetbrains.annotations.NonNls;
  * Created by repitch on 26.05.16.
  */
 public class IntroPagerFragment extends BaseFragment {
+
+    private static final int MAX_WIDTH = 768;
+    private static final int MAX_HEIGHT = 1024;
+
+    int size = (int) Math.ceil(Math.sqrt(MAX_WIDTH * MAX_HEIGHT));
 
     @NonNls
     public static final String KEY_POSITION = "KEY_POSITION";
@@ -81,7 +87,14 @@ public class IntroPagerFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
 
 //        mTxtDesc.setText(getString(INTRO_DESCRIPTIONS[mPosition]));
-        mImage.setImageDrawable(getResources().getDrawable(INTRO_IMAGES[mPosition]));
+
+        Picasso.with(view.getContext())
+                .load(INTRO_IMAGES[mPosition])
+//                .skipMemoryCache()
+                .resize(size, size)
+                .centerInside()
+                .into(mImage);
+//        mImage.setImageDrawable(getResources().getDrawable(INTRO_IMAGES[mPosition]));
     }
 
     @Override
