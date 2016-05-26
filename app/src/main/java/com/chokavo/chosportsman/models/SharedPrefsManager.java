@@ -67,7 +67,7 @@ public final class SharedPrefsManager {
         DataManager.getInstance().calendarGAPIid = null;
         getInstance().preferences
                 .edit()
-                .putString(SPORT_CALENDAR_SERVER_ID, null)
+                .remove(SPORT_CALENDAR_SERVER_ID)
                 .commit();
     }
 
@@ -85,7 +85,7 @@ public final class SharedPrefsManager {
         DataManager.getInstance().calendarCPid = -1;
         getInstance().preferences
                 .edit()
-                .putLong(SPORT_CALENDAR_CONTENT_PROVIDER_ID, -1)
+                .remove(SPORT_CALENDAR_CONTENT_PROVIDER_ID)
                 .commit();
     }
 
@@ -98,6 +98,13 @@ public final class SharedPrefsManager {
 
     public static void restoreUserSportsChosen() {
         DataManager.getInstance().userSportsChosen = getInstance().preferences.getBoolean(USER_SPORTS_CHOSEN, false);
+    }
+
+    public static void removeUserSportsChosen() {
+        getInstance().preferences
+                .edit()
+                .remove(USER_SPORTS_CHOSEN)
+                .commit();
     }
 
     public static void saveUserSportsChosen() {
@@ -117,6 +124,14 @@ public final class SharedPrefsManager {
         DataManager.getInstance().userIdOTMLite = getInstance().preferences.getInt(USER_ID_ORMLITE, -1);
     }
 
+    public static void removeUserIdORMLite() {
+        DataManager.getInstance().userIdOTMLite = -1;
+        getInstance().preferences
+                .edit()
+                .remove(USER_ID_ORMLITE)
+                .commit();
+    }
+
     public static void saveUserIdORMLite() {
         getInstance().preferences
                 .edit()
@@ -130,6 +145,13 @@ public final class SharedPrefsManager {
         restoreCalendarGAPIid();
         restoreCalendarCPid();
         restoreUserSportsChosen();
+    }
+
+    public static void removeUserData() {
+        removeUserIdORMLite();
+        removeCalendarGAPIid();
+        removeCalendarCPid();
+        removeUserSportsChosen();
     }
 }
 

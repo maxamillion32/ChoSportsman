@@ -1,5 +1,7 @@
 package com.chokavo.chosportsman.ui.activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -9,23 +11,21 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chokavo.chosportsman.AppUtils;
 import com.chokavo.chosportsman.R;
 import com.chokavo.chosportsman.models.DataManager;
+import com.chokavo.chosportsman.models.SharedPrefsManager;
 import com.chokavo.chosportsman.network.vk.VKHelper;
 import com.chokavo.chosportsman.ormlite.models.SSportType;
 import com.chokavo.chosportsman.ormlite.models.STeam;
@@ -67,6 +67,7 @@ public class LockerRoomActivity extends HeaderImageDrawerActivity /*implements A
     private LinearLayout mlinearLayoutAdd;
 
     private boolean isEditing = false;
+    private AlertDialog mLogoutDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +111,29 @@ public class LockerRoomActivity extends HeaderImageDrawerActivity /*implements A
         mBadgeTeamFan = (BadgeView) findViewById(R.id.badge_team_fan);
         mWrapTeamFan = (LinearLayout) findViewById(R.id.wrap_team_fan);
         mWrapTeamFanIcons = (LinearLayout) findViewById(R.id.wrap_team_fan_icons);
+
+        // alertdialog logout
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                this);
+        // set title
+        alertDialogBuilder.setTitle(R.string.dialog_logout_title);
+        // set dialog message
+        alertDialogBuilder
+                .setMessage(R.string.dialog_logout_message)
+                .setCancelable(false)
+                .setPositiveButton(R.string.logout,new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        logoutFinally();
+                    }
+                })
+                .setNegativeButton(R.string.cancel,new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        // create logout dialog
+        mLogoutDialog = alertDialogBuilder.create();
     }
 
     private void initActions() {
@@ -253,12 +277,26 @@ public class LockerRoomActivity extends HeaderImageDrawerActivity /*implements A
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_save) {
-            saveProfile();
-            return true;
+        switch (id) {
+            case R.id.action_logout:
+                mLogoutDialog.show();
+                return true;
+            case R.id.action_save:
+                saveProfile();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void logoutFinally() {
+        // выходим из аккаунта
+        DataManager.getInstance().mSportsman = null;
+        SharedPrefsManager.removeUserData();
+        VKSdk.logout();
+        Intent intent = new Intent(this, HelloScreenActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 
     @Override

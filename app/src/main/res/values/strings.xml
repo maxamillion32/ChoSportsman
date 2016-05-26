@@ -62,4 +62,8 @@
     <string name="add_user_sport">Добавить</string>
     <string name="Im_fan_of">Я болею за</string>
     <string name="Im_player_in">Я играю за</string>
+    <string name="dialog_logout_title">Выход из аккаунта</string>
+    <string name="dialog_logout_message">Вы уверены, что хотите выйти из аккаунта?\nВы всегда сможете войти снова без потери данных</string>
+    <string name="logout">Выйти</string>
+    <string name="cancel">Отмена</string>
 </resources>
